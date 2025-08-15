@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import Button from "./shared/Button";
+import { Link } from "react-router-dom";
 
 const languageOptions = ["English", "Twi", "Ga", "Ewe"];
 
@@ -160,7 +160,7 @@ export default function Header() {
               </div>
 
               {/* Sign In Button */}
-              <a href="/login">
+              <Link to="/login">
                 <Button
                   className="border-white/30 hover:border-[rgb(151,177,150)] hover:text-white hover:shadow-lg hover:shadow-[rgb(151,177,150)]/25 rounded-full transition-all duration-300 whitespace-nowrap transform hover:scale-105"
                   style={{
@@ -170,7 +170,7 @@ export default function Header() {
                 >
                   Sign In
                 </Button>
-              </a>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
