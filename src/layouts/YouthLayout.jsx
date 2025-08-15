@@ -66,7 +66,12 @@ const navigation = [
 const YouthLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const location = useLocation();
+
+// Determine if sidebar should appear expanded
+const isExpanded = hovered ? true : !collapsed;
+
 
   return (
     <div className="h-screen flex flex-col lg:flex-row overflow-hidden bg-gray-50">
@@ -106,88 +111,93 @@ const YouthLayout = () => {
         </div>
       </div>
 
-      {/* Sidebar for desktop */}
-      <div className={`hidden lg:flex flex-col flex-shrink-0 transition-all duration-300 ${collapsed ? 'w-20' : 'w-64'}`}>
-        <div className="flex flex-col h-full border-r border-gray-200 bg-white">
-          {/* Logo and collapse button */}
-          <div className="pt-5 pb-4 px-4">
-            <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'}`}>
-              {!collapsed && (
-                <Link to="/" className="flex-shrink-0">
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                    Ghana Talent Hub
-                  </h1>
-                </Link>
-              )}
-              <button
-                onClick={() => setCollapsed(!collapsed)}
-                className="text-gray-400 hover:text-gray-500 focus:outline-none"
-              >
-                <span className="sr-only">Collapse sidebar</span>
-                {collapsed ? (
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                  </svg>
-                ) : (
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          </div>
-          
-          {/* Navigation */}
-          <nav className="mt-5 flex-1 px-2 space-y-1 overflow-y-auto">
-            {navigation.map((item) => {
-              const isActive = location.pathname.endsWith(item.href);
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`group flex items-center ${collapsed ? 'justify-center' : 'px-3'} py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                    isActive
-                      ? `${item.bgColor} text-gray-900`
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                  }`}
-                  title={collapsed ? item.name : ''}
-                >
-                  <div className={`p-1.5 rounded-lg ${isActive ? item.bgColor : 'bg-gray-100 group-hover:bg-white'}`}>
-                    <item.icon 
-                      className={`h-5 w-5 ${isActive ? item.color : 'text-gray-500 group-hover:text-gray-700'}`} 
-                      aria-hidden="true"
-                    />
-                  </div>
-                  {!collapsed && <span className="ml-3">{item.name}</span>}
-                </Link>
-              );
-            })}
-          </nav>
-          
-          {/* User profile section */}
-          <div className="flex-shrink-0 border-t border-gray-200 p-4">
-            <div className="flex items-center">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white flex items-center justify-center flex-shrink-0">
-                <span className="text-sm font-medium">Y</span>
-              </div>
-              {!collapsed && (
-                <div className="ml-3 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">Youth User</p>
-                  <p className="text-xs text-gray-500 truncate">youth@example.com</p>
-                </div>
-              )}
-              {!collapsed && (
-                <button className="ml-auto p-1 text-gray-400 hover:text-gray-500 focus:outline-none">
-                  <ArrowRightStartOnRectangleIcon className="h-5 w-5" />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+     <div
+  className={`hidden lg:flex flex-col flex-shrink-0 transition-all duration-300 ${
+    isExpanded ? 'w-64' : 'w-20'
+  }`}
+onMouseEnter={() => collapsed && setHovered(true)}
+onMouseLeave={() => collapsed && setHovered(false)}
+>
+  <div className="flex flex-col h-full border-r border-gray-200 bg-white">
+    {/* Logo and collapse button */}
+    <div className="pt-5 pb-4 px-4">
+      <div className={`flex items-center ${isExpanded ? 'justify-between' : 'justify-center'}`}>
+        {isExpanded && (
+          <Link to="/" className="flex-shrink-0">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              Ghana Talent Hub
+            </h1>
+          </Link>
+        )}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="text-gray-400 hover:text-gray-500 focus:outline-none"
+        >
+          <span className="sr-only">Collapse sidebar</span>
+          {collapsed ? (
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+            </svg>
+          ) : (
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+            </svg>
+          )}
+        </button>
       </div>
+    </div>
+
+    {/* Navigation */}
+    <nav className="mt-5 flex-1 px-2 space-y-1 overflow-y-auto">
+      {navigation.map((item) => {
+        const isActive = location.pathname.endsWith(item.href);
+        return (
+          <Link
+            key={item.name}
+            to={item.href}
+            className={`group flex items-center ${isExpanded ? 'px-3' : 'justify-center'} py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
+              isActive
+                ? `${item.bgColor} text-gray-900`
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+            }`}
+            title={!isExpanded ? item.name : ''}
+          >
+            <div className={`p-1.5 rounded-lg ${isActive ? item.bgColor : 'bg-gray-100 group-hover:bg-white'}`}>
+              <item.icon 
+                className={`h-5 w-5 ${isActive ? item.color : 'text-gray-500 group-hover:text-gray-700'}`} 
+                aria-hidden="true"
+              />
+            </div>
+            {isExpanded && <span className="ml-3">{item.name}</span>}
+          </Link>
+        );
+      })}
+    </nav>
+
+    {/* User profile */}
+    <div className="flex-shrink-0 border-t border-gray-200 p-4">
+      <div className="flex items-center">
+        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white flex items-center justify-center flex-shrink-0">
+          <span className="text-sm font-medium">Y</span>
+        </div>
+        {isExpanded && (
+          <>
+            <div className="ml-3 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">Youth User</p>
+              <p className="text-xs text-gray-500 truncate">youth@example.com</p>
+            </div>
+            <button className="ml-auto p-1 text-gray-400 hover:text-gray-500 focus:outline-none">
+              <ArrowRightStartOnRectangleIcon className="h-5 w-5" />
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className=" flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto focus:outline-none bg-gray-50">
           {/* Page header */}
           <div className="bg-white shadow-sm border-b border-gray-200">

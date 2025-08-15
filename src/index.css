@@ -1,0 +1,28 @@
+:root {
+  /* Gold color palette */
+  --gold-50: #fef5e7;
+  --gold-100: #fef0da;
+  --gold-200: #fcebB3;
+  --gold-300: #FFB12E;
+  --gold-400: #dd8e0a;
+  --gold-500: #c47e09;
+  --gold-600: #b87708;
+  --gold-700: #935f07;
+  --gold-800: #6e4705;
+  --gold-900: #563704;
+
+  /* Primary color palette */
+  --primary-50: #e9f5f2;
+  --primary-100: #def0eb;
+  --primary-200: #bae1d5;
+  --primary-300: #209d78;
+  --primary-400: #1d8d6c;
+  --primary-500: #1a7e60;
+  --primary-600: #18765a;
+  --primary-700: #135e48;
+  --primary-800: #0e4736;
+  --primary-900: #0b372a;
+
+  --ebony-50: #111827;
+  --river-bed: #4B5563;
+}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import Button from '../../components/shared/Button';
+import SkillDevelopmentTracker from '../../components/progress/SkillDevelopmentTracker';
 const YouthDashboard = () => {
   // Mock data
   const stats = [
@@ -35,13 +36,103 @@ const YouthDashboard = () => {
     { id: 2, position: 'Mobile Developer', company: 'AppCraft', status: 'Interview Scheduled', date: '1 week ago' },
   ];
 
+   // Mock user data for development when not authenticated
+  const displayUser =  {
+    firstName: 'Demo',
+    lastName: 'User',
+    email: 'demo@example.com',
+    phone: '+233123456789',
+    ghanaCard: '1234567890123',
+    isVerified: true
+  };
+
+   const handleCompleteProfile = () => {
+    navigate('/profile');
+  };
+  const handleBrowseJobs = () => {
+    navigate('/jobs');
+  };
+  const handleSkillsAssessment = () => {
+    navigate('/assessments');
+  };
+  const handleMessages = () => {
+    navigate('/messages');
+  };
+
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="space-y-6 ">
+      {/* <div>
         <h1 className="text-2xl font-bold text-gray-900">Welcome back, Sarah!</h1>
         <p className="text-gray-600">Here are your recent activities and job matches</p>
-      </div>
-
+      </div> */}
+       {/* Welcome Card */}
+            <div className=" bg-gradient-to-r from-[rgb(151,177,150)] to-emerald-500 rounded-xl p-4 sm:p-6 text-white">
+              <h2 className="text-xl text-[var(--ebony-50)] sm:text-2xl font-bold mb-2">Welcome to Ghana Talent Hub!</h2>
+              <p className="text-white text-sm sm:text-base">
+                You're now part of Ghana's premier youth employment platform. 
+                Let's get started on your journey to success.
+              </p>
+            </div>
+         <div className="lg:col-span-2 space-y-6 col-span-12 row-span-12 ">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Profile Card */}
+                  <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Profile</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <span className="text-sm text-gray-500">Name:</span>
+                        <p className="font-medium text-sm sm:text-base">{displayUser.firstName} {displayUser.lastName}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-500">Email:</span>
+                        <p className="font-medium text-sm sm:text-base break-all">{displayUser.email}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-500">Phone:</span>
+                        <p className="font-medium text-sm sm:text-base">{displayUser.phone}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-500">Ghana Card:</span>
+                        <p className="font-medium text-sm sm:text-base">{displayUser.ghanaCard.replace(/(\d{4})(?=\d)/g, '$1-')}</p>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-500 mr-2">Status:</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${displayUser.isVerified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                          {displayUser.isVerified ? 'Verified' : 'Pending Verification'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Profile Card */}
+                  <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                    <div className="space-y-3">
+                      <Button className="w-full justify-start text-sm" variant="outline" onClick={handleCompleteProfile}>
+                        Complete Profile
+                      </Button>
+                      <Button className="w-full justify-start text-sm" variant="outline" onClick={handleBrowseJobs}>
+                        Browse Jobs
+                      </Button>
+                      <Button className="w-full justify-start text-sm" variant="outline" onClick={handleSkillsAssessment}>
+                        Skills Assessment
+                      </Button>
+                      <Button className="w-full justify-start text-sm" variant="outline" onClick={handleMessages}>
+                        Messages
+                      </Button>
+                      <Button className="w-full justify-start text-sm" variant="outline">
+                        Training Programs
+                      </Button>
+                    </div>
+                  </div>
+                  </div>
+                  
+                  </div>
+                  
+        {/* Right Column - Skill Development Tracker */}
+              <div className="lg:col-span-1 col-span-12 row-span-12 ">
+                <SkillDevelopmentTracker />
+              </div>
+          
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {stats.map((stat, index) => (

@@ -26,16 +26,30 @@ import YouthDashboard from '../pages/youth/Dashboard';
 // Auth Pages
 import AdminLogin from '../auth/admin/AdminLogin';
 import AdminRegister from '../auth/admin/AdminRegister';
-import EmployerLogin from '../auth/employer/EmployerLogin';
-import EmployerRegister from '../auth/employer/EmployerRegister';
-import YouthLogin from '../auth/youth/YouthLogin';
-import YouthRegister from '../auth/youth/YouthRegister';
 
+import Login from '../auth/Login';
+import Register from '../auth/Register';
+import ForgotPasswordPage from '../auth/ForgotPassword';
+import ResetPasswordPage from '../auth/ResetPassword';
+import OTPVerificationPage from '../auth/OtpVerification';
+
+//profile creation
+import ProfileCreation from '../pages/youth/profile/ProfileCreate';
 // Context
 import { AuthProvider } from '../context/AuthContext';
+import { PersistGate } from 'redux-persist/integration/react';
 
+
+// Redux
+import { store, persistor } from '../redux/store';
+import { Provider } from 'react-redux';
+
+//job pages
+import JobSearch from '../pages/youth/jobs/JobSearch';
 const AppRoutes = () => {
   return (
+    <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
     <AuthProvider>
       <Routes>
         {/* Public Routes */}
@@ -44,10 +58,11 @@ const AppRoutes = () => {
         {/* Auth Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/register" element={<AdminRegister />} />
-        <Route path="/employer/login" element={<EmployerLogin />} />
-        <Route path="/employer/register" element={<EmployerRegister />} />
-        <Route path="/youth/login" element={<YouthLogin />} />
-        <Route path="/youth/register" element={<YouthRegister />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="otp-verification" element={<OTPVerificationPage/>} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
@@ -77,17 +92,20 @@ const AppRoutes = () => {
         <Route path="/youth" element={<YouthLayout />}>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<YouthDashboard />} />
-          <Route path="jobs" element={<div>Jobs Page</div>} />
+          <Route path="jobs" element={<JobSearch/>} />
           <Route path="applications" element={<div>Applications Page</div>} />
           <Route path="saved" element={<div>Saved Jobs Page</div>} />
           <Route path="training" element={<div>Training Page</div>} />
-          <Route path="profile" element={<div>Profile Page</div>} />
+          <Route path="profile" element={<ProfileCreation/>} />
         </Route>
 
         {/* 404 Route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AuthProvider>
+    </PersistGate>
+    </Provider>
+
   );
 };
 

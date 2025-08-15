@@ -1,0 +1,38 @@
+import { configureStore } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+
+import workExperienceReducer from './workExperienceSection/WorkExperienceSlice';
+import personalInfoReducer from './personaInfo/PersonalInfoSlice';
+import educationReducer from './educationSection/EducationSlice';
+import skillsReducer from './skillsInfoSection/SkillSlice';
+import certificatesReducer from './certificateSection/CertificateSlice';
+import photoReducer from './photoSection/PhotoSlice'; // ✅ import Photo slice
+
+const persistConfig = {
+  key: 'root',
+  storage,
+};
+
+const makePersistedReducer = (key, reducer) =>
+  persistReducer({ ...persistConfig, key }, reducer);
+
+export const store = configureStore({
+  reducer: {
+    workExperience: makePersistedReducer('workExperience', workExperienceReducer),
+    personalInfo: makePersistedReducer('personalInfo', personalInfoReducer),
+    education: makePersistedReducer('education', educationReducer),
+    skills: makePersistedReducer('skills', skillsReducer),
+    certificates: makePersistedReducer('certificates', certificatesReducer),
+    photo: makePersistedReducer('photo', photoReducer), // ✅ register photo slice
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+      },
+    }),
+  devTools: process.env.NODE_ENV !== 'production',
+});
+
+export const persistor = persistStore(store);
