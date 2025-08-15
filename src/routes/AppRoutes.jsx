@@ -46,6 +46,9 @@ import { Provider } from 'react-redux';
 
 //job pages
 import JobSearch from '../pages/youth/jobs/JobSearch';
+import JobDetails from '../pages/youth/jobs/JobDetails';
+import ApplicationPage from '../pages/youth/jobs/ApplicationPage';
+import NotFound from '../pages/NotFound';
 const AppRoutes = () => {
   return (
     <Provider store={store}>
@@ -81,7 +84,7 @@ const AppRoutes = () => {
           {/* Job Postings */}
           <Route path="jobs" element={<JobsList />} />
           <Route path="jobs/new" element={<NewJob />} />
-          <Route path="jobs/:id" element={<JobDetail />} />
+          <Route path="jobs/:id" element={<JobDetails />} />
           <Route path="jobs/:jobId/applicants" element={<ApplicantsList />} />
           <Route path="candidates" element={<Candidates />} />
           <Route path="company" element={<CompanyProfile />} />
@@ -93,14 +96,15 @@ const AppRoutes = () => {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<YouthDashboard />} />
           <Route path="jobs" element={<JobSearch/>} />
-          <Route path="applications" element={<div>Applications Page</div>} />
+          <Route path="jobs/:id" element={<JobDetails />} />
+          <Route path="jobs/:id/apply" element={<ApplicationPage/>} />
           <Route path="saved" element={<div>Saved Jobs Page</div>} />
           <Route path="training" element={<div>Training Page</div>} />
           <Route path="profile" element={<ProfileCreation/>} />
         </Route>
 
         {/* 404 Route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound/>} />
       </Routes>
     </AuthProvider>
     </PersistGate>

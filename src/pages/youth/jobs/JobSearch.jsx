@@ -118,7 +118,7 @@ const JobSearch = () => {
   };
 
   const handleViewJob = (jobId) => {
-    navigate(`/jobs/${jobId}`);
+    navigate(`/youth/jobs/${jobId}`);
   };
 
   const handleFiltersChange = (newFilters) => {

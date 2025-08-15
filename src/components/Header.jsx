@@ -2,25 +2,28 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Button from "./shared/Button"; // Import the Button component
+import Button from "./shared/Button";
 
-const navLinks = [
+const languageOptions = ["English", "Twi", "Ga", "Ewe"];
+
+// Single unified navigation structure
+const navigation = [
+  {
+    label: "Services",
+    type: "dropdown",
+    items: [
+      { to: "/talent-matching", label: "Talent Matching" },
+      { to: "/skill-development", label: "Skill Development" },
+      { to: "/career-guidance", label: "Career Guidance" },
+      { to: "/mentorship", label: "Mentorship" },
+    ],
+  },
   { to: "/opportunities", label: "Opportunities" },
   { to: "/resources", label: "Resources" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ];
 
-const serviceLinks = [
-  { to: "/talent-matching", label: "Talent Matching" },
-  { to: "/skill-development", label: "Skill Development" },
-  { to: "/career-guidance", label: "Career Guidance" },
-  { to: "/mentorship", label: "Mentorship" },
-];
-
-const languageOptions = ["English", "Twi", "Ga", "Ewe"];
-
-// Option 1: Add padding-top to account for the header height
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
@@ -31,14 +34,13 @@ export default function Header() {
 
   return (
     <>
-      {/* Header with fixed positioning */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-2 flex-shrink-0 group cursor-pointer">
               <div
-                className="bg-[var(--gold-400)] to-emerald-500 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:from-[rgb(171,197,170)] group-hover:to-emerald-400 group-hover:shadow-lg group-hover:shadow-[rgb(151,177,150)]/25"
+                className="bg-[var(--gold-400)] rounded-xl flex items-center justify-center transition-all duration-300 group-hover:shadow-lg group-hover:shadow-[rgb(151,177,150)]/25"
                 style={{
                   width: "clamp(32px, 2.5vw, 40px)",
                   height: "clamp(32px, 2.5vw, 40px)",
@@ -65,62 +67,86 @@ export default function Header() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center flex-1 justify-center">
-              <div className="flex items-center" style={{ gap: "clamp(16px, 2vw, 32px)" }}>
-                <div className="relative group">
-                  <Link
-                    variant="ghost"
-                    size="medium"
-                    onClick={() => toggleMenu('services')}
-                    className="flex items-center gap-1 text-[var(--river-bed)] hover:text-[var(--gold-400)] transition-all duration-300 whitespace-nowrap"
-                    style={{fontSize: "clamp(12px, 0.9vw, 16px)"}}
-                  >
-                    Services
-                    <span className={`flex items-center transition-transform duration-300 ${openMenu === 'services' ? "rotate-180" : ""}`}>▼</span>
-                  </Link>
-                  {openMenu === 'services' && (
-                    <div className="absolute bg-slate-800/95 backdrop-blur-md border-white/20 shadow-xl mt-2">
-                      {serviceLinks.map(link => (
-                        <Link
-                          key={link.to}
-                          to={link.to}
-                          className="block px-4 py-2 text-white hover:bg-[var(--gold-400)]/20 hover:text-[var(--gold-400)] transition-all duration-200"
+              <div
+                className="flex items-center"
+                style={{ gap: "clamp(16px, 2vw, 32px)" }}
+              >
+                {navigation.map((nav) =>
+                  nav.type === "dropdown" ? (
+                    <div key={nav.label} className="relative group">
+                      <button
+                        onClick={() => toggleMenu(nav.label)}
+                        className="flex items-center gap-1 text-[var(--river-bed)] hover:text-[var(--gold-400)] transition-all duration-300 whitespace-nowrap"
+                        style={{
+                          fontSize: "clamp(12px, 0.9vw, 16px)",
+                        }}
+                      >
+                        {nav.label}
+                        <span
+                          className={`flex items-center transition-transform duration-300 ${
+                            openMenu === nav.label ? "rotate-180" : ""
+                          }`}
                         >
-                          {link.label}
-                        </Link>
-                      ))}
+                          ▼
+                        </span>
+                      </button>
+                      {openMenu === nav.label && (
+                        <div className="absolute bg-slate-800/95 backdrop-blur-md border-white/20 shadow-xl mt-2">
+                          {nav.items.map((item) => (
+                            <Link
+                              key={item.to}
+                              to={item.to}
+                              className="block px-4 py-2 text-white hover:bg-[var(--gold-400)]/20 hover:text-[var(--gold-400)] transition-all duration-200"
+                            >
+                              {item.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                {navLinks.map(link => (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    className="text-[var(--river-bed)] hover:text-[var(--gold-400)] transition-all duration-300 whitespace-nowrap relative group"
-                    style={{ fontSize: "clamp(12px, 0.9vw, 16px)" }}
-                  >
-                    {link.label}
-                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[var(--gold-400)] transition-all duration-300 group-hover:w-full"></span>
-                  </Link>
-                ))}
+                  ) : (
+                    <Link
+                      key={nav.to}
+                      to={nav.to}
+                      className="text-[var(--river-bed)] hover:text-[var(--gold-400)] transition-all duration-300 whitespace-nowrap relative group"
+                      style={{ fontSize: "clamp(12px, 0.9vw, 16px)" }}
+                    >
+                      {nav.label}
+                      <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[var(--gold-400)] transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                  )
+                )}
               </div>
             </div>
 
-            {/* Right Side - Language & Auth */}
-            <div className="hidden md:flex items-center flex-shrink-0" style={{ gap: "clamp(8px, 1vw, 16px)" }}>
+            {/* Right Side */}
+            <div
+              className="hidden md:flex items-center flex-shrink-0"
+              style={{ gap: "clamp(8px, 1vw, 16px)" }}
+            >
               {/* Language Dropdown */}
               <div className="relative">
                 <Button
-                  onClick={() => toggleMenu('language')}
+                  onClick={() => toggleMenu("language")}
                   variant="ghost"
                   className="flex items-center gap-1 whitespace-nowrap group"
-                  style={{ fontSize: "clamp(12px, 0.9vw, 16px)", padding: "0 clamp(10px, 1vw, 14px);" }}
+                  style={{
+                    fontSize: "clamp(12px, 0.9vw, 16px)",
+                    padding: "0 clamp(10px, 1vw, 14px)",
+                  }}
                 >
                   English
-                  <span className={`transition-transform duration-300 ${openMenu === 'language' ? "rotate-180" : ""}`}>▼</span>
+                  <span
+                    className={`transition-transform duration-300 ${
+                      openMenu === "language" ? "rotate-180" : ""
+                    }`}
+                  >
+                    ▼
+                  </span>
                 </Button>
-                {openMenu === 'language' && (
+                {openMenu === "language" && (
                   <div className="absolute bg-slate-800/95 backdrop-blur-md border-white/20 shadow-xl mt-2">
-                    {languageOptions.map(lang => (
+                    {languageOptions.map((lang) => (
                       <div
                         key={lang}
                         className="text-white hover:bg-[var(--gold-400)]/20 hover:text-[var(--gold-400)] transition-all duration-200 cursor-pointer px-4 py-2"
@@ -164,24 +190,53 @@ export default function Header() {
           {isMobileMenuOpen && (
             <div className="md:hidden bg-slate-800/95 backdrop-blur-md border-t border-white/10">
               <div className="px-2 pt-2 pb-3 space-y-1">
-                {navLinks.map(link => (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    className="block px-3 py-2 text-white hover:bg-[var(--gold-400)]/30 hover:text-[var(--gold-400)] rounded transition-all duration-200 relative group"
-                    style={{ fontSize: "clamp(14px, 1.2vw, 16px)" }}
-                  >
-                    {link.label}
-                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[var(--gold-400)] transition-all duration-300 group-hover:w-full"></span>
-                  </Link>
-                ))}
+                {navigation.map((nav) =>
+                  nav.type === "dropdown" ? (
+                    <div key={nav.label}>
+                      <div
+                        onClick={() => toggleMenu(nav.label)}
+                        className="px-3 py-2 text-white hover:bg-[var(--gold-400)]/30 hover:text-[var(--gold-400)] rounded transition-all duration-200 cursor-pointer flex justify-between items-center"
+                      >
+                        {nav.label}
+                        <span
+                          className={`transition-transform duration-300 ${
+                            openMenu === nav.label ? "rotate-180" : ""
+                          }`}
+                        >
+                          ▼
+                        </span>
+                      </div>
+                      {openMenu === nav.label && (
+                        <div className="pl-4">
+                          {nav.items.map((item) => (
+                            <Link
+                              key={item.to}
+                              to={item.to}
+                              className="block px-3 py-2 text-white hover:bg-[var(--gold-400)]/20 hover:text-[var(--gold-400)] rounded transition-all duration-200"
+                            >
+                              {item.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <Link
+                      key={nav.to}
+                      to={nav.to}
+                      className="block px-3 py-2 text-white hover:bg-[var(--gold-400)]/30 hover:text-[var(--gold-400)] rounded transition-all duration-200 relative group"
+                      style={{ fontSize: "clamp(14px, 1.2vw, 16px)" }}
+                    >
+                      {nav.label}
+                      <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[var(--gold-400)] transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                  )
+                )}
               </div>
             </div>
           )}
         </div>
       </nav>
-      
-      {/* Spacer div to push content below the fixed header */}
       <div className="h-16"></div>
     </>
   );
