@@ -10,8 +10,8 @@ import {
   SelectValue,
 } from '../ui/select';
 import { Calendar, Building2, Trash2, Eye } from 'lucide-react';
-import { getApplications, updateApplicationStatus, deleteApplication } from '../utils/applicationTracker';
-import { useToast } from '../hooks/use-toast';
+import { getApplications, updateApplicationStatus, deleteApplication } from '../../utils/ApplicationTracker';
+import { useToast } from '../../hooks/use-toast';
 
 const ApplicationTracker = () => {
   const [applications, setApplications] = useState([]);

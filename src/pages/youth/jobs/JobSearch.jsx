@@ -20,6 +20,7 @@ import SortOptions from '../../../components/jobs/SortOptions';
 import { useNavigate } from 'react-router-dom';
 import { searchJobs, sortJobs, getJobSuggestions } from '../../../utils/JobSearch';
 import InputField from '../../../components/shared/InputField'; // ✅ Using your custom InputField
+import { saveJob, unsaveJob, getSavedJobs } from '../../../utils/SavedJobs';
 
 const JobSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -112,9 +113,17 @@ const JobSearch = () => {
   };
 
   const handleSaveJob = (jobId) => {
-    setSavedJobs((prev) =>
-      prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [...prev, jobId]
-    );
+    const isSaved = savedJobs.includes(jobId);
+    if (isSaved) {
+      unsaveJob(jobId);
+    } else {
+      // find job from current processed list or mockJobs
+      const job = processedJobs.find((j) => j.id === jobId) || mockJobs.find((j) => j.id === jobId);
+      if (job) saveJob(job);
+    }
+    // refresh local ids
+    const stored = getSavedJobs();
+    setSavedJobs(Array.isArray(stored) ? stored.map((j) => j.id) : []);
   };
 
   const handleViewJob = (jobId) => {
@@ -149,6 +158,16 @@ const JobSearch = () => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // load saved jobs from storage (store as array of ids for quick checks)
+  React.useEffect(() => {
+    try {
+      const stored = getSavedJobs();
+      setSavedJobs(Array.isArray(stored) ? stored.map((j) => j.id) : []);
+    } catch (e) {
+      setSavedJobs([]);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">

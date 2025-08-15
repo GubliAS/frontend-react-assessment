@@ -33,7 +33,7 @@ import ForgotPasswordPage from '../auth/ForgotPassword';
 import ResetPasswordPage from '../auth/ResetPassword';
 import OTPVerificationPage from '../auth/OtpVerification';
 
-//profile creation
+//profile page
 import ProfileCreation from '../pages/youth/profile/ProfileCreate';
 // Context
 import { AuthProvider } from '../context/AuthContext';
@@ -49,6 +49,15 @@ import JobSearch from '../pages/youth/jobs/JobSearch';
 import JobDetails from '../pages/youth/jobs/JobDetails';
 import ApplicationPage from '../pages/youth/jobs/ApplicationPage';
 import NotFound from '../pages/NotFound';
+import SavedJobs from '../pages/youth/jobs/SavedJobs';
+import Applications from '../pages/youth/jobs/Applications';
+
+//assessment pages
+import Assessments from '../pages/youth/assessment/Assessments';
+import AssessmentResults from '../pages/youth/assessment/AssessmentResults';
+
+// Gamification page
+import Gamification from '../pages/youth/gamification';
 const AppRoutes = () => {
   return (
     <Provider store={store}>
@@ -98,9 +107,13 @@ const AppRoutes = () => {
           <Route path="jobs" element={<JobSearch/>} />
           <Route path="jobs/:id" element={<JobDetails />} />
           <Route path="jobs/:id/apply" element={<ApplicationPage/>} />
-          <Route path="saved" element={<div>Saved Jobs Page</div>} />
+          <Route path="applications" element={<Applications />} />
+          <Route path="saved" element={<SavedJobs/>} />
           <Route path="training" element={<div>Training Page</div>} />
           <Route path="profile" element={<ProfileCreation/>} />
+          <Route path="assessments" element={<Assessments />} />
+         <Route path="assessment/results" element={<AssessmentResults />} />
+         <Route path="rewards" element={<Gamification/>} />
         </Route>
 
         {/* 404 Route */}

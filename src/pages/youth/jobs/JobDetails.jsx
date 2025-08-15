@@ -7,6 +7,7 @@ import {
 // import AppHeader from '../components/layout/AppHeader';
 // import ApplicationModal from '../components/jobs/ApplicationModal';
 import { getApplicationByJobId } from '../../../utils/ApplicationTracker';
+import { saveJob, unsaveJob, isJobSaved, getSavedJobs } from '../../../utils/SavedJobs';
 
 export default function JobDetailsPage() {
   const { id } = useParams();
@@ -45,10 +46,24 @@ export default function JobDetailsPage() {
       const application = getApplicationByJobId(id);
       setHasApplied(!!application);
     }
+    // sync saved state
+    try {
+      setIsSaved(isJobSaved(id));
+    } catch (e) {
+      setIsSaved(false);
+    }
   }, [id]);
 
   const handleBack = () => navigate(-1);
-  const handleSave = () => setIsSaved(!isSaved);
+  const handleSave = () => {
+    if (isSaved) {
+      unsaveJob(jobData.id);
+    } else {
+      saveJob(jobData);
+    }
+    // refresh state
+    setIsSaved(isJobSaved(jobData.id));
+  };
   const handleApply = () => {
     if (!hasApplied) {
       // navigate to application page, passing jobData in state for convenience

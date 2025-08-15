@@ -55,6 +55,20 @@ const navigation = [
     bgColor: 'bg-purple-50'
   },
   { 
+    name: 'Assessments',
+    href: 'assessments',
+    icon: StarIcon,
+    color: 'text-yellow-500',
+    bgColor: 'bg-yellow-50'
+  },
+  {
+    name: 'Rewards',
+    href: 'rewards',
+    icon: ClockIcon,
+    color: 'text-amber-500',
+    bgColor: 'bg-amber-50'
+  },
+  { 
     name: 'My Profile', 
     href: 'profile', 
     icon: UserIcon,
@@ -211,6 +225,8 @@ onMouseLeave={() => collapsed && setHovered(false)}
                     {location.pathname.endsWith('dashboard') && 'Overview of your job search and applications'}
                     {location.pathname.endsWith('jobs') && 'Browse and apply for available job opportunities'}
                     {location.pathname.endsWith('applications') && 'Track the status of your job applications'}
+                    {location.pathname.endsWith('assessments') && 'Take assessments to improve and certify your skills'}
+                    {location.pathname.endsWith('rewards') && 'View and redeem rewards earned from assessments and challenges'}
                     {location.pathname.endsWith('saved') && 'Your saved job opportunities'}
                     {location.pathname.endsWith('training') && 'Enhance your skills with our training programs'}
                     {location.pathname.endsWith('profile') && 'Manage your personal and professional profile'}
@@ -221,6 +237,18 @@ onMouseLeave={() => collapsed && setHovered(false)}
                     <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                       <PlusCircleIcon className="-ml-1 mr-2 h-5 w-5" />
                       Apply for Jobs
+                    </button>
+                  )}
+                  {location.pathname.endsWith('assessments') && (
+                    <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400">
+                      <PlusCircleIcon className="-ml-1 mr-2 h-5 w-5" />
+                      Start Assessment
+                    </button>
+                  )}
+                  {location.pathname.endsWith('rewards') && (
+                    <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-700 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400">
+                      <StarIcon className="-ml-1 mr-2 h-5 w-5" />
+                      Redeem Rewards
                     </button>
                   )}
                   <button className="p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
