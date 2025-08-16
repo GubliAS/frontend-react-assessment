@@ -32,7 +32,7 @@ import Register from '../auth/Register';
 import ForgotPasswordPage from '../auth/ForgotPassword';
 import ResetPasswordPage from '../auth/ResetPassword';
 import OTPVerificationPage from '../auth/OtpVerification';
-
+import AccountActivationPage from '../auth/AccountActivation';
 //profile page
 import ProfileCreation from '../pages/youth/profile/ProfileCreate';
 // Context
@@ -58,6 +58,7 @@ import AssessmentResults from '../pages/youth/assessment/AssessmentResults';
 
 // Gamification page
 import Gamification from '../pages/youth/gamification';
+
 const AppRoutes = () => {
   return (
     <Provider store={store}>
@@ -72,6 +73,8 @@ const AppRoutes = () => {
         <Route path="/admin/register" element={<AdminRegister />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        <Route path="/account-activation" element={<AccountActivationPage/>} />
         <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="otp-verification" element={<OTPVerificationPage/>} />

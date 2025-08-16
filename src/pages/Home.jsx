@@ -26,7 +26,7 @@ const Home = () => {
       </div>
 
       {/* Leading Talent Platform Section */}
-      <LeadingTalentPlaformSection />
+      <LeadingTalentPlatformSection />
 
       {/* Launch Your Career Section */}
       <LaunchYourCareerSection />

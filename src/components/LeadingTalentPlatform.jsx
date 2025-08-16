@@ -1,6 +1,6 @@
 import React from "react";
 
-const LeadingTalentPlaformSection = () => {
+const LeadingTalentPlatformSection = () => {
   const statsData = [
     {
       value: "15,000+",
@@ -69,4 +69,4 @@ const LeadingTalentPlaformSection = () => {
   );
 };
 
-export default LeadingTalentPlaformSection;
+export default LeadingTalentPlatformSection;
