@@ -237,7 +237,8 @@ export default function Header() {
           )}
         </div>
       </nav>
-      <div className="h-16"></div>
+      {/* replace fixed tailwind spacer with same CSS variable so it always matches nav height */}
+      <div style={{ height: "var(--header-height)" }} />
     </>
   );
 }
