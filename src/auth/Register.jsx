@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Button from '../components/shared/Button';
 import '../styles/authlayout.css';
@@ -145,10 +146,12 @@ const OpportunitySeekerForm = () => {
     uppercase: false,
     lowercase: false,
     number: false,
+    special: false,
     match: false,
   });
   const [emailValid, setEmailValid] = useState(false);
   const [phoneValid, setPhoneValid] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const p = formData.password;
@@ -157,6 +160,8 @@ const OpportunitySeekerForm = () => {
       uppercase: /[A-Z]/.test(p),
       lowercase: /[a-z]/.test(p),
       number: /[0-9]/.test(p),
+      // require at least one non-alphanumeric (special) character
+      special: /[^A-Za-z0-9]/.test(p),
       match: p && formData.confirm_password && p === formData.confirm_password,
     });
 
@@ -241,6 +246,7 @@ const OpportunitySeekerForm = () => {
             <RequirementItem valid={passwordRequirements.uppercase} label="One uppercase letter" />
             <RequirementItem valid={passwordRequirements.lowercase} label="One lowercase letter" />
             <RequirementItem valid={passwordRequirements.number} label="One number" />
+            <RequirementItem valid={passwordRequirements.special} label="One special character" />
             <RequirementItem valid={passwordRequirements.match} label="Passwords match" matchCheck />
           </div>
         </div>
@@ -289,10 +295,12 @@ const EmployerForm = () => {
     uppercase: false,
     lowercase: false,
     number: false,
+    special: false,
     match: false,
   });
   const [emailValid, setEmailValid] = useState(false);
   const [phoneValid, setPhoneValid] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const p = formData.password;
@@ -301,6 +309,8 @@ const EmployerForm = () => {
       uppercase: /[A-Z]/.test(p),
       lowercase: /[a-z]/.test(p),
       number: /[0-9]/.test(p),
+      // require at least one non-alphanumeric (special) character
+      special: /[^A-Za-z0-9]/.test(p),
       match: p && formData.confirm_password && p === formData.confirm_password,
     });
     setEmailValid(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail));
@@ -383,6 +393,7 @@ const EmployerForm = () => {
             <RequirementItem valid={passwordRequirements.uppercase} label="One uppercase letter" />
             <RequirementItem valid={passwordRequirements.lowercase} label="One lowercase letter" />
             <RequirementItem valid={passwordRequirements.number} label="One number" />
+            <RequirementItem valid={passwordRequirements.special} label="One special character" />
             <RequirementItem valid={passwordRequirements.match} label="Passwords match" matchCheck />
           </div>
         </div>
