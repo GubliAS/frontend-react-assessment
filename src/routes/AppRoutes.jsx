@@ -58,6 +58,7 @@ import AssessmentResults from '../pages/youth/assessment/AssessmentResults';
 
 // Gamification page
 import Gamification from '../pages/youth/gamification';
+import ProtectedRoute from "../routes/ProtectedRoute";
 
 const AppRoutes = () => {
   return (
@@ -90,7 +91,11 @@ const AppRoutes = () => {
         </Route>
 
         {/* Employer Routes */}
-        <Route path="/employer" element={<EmployerLayout />}>
+        <Route path="/employer" element={
+          <ProtectedRoute role="employer">
+            <EmployerLayout />
+          </ProtectedRoute>
+        }>
           <Route index element={<EmployerDashboard />} />
           <Route path="dashboard" element={<EmployerDashboard />} />
           {/* Job Postings */}
@@ -104,7 +109,11 @@ const AppRoutes = () => {
         </Route>
 
         {/* Youth Routes */}
-        <Route path="/youth" element={<YouthLayout />}>
+        <Route path="/youth" element={
+          <ProtectedRoute role="seeker">
+            <YouthLayout />
+          </ProtectedRoute>
+        }>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<YouthDashboard />} />
           <Route path="jobs" element={<JobSearch/>} />

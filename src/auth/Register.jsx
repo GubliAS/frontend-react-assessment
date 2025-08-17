@@ -359,7 +359,7 @@ const EmployerForm = () => {
       };
 
       const res = await registerEmployer(body);
-      navigate('/auth/otp', { state: { email: body.email, from: 'register', response: res } });
+      navigate('/account-activation', { state: { email: body.email, from: 'register', response: res } });
     } catch (err) {
       console.error('Register employer failed', err);
       alert(err?.message || 'Registration failed');

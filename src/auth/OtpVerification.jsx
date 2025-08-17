@@ -2,8 +2,14 @@ import React, { useState, useRef, useEffect } from "react";
 import { MessageSquare, PenLine } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { verifyOtpSeeker, verifyOtpEmployer } from "../services/auth";
+import { useDispatch } from "react-redux";
+import { setUser, setToken } from "../redux/auth/authSlice";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 
 const OTPVerificationPage = () => {
+  const dispatch = useDispatch();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState(900); // 15 min countdown
   const [canResend, setCanResend] = useState(false);
@@ -66,7 +72,23 @@ const OTPVerificationPage = () => {
       } else {
         res = await verifyOtpEmployer(body);
       }
-      // on success redirect to the appropriate dashboard
+
+      // Persist token + user in redux (reducers also write cookies)
+      // backend returns accessToken (not token)
+      const token = res?.accessToken || res?.token;
+      const user = res?.user || null;
+
+      if (token) {
+        // store via redux (authSlice will also set cookies) and ensure cookie fallback
+        dispatch(setToken(token));
+        cookies.set("auth_token", token, { path: "/", sameSite: "lax" });
+      }
+      if (user) {
+        dispatch(setUser(user));
+        cookies.set("user", JSON.stringify(user), { path: "/", sameSite: "lax" });
+      }
+
+      // redirect based on accountType
       if (accountType === "seeker") {
         navigate("/youth/dashboard", { replace: true });
       } else {

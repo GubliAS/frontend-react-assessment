@@ -60,19 +60,10 @@ const authSlice = createSlice({
       } catch (e) { /* ignore */ }
     },
 
-    // New reducers requested
-    isValidReducer(state, action) {
-      state.isValid = !!action.payload;
-    },
-    isLoadingReducer(state, action) {
-      state.isLoading = !!action.payload;
-    },
-    isAuthenticatedReducer(state, action) {
-      state.isAuthenticated = !!action.payload;
-    },
-    redirectReducer(state, action) {
-      state.redirectPath = action.payload || null;
-    },
+    // keep these if you use them elsewhere
+    isValidReducer(state, action) { state.isValid = !!action.payload; },
+    isLoadingReducer(state, action) { state.isLoading = !!action.payload; },
+    redirectReducer(state, action) { state.redirectPath = action.payload || null; },
   },
 });
 
@@ -89,14 +80,12 @@ export const {
 export const {
   isValidReducer,
   isLoadingReducer,
-  isAuthenticatedReducer,
   redirectReducer
 } = authSlice.actions;
 
 export const selectAuth = (state) => state.auth;
 export const selectUser = (state) => state.auth.user;
 export const selectToken = (state) => state.auth.token;
-export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectAuthLoading = (state) => state.auth.isLoading;
 export const selectAuthError = (state) => state.auth.error;
 

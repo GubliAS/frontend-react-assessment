@@ -42,7 +42,7 @@ const Login = () => {
       }
       // on success: navigate to appropriate dashboard (adjust routes as needed)
       // you can also dispatch Redux actions here to store token/user
-      navigate('/otp-verification', {state: { email: formData.email } });
+      navigate('/otp-verification', {state: { accountType: accountType, email: formData.email } });
     } catch (err) {
       setError(err?.message || 'Login failed');
     } finally {
