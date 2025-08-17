@@ -1,11 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MessageSquare, PenLine } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { verifyOtpSeeker, verifyOtpEmployer } from "../services/auth";
 
 const OTPVerificationPage = () => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState(900); // 15 min countdown
   const [canResend, setCanResend] = useState(false);
   const inputsRef = useRef([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const email = state?.email || "email@hidden.com";
+  const accountType = state?.accountType || "seeker"; // 'seeker' | 'employer'
 
   // Countdown timer
   useEffect(() => {
@@ -41,10 +49,34 @@ const OTPVerificationPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Entered OTP:", otp.join(""));
-    // Handle verification logic
+    setError("");
+    const code = otp.join("");
+    if (code.length !== 6) {
+      setError("Please enter the 6-digit code.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const body = { email, otp: code };
+      let res;
+      if (accountType === "seeker") {
+        res = await verifyOtpSeeker(body);
+      } else {
+        res = await verifyOtpEmployer(body);
+      }
+      // on success redirect to the appropriate dashboard
+      if (accountType === "seeker") {
+        navigate("/youth/dashboard", { replace: true });
+      } else {
+        navigate("/employer/dashboard", { replace: true });
+      }
+    } catch (err) {
+      setError(err?.message || "Verification failed");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleResend = () => {
@@ -72,7 +104,7 @@ const OTPVerificationPage = () => {
             Enter the security code we sent to
           </div>
           <div className="flex items-center justify-center gap-2 bg-white/5 rounded-lg p-3">
-            <span className="text-white font-medium">eamokuandoh@gmail.com</span>
+            <span className="text-white font-medium">{email}</span>
             <button className="text-[rgb(151,177,150)] hover:text-[rgb(171,197,170)] transition-colors duration-300">
               <PenLine className="w-4 h-4" />
             </button>
@@ -110,12 +142,14 @@ const OTPVerificationPage = () => {
 
             <button
               type="submit"
-              disabled={otp.some((val) => !val)}
+              disabled={otp.some((val) => !val) || isSubmitting}
               className="h-10 px-4 w-full bg-gradient-to-r from-[rgb(151,177,150)] to-emerald-500 hover:from-[rgb(171,197,170)] hover:to-emerald-400 text-white font-semibold py-3 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-[rgb(151,177,150)]/25 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed rounded-md flex items-center justify-center gap-2"
             >
-              Verify
+              {isSubmitting ? "Verifying..." : "Verify"}
             </button>
           </form>
+
+          {error && <div className="text-sm text-red-400 text-center">{error}</div>}
 
           {/* Resend */}
           <div className="text-center space-y-2">

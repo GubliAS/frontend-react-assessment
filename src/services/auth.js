@@ -36,6 +36,9 @@ export const loginEmployer = (body) =>
 export const verifyOtpSeeker = (body) =>
   api.post('/verifyOtp/seeker', body).then(handleResponse).catch(handleError);
 
+export const verifyOtpEmployer = (body) =>
+  api.post('/verifyOtp/employer', body).then(handleResponse).catch(handleError);
+
 export const logoutSeeker = (body) =>
   api.post('/seeker/logout', body).then(handleResponse).catch(handleError);
 

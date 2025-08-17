@@ -4,8 +4,8 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 const BASE =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE) || 'http://localhost:9000'||
-  'https://srt-ghana-talent-hub-bckend.onrender.com';
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE) ||
+  'http://localhost:9000';
 
 const api = axios.create({
   baseURL: BASE,

@@ -278,6 +278,8 @@ const OpportunitySeekerForm = () => {
 };
 
 const EmployerForm = () => {
+  const industryOptions = [ { value: 'technology', label: 'Technology' }, { value: 'finance', label: 'Finance & Banking' }, { value: 'healthcare', label: 'Healthcare' }, { value: 'education', label: 'Education' }, { value: 'manufacturing', label: 'Manufacturing' }, { value: 'retail', label: 'Retail & Commerce' }, { value: 'agriculture', label: 'Agriculture' }, { value: 'construction', label: 'Construction' }, { value: 'other', label: 'Other' }, ];
+  const sizeOptions = [ { value: '1-10', label: '1-10 employees' }, { value: '11-50', label: '11-50 employees' }, { value: '51-200', label: '51-200 employees' }, { value: '201-500', label: '201-500 employees' }, { value: '500+', label: '500+ employees' }, ];
   const [formData, setFormData] = useState({
     companyName: '',
     industry: '',
