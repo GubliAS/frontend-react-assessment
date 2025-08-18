@@ -98,13 +98,13 @@ const EmpoweringYouthSection = () => {
 			<div className="text-center max-w-3xl mx-auto mb-8">
 				<h2
 					id="empowering-title"
-					className="font-semibold text-[var(--ebony-900)]"
+					className="font-semibold text-[var(--ebony-50)]"
 					style={{ fontSize: "clamp(1.25rem, 3.2vw, 2rem)" }}
 				>
 					Empowering Youth with Career Tools
 				</h2>
 				<p
-					className="mt-3 text-[var(--ebony-600)]"
+					className="mt-3 text-[var(--river-bed)]"
 					style={{ fontSize: "clamp(.9rem, 1.6vw, 1rem)" }}
 				>
 					Everything you need to launch and advance your career in Ghana's
@@ -136,9 +136,10 @@ const EmpoweringYouthSection = () => {
 							role="list"
 						>
 							{features.map((f, i) => (
-								<Card key={i} className="bg-white rounded-xl p-6 shadow-lg">
+								<Card key={i} className="bg-white rounded-xl p-2 shadow-lg">
 									<CardHeader className="p-0">
-										<div className="flex items-start gap-4">
+										{/* stacked: icon above, text centered below */}
+										<div className="flex flex-col items-start  gap-4">
 											<div
 												className={`${f.color} rounded-lg flex items-center justify-center`}
 												style={{
@@ -146,15 +147,18 @@ const EmpoweringYouthSection = () => {
 													height: "clamp(44px, 7vw, 56px)",
 													flexShrink: 0,
 												}}
-												aria-hidden
+												aria-hidden="true"
 											>
 												{f.icon}
 											</div>
+
 											<div>
-												{/* Title and description use the same font color/weight as other sections */}
 												<CardTitle
 													className="text-[var(--ebony-900)] font-semibold"
-													style={{ fontSize: "clamp(1rem, 1.8vw, 1.125rem)" }}
+													style={{
+														fontSize: "clamp(1rem, 1.8vw, 1.125rem)",
+														marginBottom: "clamp(8px, 1.2vw, 12px)",
+													}}
 												>
 													{f.title}
 												</CardTitle>
