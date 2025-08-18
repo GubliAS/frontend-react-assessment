@@ -8,6 +8,7 @@ import educationReducer from './educationSection/EducationSlice';
 import skillsReducer from './skillsInfoSection/SkillSlice';
 import certificatesReducer from './certificateSection/CertificateSlice';
 import photoReducer from './photoSection/PhotoSlice'; // ✅ import Photo slice
+import authReducer from './auth/authSlice'; // <-- add auth slice import
 
 const persistConfig = {
   key: 'root',
@@ -19,6 +20,7 @@ const makePersistedReducer = (key, reducer) =>
 
 export const store = configureStore({
   reducer: {
+    auth: makePersistedReducer('auth', authReducer), // <-- register auth slice
     workExperience: makePersistedReducer('workExperience', workExperienceReducer),
     personalInfo: makePersistedReducer('personalInfo', personalInfoReducer),
     education: makePersistedReducer('education', educationReducer),

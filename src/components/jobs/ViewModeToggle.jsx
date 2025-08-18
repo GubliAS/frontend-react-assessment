@@ -6,7 +6,7 @@ const ViewModeToggle = ({ viewMode, onViewModeChange }) => {
   return (
     <div className="flex items-center border rounded-md overflow-hidden">
       <Button
-        variant={viewMode === "list" ? "primary" : "ghost"}
+        variant={viewMode === "list" ? "emerald" : "ghost"}
         size="small"
         onClick={() => onViewModeChange("list")}
         className="rounded-r-none"

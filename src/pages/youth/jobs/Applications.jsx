@@ -63,7 +63,7 @@ const Applications = () => {
             return (
               <div
                 key={index}
-                className="rounded-lg border border-input bg-card p-4 shadow-sm"
+                className="bg-white shadow-lg hover:shadow-xl transition-all rounded-lg  border-input bg-card p-4 shadow-sm"
               >
                 <div className="flex flex-row items-center justify-between pb-2">
                   <h2 className="text-sm font-medium">{stat.title}</h2>

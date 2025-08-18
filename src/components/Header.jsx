@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import Button from "./shared/Button";
 import { Link } from "react-router-dom";
 
@@ -27,11 +28,12 @@ const navigation = [
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
+  const isAuth = useSelector((state) => state?.auth?.isAuthenticated);
 
   const toggleMenu = (menuName) => {
     setOpenMenu(openMenu === menuName ? null : menuName);
   };
-
+  console.log("isAuth", isAuth);
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md border-b border-white/10">
@@ -159,18 +161,20 @@ export default function Header() {
                 )}
               </div>
 
-              {/* Sign In Button */}
-              <Link to="/login">
-                <Button
-                  className="border-white/30 hover:border-[rgb(151,177,150)] hover:text-white hover:shadow-lg hover:shadow-[rgb(151,177,150)]/25 rounded-full transition-all duration-300 whitespace-nowrap transform hover:scale-105"
-                  style={{
-                    fontSize: "clamp(12px, 0.9vw, 14px)",
-                    padding: "clamp(6px, 0.5vw, 8px) clamp(12px, 1vw, 16px)",
-                  }}
-                >
-                  Sign In
-                </Button>
-              </Link>
+              {/* Sign In Button - only show when NOT authenticated */}
+              {!isAuth && (
+                <Link to="/login">
+                  <Button
+                    className="border-white/30 hover:border-[rgb(151,177,150)] hover:text-white hover:shadow-lg hover:shadow-[rgb(151,177,150)]/25 rounded-full transition-all duration-300 whitespace-nowrap transform hover:scale-105"
+                    style={{
+                      fontSize: "clamp(12px, 0.9vw, 14px)",
+                      padding: "clamp(6px, 0.5vw, 8px) clamp(12px, 1vw, 16px)",
+                    }}
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -238,7 +242,7 @@ export default function Header() {
         </div>
       </nav>
       {/* replace fixed tailwind spacer with same CSS variable so it always matches nav height */}
-      <div style={{ height: "var(--header-height)" }} />
+      {/* <div style={{ height: "var(--header-height)" }} /> */}
     </>
   );
 }

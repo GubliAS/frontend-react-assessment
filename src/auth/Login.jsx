@@ -8,7 +8,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { FaFacebookF, FaLinkedinIn } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { loginSeeker, loginEmployer } from '../services/auth';
-
+import { ErrorMessage } from '../components/error-componenets';
 const Login = () => {
   const [accountType, setAccountType] = useState('seeker'); // seeker | employer
   const [formData, setFormData] = useState({ email: '', password: '', remember: false });
@@ -119,10 +119,14 @@ const Login = () => {
                   <input type="checkbox" name="remember" checked={formData.remember} onChange={handleChange} className="h-4 w-4 rounded-sm" />
                   Remember me
                 </label>
-                <a href="/auth/forgot-password" className="text-sm text-[var(--gold-300)] hover:underline">Forgot password?</a>
+                <a href="/forgot-password" className="text-sm text-[var(--gold-300)] hover:underline">Forgot password?</a>
               </div>
 
-              {error && <div className="text-sm text-red-400">{error}</div>}
+              {error && <ErrorMessage
+                      message={error}
+                      type="error"
+                      onDismiss={() => {}}
+                    />}
 
               <Button type="submit" variant="gradient" size="large" fullWidth disabled={isSubmitting} className="w-full font-semibold py-3">
                 {isSubmitting ? 'Signing in...' : 'Sign In'}

@@ -15,7 +15,7 @@ const Home = () => {
       {/* Hero Section */}
       <div className="bg-white">
          <LeadingTalentPlatformSection />
-         <EmpoweringYouthSection/>
+         {/* <EmpoweringYouthSection/> */}
         <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8 text-center">
           {/* <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
             

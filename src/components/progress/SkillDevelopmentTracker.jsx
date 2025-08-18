@@ -109,7 +109,7 @@ const SkillDevelopmentTracker = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Progress Section */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg shadow col-span-12">
+      <div className="bg-white rounded-lg shadow col-span-12">
         <div className="text-center pb-4 sm:pb-6 border-b border-gray-200 pt-4">
           <h2 className="flex items-center justify-center gap-2 text-lg sm:text-xl text-gray-900 font-semibold">
             <Target className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />

@@ -14,7 +14,7 @@ const Card = ({
 }) => {
   return (
     <div 
-      className={`bg-white ${rounded} ${shadow} ${border} overflow-hidden ${hoverEffect ? 'transition-all duration-200 hover:shadow-md' : ''} ${className}`}
+      className={`bg-white shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200  ${rounded} ${shadow} ${border} overflow-hidden ${hoverEffect ? 'transition-all duration-200 hover:shadow-md' : ''} ${className}`}
     >
       {header && (
         <div className="border-b border-gray-200 px-6 py-4">

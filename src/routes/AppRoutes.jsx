@@ -39,7 +39,6 @@ import ProfileCreation from '../pages/youth/profile/ProfileCreate';
 import { AuthProvider } from '../context/AuthContext';
 import { PersistGate } from 'redux-persist/integration/react';
 
-
 // Redux
 import { store, persistor } from '../redux/store';
 import { Provider } from 'react-redux';

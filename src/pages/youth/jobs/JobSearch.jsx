@@ -170,7 +170,7 @@ const JobSearch = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+   <>
       {/* <AppHeader /> */}
 
       {/* Header */}
@@ -184,8 +184,8 @@ const JobSearch = () => {
       </div> */}
 
       {/* Search Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card className="mb-8 pt-6">
+      <div>
+        <Card className="mb-8">
           <CardContent className="p-6">
             <div className="space-y-4">
               <div className="flex flex-col md:flex-row gap-4">
@@ -207,7 +207,7 @@ const JobSearch = () => {
                     className="pl-10"
                   />
                 </div>
-                <Button onClick={handleSearch} className="px-8">
+                <Button variant="emeraldGradient" onClick={handleSearch} className="px-8">
                   Search Jobs
                 </Button>
               </div>
@@ -216,7 +216,7 @@ const JobSearch = () => {
         </Card>
 
         {/* Results Section */}
-        <div className="flex gap-8">
+        <div className="flex gap-4">
           {/* Filters Sidebar */}
           <div className="w-64 hidden lg:block">
             <FilterSidebar
@@ -227,8 +227,8 @@ const JobSearch = () => {
           </div>
 
           {/* Job Results */}
-          <div className="flex-1">
-            <div className="mb-4 flex items-center justify-between flex-wrap gap-4">
+          <div className="flex-1 ">
+            <div className="mb-4 flex items-center justify-between flex-wrap gap-4 ">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">Job Opportunities</h2>
                 <p className="text-sm text-gray-500">{processedJobs.length} jobs found</p>
@@ -316,7 +316,7 @@ const JobSearch = () => {
           </div>
         </div>
       </div>
-    </div>
+ </>
   );
 };
 

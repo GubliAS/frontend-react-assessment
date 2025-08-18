@@ -1,7 +1,7 @@
 import React from "react";
 
 const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000;
+const TOAST_REMOVE_DELAY = 5000; // 5s after dismiss -> remove from state
 
 let count = 0;
 

@@ -5,7 +5,7 @@ const Card = forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
     className={classNames(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      "bg-white shadow-lg hover:shadow-xl transition-all rounded-lg  text-card-foreground shadow-sm",
       className
     )}
     {...props}
@@ -22,36 +22,61 @@ const CardHeader = forwardRef(({ className, ...props }, ref) => (
 ));
 CardHeader.displayName = "CardHeader";
 
-const CardTitle = forwardRef(({ className, ...props }, ref) => (
-  <h3
-    ref={ref}
-    className={classNames(
-      "text-2xl font-semibold leading-none tracking-tight",
-      className
-    )}
-    {...props}
-  />
-));
+const CardTitle = forwardRef(({ className, style, ...props }, ref) => {
+  const responsiveStyle = {
+    fontSize: "clamp(1rem, 1.6vw + 0.5rem, 1.75rem)",
+    ...style,
+  };
+  return (
+    <h3
+      ref={ref}
+      style={responsiveStyle}
+      className={classNames(
+        "font-semibold leading-none tracking-tight",
+        className
+      )}
+      {...props}
+    />
+  );
+});
 CardTitle.displayName = "CardTitle";
 
-const CardDescription = forwardRef(({ className, ...props }, ref) => (
-  <p
-    ref={ref}
-    className={classNames("text-sm text-muted-foreground", className)}
-    {...props}
-  />
-));
+const CardDescription = forwardRef(({ className, style, ...props }, ref) => {
+  const responsiveStyle = {
+    fontSize: "clamp(0.875rem, 0.8vw + 0.3rem, 1rem)",
+    ...style,
+  };
+  return (
+    <p
+      ref={ref}
+      style={responsiveStyle}
+      className={classNames("text-muted-foreground", className)}
+      {...props}
+    />
+  );
+});
 CardDescription.displayName = "CardDescription";
 
-const CardContent = forwardRef(({ className, ...props }, ref) => (
-  <div ref={ref} className={classNames("p-6 pt-0", className)} {...props} />
-));
+const CardContent = forwardRef(({ className, style, ...props }, ref) => {
+  const responsiveStyle = {
+    fontSize: "clamp(0.95rem, 0.9vw + 0.2rem, 1rem)",
+    ...style,
+  };
+  return (
+    <div
+      ref={ref}
+      style={responsiveStyle}
+      className={classNames("p-6", className)}
+      {...props}
+    />
+  );
+});
 CardContent.displayName = "CardContent";
 
 const CardFooter = forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={classNames("flex items-center p-6 pt-0", className)}
+    className={classNames("flex items-center p-6", className)}
     {...props}
   />
 ));

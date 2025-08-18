@@ -71,7 +71,7 @@ const SearchBar = ({ value, onChange, onSearch, suggestions = [], loading = fals
               }
             }, 150);
           }}
-          className="w-full pl-10 pr-4 py-2 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full pl-10 pr-4 py-2  border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           disabled={loading}
         />
       </form>

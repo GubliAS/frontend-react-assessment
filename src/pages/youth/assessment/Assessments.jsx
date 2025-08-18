@@ -68,9 +68,9 @@ const Assessments = () => {
 
   // Main assessments page with tabs
   return (
-    <div className="min-h-screen bg-background">
+    <div >
       {/* <AppHeader /> */}
-      <div className="py-8">
+    
         <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-7xl mx-auto px-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
@@ -90,7 +90,7 @@ const Assessments = () => {
             <AssessmentHistory />
           </TabsContent>
         </Tabs>
-      </div>
+     
     </div>
   );
 };

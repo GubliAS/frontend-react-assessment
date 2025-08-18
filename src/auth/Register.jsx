@@ -11,6 +11,8 @@ import { FaFacebookF, FaLinkedinIn } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc"; // Google colored icon
 import { registerSeeker, registerEmployer } from "../services/auth"; // ✅ use your auth.js
 import { isValidPhone, toE164 } from '../utils/PhoneNumberValidator';
+import { useFormValidation, validationRules, FieldError } from '../components/error-componenets'; // <-- added
+import { toast } from "../hooks/use-toast"; // <-- added near other imports
 
 const YouthRegister = () => {
   return (
@@ -152,6 +154,23 @@ const OpportunitySeekerForm = () => {
   const [emailValid, setEmailValid] = useState(false);
   const [phoneValid, setPhoneValid] = useState(false);
   const navigate = useNavigate();
+  const { errors, validateForm, validateField, clearFieldError } = useFormValidation();
+
+  // define the validation map for this form (age used for date_of_birth)
+  const validationMap = {
+    first_name: [validationRules.required('First name')],
+    last_name: [validationRules.required('Last name')],
+    email: [validationRules.required('Email'), validationRules.email()],
+    phone_number: [validationRules.required('Phone number'), validationRules.phone()],
+    password: [validationRules.password()],
+    confirm_password: [validationRules.required('Confirm password')],
+    date_of_birth: [validationRules.required('Date of birth'), validationRules.age()],
+    terms: [
+      {
+        validate: (v) => (v ? null : 'You must accept terms'),
+      },
+    ],
+  };
 
   useEffect(() => {
     const p = formData.password;
@@ -183,15 +202,35 @@ const OpportunitySeekerForm = () => {
     setFormData((p) => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
   };
 
+  // keep existing isValid visual flag, but use validateForm at submit for authoritative check
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // run validation; if invalid, bail and let FieldError show messages
+    const formForValidation = {
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      email: formData.email,
+      phone_number: formData.phone_number,
+      password: formData.password,
+      confirm_password: formData.confirm_password,
+      date_of_birth: formData.date_of_birth,
+      terms: formData.terms,
+    };
+
+    const ok = validateForm(formForValidation, validationMap);
+    if (!ok) return;
+
     if (!isValid) return;
     setIsSubmitting(true);
     try {
-      console.log
       const normalized = toE164(formData.phone_number, 'GH');
       if (!normalized) {
-        alert('Please enter a valid phone number.');
+         toast({
+        title: 'Invalid phone number',
+        description: err?.message || 'Please enter a valid phone number.',
+      });
+
         return;
       }
       console.log('Registering seeker with data:', formData);
@@ -213,7 +252,10 @@ const OpportunitySeekerForm = () => {
       navigate('/account-activation', { state: { email: body.email, from: 'register', response: res } });
     } catch (err) {
       console.error('Register seeker failed', err);
-      alert(err?.message || 'Registration failed');
+      toast({
+        title: 'Registration failed',
+        description: err?.message || 'Registration failed',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -252,7 +294,9 @@ const OpportunitySeekerForm = () => {
         </div>
       )}
 
-      <InputField label="Date of Birth" name="date_of_birth" type="date" required value={formData.date_of_birth} onChange={handleChange} />
+      <InputField label="Date of Birth" name="date_of_birth" type="date" required value={formData.date_of_birth} onChange={(e) => { handleChange(e); clearFieldError('date_of_birth'); }} />
+      {/* show field error produced by age validator */}
+      <FieldError message={errors.date_of_birth} onDis />
 
       <div className="flex items-start space-x-3">
         <input id="terms" name="terms" type="checkbox" checked={formData.terms} onChange={handleChange} className="h-4 w-4 shrink-0 rounded-sm border border-white/30 hover:border-[rgb(151,177,150)]/50 data-[state=checked]:bg-[rgb(151,177,150)] data-[state=checked]:border-[rgb(151,177,150)] transition-all duration-300" />
@@ -362,7 +406,10 @@ const EmployerForm = () => {
       navigate('/account-activation', { state: { email: body.email, from: 'register', response: res } });
     } catch (err) {
       console.error('Register employer failed', err);
-      alert(err?.message || 'Registration failed');
+      toast({
+        title: 'Registration failed',
+        description: err?.message || 'Registration failed',
+      });
     } finally {
       setIsSubmitting(false);
     }

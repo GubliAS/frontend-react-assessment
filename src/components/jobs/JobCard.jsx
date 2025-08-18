@@ -54,13 +54,34 @@ const JobCard = ({
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={handleView}>
+    <Card
+      className="pt-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 overflow-hidden cursor-pointer"
+      onClick={handleView}
+    >
       <CardContent className="p-6">
-        <div className="flex justify-between items-start mb-3">
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">{title}</h3>
-            <p className="text-blue-600 font-medium">{company}</p>
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start gap-4">
+            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+              {company ? company.split(' ').map(word => word[0]).join('').substring(0, 2) : 'JC'}
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <h3 className="text-xl font-bold text-gray-900 mb-1">{title}</h3>
+              <p className="text-green-600 font-semibold text-lg">{company}</p>
+
+              <div className="flex items-center gap-4 text-sm text-gray-500 mt-2">
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4" />
+                  {location}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  {getTimeAgo(postedDate)}
+                </span>
+              </div>
+            </div>
           </div>
+
           <div className="flex items-center gap-2">
             {hasApplied && (
               <Badge className="bg-green-100 text-green-800">
@@ -68,59 +89,61 @@ const JobCard = ({
                 Applied
               </Badge>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSave}
-              className="p-2"
+
+            <button
+              onClick={(e) => { e.stopPropagation(); handleSave(e); }}
+              className={`p-2 rounded-full transition-colors ${
+                isSaved ? 'text-green-600 bg-green-50' : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+              }`}
+              aria-label={isSaved ? 'Unsave job' : 'Save job'}
             >
               {isSaved ? (
-                <BookmarkCheck className="w-5 h-5 text-blue-600" />
+                <BookmarkCheck className="w-5 h-5 text-green-600" />
               ) : (
-                <Bookmark className="w-5 h-5 text-gray-400" />
+                <Bookmark className="w-5 h-5" />
               )}
-            </Button>
+            </button>
           </div>
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-          <div className="flex items-center gap-1">
-            <MapPin className="w-4 h-4" />
-            <span>{location}</span>
-          </div>
-          {salary && (
-            <div className="flex items-center gap-1">
-              <DollarSign className="w-4 h-4" />
-              <span>{formatSalary()}</span>
-            </div>
-          )}
-          <div className="flex items-center gap-1">
-            <Clock className="w-4 h-4" />
-            <span>{getTimeAgo(postedDate)}</span>
-          </div>
-        </div>
-
-        <div className="mb-3">
-          <Badge variant="secondary" className="mr-2">
-            {jobType}
-          </Badge>
-        </div>
-
-        <p className="text-gray-700 text-sm mb-4 line-clamp-2">
+        <p className="text-gray-600 mb-4 line-clamp-2">
           {description}
         </p>
 
-        <div className="flex flex-wrap gap-2">
-          {skills.slice(0, 3).map((skill, index) => (
-            <Badge key={index} variant="outline" className="text-xs">
+        <div className="flex flex-wrap gap-2 mb-4">
+          {skills.slice(0, 4).map((skill, index) => (
+            <span key={index} className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-medium">
               {skill}
-            </Badge>
+            </span>
           ))}
-          {skills.length > 3 && (
-            <Badge variant="outline" className="text-xs">
-              +{skills.length - 3} more
-            </Badge>
+          {skills.length > 4 && (
+            <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
+              +{skills.length - 4} more
+            </span>
           )}
+        </div>
+
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div className="flex items-center gap-4">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+              {jobType}
+            </span>
+
+            {salary && (
+              <span className="text-lg font-bold text-green-600">
+                {formatSalary()}
+              </span>
+            )}
+          </div>
+
+          <Button
+            onClick={(e) => { e.stopPropagation(); handleView(); }}
+            variant="emeraldGradient"
+            size="medium"
+            className="px-6 py-2"
+          >
+            View Job
+          </Button>
         </div>
       </CardContent>
     </Card>

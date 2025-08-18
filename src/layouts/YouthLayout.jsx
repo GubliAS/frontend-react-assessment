@@ -17,7 +17,7 @@ import {
   ClockIcon,
   StarIcon
 } from '@heroicons/react/24/outline';
-
+import LogoutButton from '../components/LogoutButton';
 const navigation = [
   { 
     name: 'Dashboard', 
@@ -88,7 +88,11 @@ const isExpanded = hovered ? true : !collapsed;
 
 
   return (
-    <div className="h-screen flex flex-col lg:flex-row overflow-hidden bg-gray-50">
+    // ensure content sits below the fixed header added in Header.jsx
+    <div
+      className="h-screen flex flex-col lg:flex-row overflow-hidden bg-gray-50"
+      style={{ paddingTop: "var(--header-height)" }}
+    >
       {/* Mobile menu button */}
       <div className="lg:hidden bg-white border-b border-gray-200 flex-shrink-0">
         <div className="flex items-center justify-between px-4 py-3">
@@ -200,9 +204,7 @@ onMouseLeave={() => collapsed && setHovered(false)}
               <p className="text-sm font-medium text-gray-900 truncate">Youth User</p>
               <p className="text-xs text-gray-500 truncate">youth@example.com</p>
             </div>
-            <button className="ml-auto p-1 text-gray-400 hover:text-gray-500 focus:outline-none">
-              <ArrowRightStartOnRectangleIcon className="h-5 w-5" />
-            </button>
+            <LogoutButton className="ml-auto p-1 text-gray-400 hover:text-gray-500 focus:outline-none" />
           </>
         )}
       </div>
@@ -262,12 +264,12 @@ onMouseLeave={() => collapsed && setHovered(false)}
           </div>
 
           {/* Page content */}
-          <div className="px-4 sm:px-6 lg:px-8 py-6">
+          <div className="px-4 sm:px-6 lg:px-8 py-6 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
             <div className="max-w-7xl mx-auto">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-6 sm:p-8">
+              <div
+              >
+             
                   <Outlet />
-                </div>
               </div>
             </div>
           </div>

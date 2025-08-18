@@ -25,4 +25,7 @@
 
   --ebony-50: #111827;
   --river-bed: #4B5563;
+
+  /* Header height matches Header.jsx h-16 (4rem / 64px) */
+  --header-height: 64px;
 }
