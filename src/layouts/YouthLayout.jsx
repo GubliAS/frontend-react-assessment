@@ -7,7 +7,6 @@ import {
   UserIcon, 
   AcademicCapIcon,
   BellIcon,
-  Bars3Icon as MenuIcon,
   XMarkIcon as XIcon,
   DocumentTextIcon,
   PlusCircleIcon,
@@ -18,6 +17,8 @@ import {
   StarIcon
 } from '@heroicons/react/24/outline';
 import LogoutButton from '../components/LogoutButton';
+
+
 const navigation = [
   { 
     name: 'Dashboard', 
@@ -97,14 +98,12 @@ const isExpanded = !collapsed;
       <div className="lg:hidden bg-white border-b border-gray-200 flex-shrink-0">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center">
-            <button
-              type="button"
-              className="text-gray-500 hover:text-gray-600 focus:outline-none"
+            <ArrowCollapse
+              collapsed={collapsed}
               onClick={() => setSidebarOpen(true)}
-            >
-              <span className="sr-only">Open sidebar</span>
-              <MenuIcon className="h-6 w-6" aria-hidden="true" />
-            </button>
+              className="text-gray-500 hover:text-gray-600 focus:outline-none"
+              ariaLabel="Open sidebar"
+            />
             <Link to="/" className="ml-4">
               <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                 Ghana Talent Hub
@@ -207,21 +206,12 @@ const isExpanded = !collapsed;
                   </h1>
                 </Link>
               )}
-              <button
+              <ArrowCollapse
+                collapsed={collapsed}
                 onClick={() => setCollapsed(!collapsed)}
                 className="text-gray-400 hover:text-gray-500 focus:outline-none"
-              >
-                <span className="sr-only">Collapse sidebar</span>
-                {collapsed ? (
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                  </svg>
-                ) : (
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                  </svg>
-                )}
-              </button>
+                ariaLabel={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              />
             </div>
           </div>
 
@@ -341,5 +331,29 @@ const isExpanded = !collapsed;
     </div>
   );
 };
+
+
+const ArrowCollapse = ({ collapsed = false, onClick, className = "", ariaLabel }) => {
+  const label = ariaLabel ?? (collapsed ? "Expand sidebar" : "Collapse sidebar");
+  const path = collapsed
+    ? "M13 5l7 7-7 7M5 5l7 7-7 7"   // points right (expand)
+    : "M11 19l-7-7 7-7m8 14l-7-7 7-7"; // points left (collapse)
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={className}
+      aria-label={label}
+      title={label}
+    >
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={path} />
+      </svg>
+    </button>
+  );
+};
+
+
 
 export default YouthLayout;

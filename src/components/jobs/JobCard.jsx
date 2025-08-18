@@ -69,12 +69,12 @@ const JobCard = ({
               <h3 className="text-xl font-bold text-gray-900 mb-1">{title}</h3>
               <p className="text-green-600 font-semibold text-lg">{company}</p>
 
-              <div className="flex items-center gap-4 text-sm text-gray-500 mt-2">
-                <span className="flex items-center gap-1">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-sm text-gray-500 mt-2">
+                <span className="flex items-center gap-1 min-w-0">
                   <MapPin className="w-4 h-4" />
-                  {location}
+                  <span className="truncate">{location}</span>
                 </span>
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1 text-sm">
                   <Clock className="w-4 h-4" />
                   {getTimeAgo(postedDate)}
                 </span>
@@ -123,27 +123,29 @@ const JobCard = ({
           )}
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between pt-4 border-t border-gray-100 gap-3">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
               {jobType}
             </span>
 
             {salary && (
-              <span className="text-lg font-bold text-green-600">
+              <span className="text-lg font-bold text-green-600 truncate">
                 {formatSalary()}
               </span>
             )}
           </div>
 
-          <Button
-            onClick={(e) => { e.stopPropagation(); handleView(); }}
-            variant="emeraldGradient"
-            size="medium"
-            className="px-6 py-2"
-          >
-            View Job
-          </Button>
+          <div className="w-full sm:w-auto">
+            <Button
+              onClick={(e) => { e.stopPropagation(); handleView(); }}
+              variant="emeraldGradient"
+              size="medium"
+              className="px-6 py-2 w-full sm:w-auto"
+            >
+              View Job
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
