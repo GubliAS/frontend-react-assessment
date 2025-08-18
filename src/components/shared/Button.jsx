@@ -29,7 +29,7 @@ const Button = ({
     outlineWhite: 'border border-white/30 text-white rounded-full hover:border-[rgb(151,177,150)] hover:text-white transition-all duration-300 transform hover:scale-105',
     outlineEbony: 'bg-transparent text-[var(--ebony-50)] hover:text-[var(--gold-300)] hover:bg-transparent border-ebony hover:bg-[var(--ebony-50)]',
     mobileMenu: 'bg-transparent text-[var(--ebony-50)] hover:bg-[rgb(151,177,150)]/20 hover:text-[var(--ebony-50)] transition-all duration-300 rounded',
-    seekerOremployer: 'gap-2 text-gray-300 hover:text-white hover:bg-white/10',
+    seekerOremployer: 'gap-2 text-[var(--river-bed))] hover:text-[var(--ebony-50)] hover:bg-white/10',
 
     // NEW: Gradient button (Create Account style)
     gradient: 'text-white bg-gradient-to-r from-[rgb(151,177,150)] to-emerald-500 ' +
