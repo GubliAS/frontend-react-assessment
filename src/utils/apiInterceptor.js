@@ -5,7 +5,7 @@ const cookies = new Cookies();
 
 const BASE =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE) ||
-  'http://localhost:9000';
+  'http://localhost:9000' || process.env.REACT_APP_BASE_URL;
 
 const api = axios.create({
   baseURL: BASE,
