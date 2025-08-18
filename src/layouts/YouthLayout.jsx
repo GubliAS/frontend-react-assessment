@@ -80,11 +80,11 @@ const navigation = [
 const YouthLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-  const [hovered, setHovered] = useState(false);
+
   const location = useLocation();
 
-// Determine if sidebar should appear expanded
-const isExpanded = hovered ? true : !collapsed;
+// Determine if sidebar should appear expanded (no hover behavior)
+const isExpanded = !collapsed;
 
 
   return (
@@ -129,88 +129,148 @@ const isExpanded = hovered ? true : !collapsed;
         </div>
       </div>
 
-     <div
-  className={`hidden lg:flex flex-col flex-shrink-0 transition-all duration-300 ${
-    isExpanded ? 'w-64' : 'w-20'
-  }`}
-onMouseEnter={() => collapsed && setHovered(true)}
-onMouseLeave={() => collapsed && setHovered(false)}
->
-  <div className="flex flex-col h-full border-r border-gray-200 bg-white">
-    {/* Logo and collapse button */}
-    <div className="pt-5 pb-4 px-4">
-      <div className={`flex items-center ${isExpanded ? 'justify-between' : 'justify-center'}`}>
-        {isExpanded && (
-          <Link to="/" className="flex-shrink-0">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              Ghana Talent Hub
-            </h1>
-          </Link>
-        )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="text-gray-400 hover:text-gray-500 focus:outline-none"
-        >
-          <span className="sr-only">Collapse sidebar</span>
-          {collapsed ? (
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-            </svg>
-          ) : (
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-            </svg>
-          )}
-        </button>
-      </div>
-    </div>
-
-    {/* Navigation */}
-    <nav className="mt-5 flex-1 px-2 space-y-1 overflow-y-auto">
-      {navigation.map((item) => {
-        const isActive = location.pathname.endsWith(item.href);
-        return (
-          <Link
-            key={item.name}
-            to={item.href}
-            className={`group flex items-center ${isExpanded ? 'px-3' : 'justify-center'} py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
-              isActive
-                ? `${item.bgColor} text-gray-900`
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-            }`}
-            title={!isExpanded ? item.name : ''}
-          >
-            <div className={`p-1.5 rounded-lg ${isActive ? item.bgColor : 'bg-gray-100 group-hover:bg-white'}`}>
-              <item.icon 
-                className={`h-5 w-5 ${isActive ? item.color : 'text-gray-500 group-hover:text-gray-700'}`} 
-                aria-hidden="true"
-              />
+      {/* Mobile sidebar drawer */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setSidebarOpen(false)}
+            aria-hidden="true"
+          />
+          <aside className="absolute left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-200 shadow-lg p-4 overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <Link to="/" onClick={() => setSidebarOpen(false)} className="text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                Ghana Talent Hub
+              </Link>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 text-gray-600 hover:text-gray-800 focus:outline-none"
+                aria-label="Close menu"
+              >
+                <XIcon className="h-6 w-6" />
+              </button>
             </div>
-            {isExpanded && <span className="ml-3">{item.name}</span>}
-          </Link>
-        );
-      })}
-    </nav>
 
-    {/* User profile */}
-    <div className="flex-shrink-0 border-t border-gray-200 p-4">
-      <div className="flex items-center">
-        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white flex items-center justify-center flex-shrink-0">
-          <span className="text-sm font-medium">Y</span>
+            <nav className="space-y-1">
+              {navigation.map((item) => {
+                const isActive = location.pathname.endsWith(item.href);
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive ? `${item.bgColor} text-gray-900` : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <div className={`p-1.5 rounded-lg ${isActive ? item.bgColor : 'bg-gray-100'}`}>
+                      <item.icon className={`h-5 w-5 ${isActive ? item.color : 'text-gray-500'}`} />
+                    </div>
+                    <span className="ml-3">{item.name}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Mobile user area + logout */}
+            <div className="mt-6 pt-4 border-t border-gray-100">
+              <div className="flex items-center">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white flex items-center justify-center flex-shrink-0">
+                  <span className="text-sm font-medium">Y</span>
+                </div>
+                <div className="ml-3 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">Youth User</p>
+                  <p className="text-xs text-gray-500 truncate">youth@example.com</p>
+                </div>
+                <div className="ml-auto">
+                  <LogoutButton className="p-2 text-gray-500 hover:text-gray-700" />
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
-        {isExpanded && (
-          <>
-            <div className="ml-3 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">Youth User</p>
-              <p className="text-xs text-gray-500 truncate">youth@example.com</p>
+      )}
+
+      <div
+        className={`hidden lg:flex flex-col flex-shrink-0 transition-all duration-300 ${
+          isExpanded ? 'w-64' : 'w-20'
+        }`}
+      >
+        <div className="flex flex-col h-full border-r border-gray-200 bg-white">
+          {/* Logo and collapse button */}
+          <div className="pt-5 pb-4 px-4">
+            <div className={`flex items-center ${isExpanded ? 'justify-between' : 'justify-center'}`}>
+              {isExpanded && (
+                <Link to="/" className="flex-shrink-0">
+                  <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                    Ghana Talent Hub
+                  </h1>
+                </Link>
+              )}
+              <button
+                onClick={() => setCollapsed(!collapsed)}
+                className="text-gray-400 hover:text-gray-500 focus:outline-none"
+              >
+                <span className="sr-only">Collapse sidebar</span>
+                {collapsed ? (
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                  </svg>
+                ) : (
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                  </svg>
+                )}
+              </button>
             </div>
-            <LogoutButton className="ml-auto p-1 text-gray-400 hover:text-gray-500 focus:outline-none" />
-          </>
-        )}
+          </div>
+
+          {/* Navigation */}
+          <nav className="mt-5 flex-1 px-2 space-y-1 overflow-y-auto">
+            {navigation.map((item) => {
+              const isActive = location.pathname.endsWith(item.href);
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`group flex items-center ${isExpanded ? 'px-3' : 'justify-center'} py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                    isActive
+                      ? `${item.bgColor} text-gray-900`
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  }`}
+                  title={!isExpanded ? item.name : ''}
+                >
+                  <div className={`p-1.5 rounded-lg ${isActive ? item.bgColor : 'bg-gray-100 group-hover:bg-white'}`}>
+                    <item.icon 
+                      className={`h-5 w-5 ${isActive ? item.color : 'text-gray-500 group-hover:text-gray-700'}`} 
+                      aria-hidden="true"
+                    />
+                  </div>
+                  {isExpanded && <span className="ml-3">{item.name}</span>}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* User profile */}
+          <div className="flex-shrink-0 border-t border-gray-200 p-4">
+            <div className="flex items-center">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white flex items-center justify-center flex-shrink-0">
+                <span className="text-sm font-medium">Y</span>
+              </div>
+              {isExpanded && (
+                <>
+                  <div className="ml-3 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">Youth User</p>
+                    <p className="text-xs text-gray-500 truncate">youth@example.com</p>
+                  </div>
+                  <LogoutButton className="ml-auto p-1 text-gray-400 hover:text-gray-500 focus:outline-none" />
+                </>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
       {/* Main content */}
       <div className=" flex-1 flex flex-col overflow-hidden">
@@ -234,7 +294,7 @@ onMouseLeave={() => collapsed && setHovered(false)}
                     {location.pathname.endsWith('profile') && 'Manage your personal and professional profile'}
                   </p>
                 </div>
-                <div className="flex space-x-3">
+                {/* <div className="flex space-x-3">
                   {location.pathname.endsWith('jobs') && (
                     <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                       <PlusCircleIcon className="-ml-1 mr-2 h-5 w-5" />
@@ -258,7 +318,7 @@ onMouseLeave={() => collapsed && setHovered(false)}
                     <BellIcon className="h-6 w-6" />
                     <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
