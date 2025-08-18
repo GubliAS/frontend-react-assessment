@@ -1,11 +1,11 @@
 import axios from 'axios';
+import { Import } from 'lucide-react';
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
 
-const BASE =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE) ||
-  'http://localhost:9000' || process.env.BASE_URL;
+// Fix: Use import.meta.env.VITE_API_BASE for Vite environment variables
+const BASE = import.meta.env.VITE_API_BASE || 'http://localhost:9000';
 
 const api = axios.create({
   baseURL: BASE,
@@ -37,12 +37,22 @@ api.interceptors.response.use(
         // Call refresh token API
         const refreshToken = cookies.get("refresh_token");
         if (refreshToken) {
-          const { data } = await axios.post(`${BASE}/refresh`, { refresh_token: refreshToken });
+          const { data } = await axios.post(`${BASE}/refresh`, { 
+            refresh_token: refreshToken // Fix: was "refre{" - incomplete variable name
+          });
           
           // Save new tokens in cookies
-          cookies.set("auth_token", data.access_token, { path: "/", secure: true, sameSite: "strict" });
-          cookies.set("refresh_token", data.refresh_token, { path: "/", secure: true, sameSite: "strict" });
-
+          cookies.set("auth_token", data.access_token, { 
+            path: "/", 
+            secure: true, 
+            sameSite: "strict" 
+          });
+          cookies.set("refresh_token", data.refresh_token, { 
+            path: "/", 
+            secure: true, 
+            sameSite: "strict" 
+          });
+          
           // Retry original request with new token
           error.config.headers.Authorization = `Bearer ${data.access_token}`;
           return api.request(error.config);

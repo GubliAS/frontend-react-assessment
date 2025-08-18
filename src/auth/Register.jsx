@@ -6,18 +6,17 @@ import '../styles/authlayout.css';
 import AuthAside from '../components/AuthAside';
 import InputField from '../components/shared/InputField';
 import SelectField from '../components/shared/SelectInputField';
-import { Phone, Eye, EyeOff, AlertCircle, CheckCircle2} from 'lucide-react';
+import { Phone, Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { FaFacebookF, FaLinkedinIn } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc"; // Google colored icon
-import { registerSeeker, registerEmployer } from "../services/auth"; // ✅ use your auth.js
+import { registerSeeker, registerEmployer } from "../services/auth";
 import { isValidPhone, toE164 } from '../utils/PhoneNumberValidator';
-import { useFormValidation, validationRules, FieldError } from '../components/error-componenets'; // <-- added
-import { toast } from "../hooks/use-toast"; // <-- added near other imports
+import { useFormValidation, validationRules, FieldError } from '../components/error-componenets';
+import { toast } from "../hooks/use-toast";
 
 const YouthRegister = () => {
   return (
    <div className='authlayout-bg relative z-10 min-h-screen flex items-center justify-center p-4 pt-20'>
-
     <div className='w-full max-w-7xl grid lg:grid-cols-2 gap-12 items-center'>
       <AuthAside/>
       <CreateAccountForm />
@@ -26,13 +25,11 @@ const YouthRegister = () => {
   );
 };
 
-
-
-
-
-
 const CreateAccountForm = () => {
   const [accountType, setAccountType] = useState("seeker");
+
+  // create a single shared validation instance and pass to child forms
+  const validation = useFormValidation();
 
   const socialLinks = [
     { label: "Facebook", icon: <FaFacebookF className="w-5 h-5" /> },
@@ -49,40 +46,37 @@ const CreateAccountForm = () => {
 
       <div className="p-6 pt-0 space-y-6">
        <div className="flex bg-white/5 rounded-lg p-1 mb-6">
-  {/* Youth Form Button */}
-  <Button
-    variant={accountType === "seeker" ? "primary" : "seekerOremployer"}
-    size="medium"
-    fullWidth
-    className={
-      accountType === "seeker"
-        ? "gap-2 bg-gradient-to-r from-[rgb(151,177,150)] to-emerald-500 text-white shadow-lg"
-        : "gap-2 text-gray-300 hover:text-white hover:bg-white/10"
-    }
-    onClick={() => setAccountType("seeker")}
-  >
-    Opportunity Seeker
-  </Button>
+          <Button
+            variant={accountType === "seeker" ? "primary" : "seekerOremployer"}
+            size="medium"
+            fullWidth
+            className={
+              accountType === "seeker"
+                ? "gap-2 bg-gradient-to-r from-[rgb(151,177,150)] to-emerald-500 text-white shadow-lg"
+                : "gap-2 text-gray-300 hover:text-white hover:bg-white/10"
+            }
+            onClick={() => setAccountType("seeker")}
+          >
+            Opportunity Seeker
+          </Button>
 
-  {/* Employer Form Button */}
-  <Button
-    variant={accountType === "employer" ? "primary" : "seekerOremployer"}
-    size="medium"
-    fullWidth
-    className={
-      accountType === "employer"
-        ? "gap-2 bg-gradient-to-r from-[rgb(151,177,150)] to-emerald-500 text-white shadow-lg"
-        : "gap-2 text-gray-300 hover:text-white hover:bg-white/10"
-    }
-    onClick={() => setAccountType("employer")}
-  >
-    Employer
-  </Button>
-</div>
+          <Button
+            variant={accountType === "employer" ? "primary" : "seekerOremployer"}
+            size="medium"
+            fullWidth
+            className={
+              accountType === "employer"
+                ? "gap-2 bg-gradient-to-r from-[rgb(151,177,150)] to-emerald-500 text-white shadow-lg"
+                : "gap-2 text-gray-300 hover:text-white hover:bg-white/10"
+            }
+            onClick={() => setAccountType("employer")}
+          >
+            Employer
+          </Button>
+        </div>
 
-
-        {/* Render form based on selection */}
-        {accountType === "seeker" ? <OpportunitySeekerForm /> : <EmployerForm />}
+        {/* Render form based on selection, pass shared validation */}
+        {accountType === "seeker" ? <OpportunitySeekerForm validation={validation} /> : <EmployerForm validation={validation} />}
 
         {/* Social sign-in */}
         <div className="space-y-4">
@@ -129,9 +123,9 @@ const CreateAccountForm = () => {
   );
 };
 
+const OpportunitySeekerForm = ({ validation }) => {
+  const { errors, validateForm, validateField, clearFieldError } = validation;
 
-
-const OpportunitySeekerForm = () => {
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -151,10 +145,8 @@ const OpportunitySeekerForm = () => {
     special: false,
     match: false,
   });
-  const [emailValid, setEmailValid] = useState(false);
-  const [phoneValid, setPhoneValid] = useState(false);
+
   const navigate = useNavigate();
-  const { errors, validateForm, validateField, clearFieldError } = useFormValidation();
 
   // define the validation map for this form (age used for date_of_birth)
   const validationMap = {
@@ -179,34 +171,38 @@ const OpportunitySeekerForm = () => {
       uppercase: /[A-Z]/.test(p),
       lowercase: /[a-z]/.test(p),
       number: /[0-9]/.test(p),
-      // require at least one non-alphanumeric (special) character
       special: /[^A-Za-z0-9]/.test(p),
       match: p && formData.confirm_password && p === formData.confirm_password,
     });
+  }, [formData.password, formData.confirm_password]);
 
-    setEmailValid(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email));
-    setPhoneValid(isValidPhone(formData.phone_number, 'GH'));
-  }, [formData.password, formData.confirm_password, formData.email, formData.phone_number]);
-
+  // compute isValid from required fields, passwordRequirements and validation errors
   const isValid =
     formData.first_name.trim() &&
     formData.last_name.trim() &&
-    emailValid &&
-    phoneValid &&
     formData.date_of_birth &&
     Object.values(passwordRequirements).every(Boolean) &&
-    formData.terms;
+    formData.terms &&
+    !errors?.email &&
+    !errors?.phone_number;
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((p) => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
+    const newVal = type === 'checkbox' ? checked : value;
+    setFormData((p) => ({ ...p, [name]: newVal }));
+
+    // run per-field validation if rules exist
+    if (validationMap[name]) {
+      validateField(name, newVal, validationMap[name]);
+    } else {
+      // clear previous error if no rules for this field
+      clearFieldError(name);
+    }
   };
 
-  // keep existing isValid visual flag, but use validateForm at submit for authoritative check
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // run validation; if invalid, bail and let FieldError show messages
     const formForValidation = {
       first_name: formData.first_name,
       last_name: formData.last_name,
@@ -227,28 +223,23 @@ const OpportunitySeekerForm = () => {
       const normalized = toE164(formData.phone_number, 'GH');
       if (!normalized) {
          toast({
-        title: 'Invalid phone number',
-        description: err?.message || 'Please enter a valid phone number.',
-      });
-
-        return;
+           title: 'Invalid phone number',
+           description: 'Please enter a valid phone number.',
+         });
+         setIsSubmitting(false);
+         return;
       }
-      console.log('Registering seeker with data:', formData);
+
       const body = {
         firstName: formData.first_name,
         lastName: formData.last_name,
         email: formData.email,
-        phoneNumber: normalized, // E.164
+        phoneNumber: normalized,
         password: formData.password,
         dateOfBirth: formData.date_of_birth,
       };
 
-
-
       const res = await registerSeeker(body);
-      // adjust if backend returns different shape
-      console.log(res)
-      // if (res.ok) {
       navigate('/account-activation', { state: { email: body.email, from: 'register', response: res } });
     } catch (err) {
       console.error('Register seeker failed', err);
@@ -268,9 +259,9 @@ const OpportunitySeekerForm = () => {
         <InputField label="Last Name" name="last_name" placeholder="Asante" required value={formData.last_name} onChange={handleChange} />
       </div>
 
-      <InputField label="Email Address" name="email" type="email" placeholder="you@example.com" required value={formData.email} onChange={handleChange} error={formData.email && !emailValid ? 'Enter a valid email' : ''} />
+      <InputField label="Email Address" name="email" type="email" placeholder="you@example.com" required value={formData.email} onChange={handleChange} error={errors?.email} />
 
-      <InputField label="Phone Number" name="phone_number" type="tel" placeholder="+233 XX XXX XXXX" required value={formData.phone_number} onChange={handleChange} error={formData.phone_number && !phoneValid ? 'Enter a valid phone number' : ''} />
+      <InputField label="Phone Number" name="phone_number" type="tel" placeholder="+233 XX XXX XXXX" required value={formData.phone_number} onChange={handleChange} error={errors?.phone_number} />
 
       <div className="relative">
         <InputField type="password" label="Password" name="password" placeholder="Create a strong password" required value={formData.password} onChange={handleChange} />
@@ -295,8 +286,7 @@ const OpportunitySeekerForm = () => {
       )}
 
       <InputField label="Date of Birth" name="date_of_birth" type="date" required value={formData.date_of_birth} onChange={(e) => { handleChange(e); clearFieldError('date_of_birth'); }} />
-      {/* show field error produced by age validator */}
-      <FieldError message={errors.date_of_birth} onDis />
+      <FieldError message={errors?.date_of_birth} />
 
       <div className="flex items-start space-x-3">
         <input id="terms" name="terms" type="checkbox" checked={formData.terms} onChange={handleChange} className="h-4 w-4 shrink-0 rounded-sm border border-white/30 hover:border-[rgb(151,177,150)]/50 data-[state=checked]:bg-[rgb(151,177,150)] data-[state=checked]:border-[rgb(151,177,150)] transition-all duration-300" />
@@ -321,7 +311,9 @@ const OpportunitySeekerForm = () => {
   );
 };
 
-const EmployerForm = () => {
+const EmployerForm = ({ validation }) => {
+  const { errors, validateForm, validateField, clearFieldError } = validation;
+
   const industryOptions = [ { value: 'technology', label: 'Technology' }, { value: 'finance', label: 'Finance & Banking' }, { value: 'healthcare', label: 'Healthcare' }, { value: 'education', label: 'Education' }, { value: 'manufacturing', label: 'Manufacturing' }, { value: 'retail', label: 'Retail & Commerce' }, { value: 'agriculture', label: 'Agriculture' }, { value: 'construction', label: 'Construction' }, { value: 'other', label: 'Other' }, ];
   const sizeOptions = [ { value: '1-10', label: '1-10 employees' }, { value: '11-50', label: '11-50 employees' }, { value: '51-200', label: '51-200 employees' }, { value: '201-500', label: '201-500 employees' }, { value: '500+', label: '500+ employees' }, ];
   const [formData, setFormData] = useState({
@@ -344,8 +336,6 @@ const EmployerForm = () => {
     special: false,
     match: false,
   });
-  const [emailValid, setEmailValid] = useState(false);
-  const [phoneValid, setPhoneValid] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -355,28 +345,43 @@ const EmployerForm = () => {
       uppercase: /[A-Z]/.test(p),
       lowercase: /[a-z]/.test(p),
       number: /[0-9]/.test(p),
-      // require at least one non-alphanumeric (special) character
       special: /[^A-Za-z0-9]/.test(p),
       match: p && formData.confirm_password && p === formData.confirm_password,
     });
-    setEmailValid(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail));
-    const digits = String(formData.phoneNumber || '').replace(/\D/g, '');
-    setPhoneValid(digits.length >= 10);
-  }, [formData.password, formData.confirm_password, formData.contactEmail, formData.phoneNumber]);
+  }, [formData.password, formData.confirm_password]);
+
+  const validationMap = {
+    companyName: [validationRules.required('Company name')],
+    industry: [validationRules.required('Industry')],
+    companySize: [validationRules.required('Company size')],
+    contactPersonName: [validationRules.required('Contact person name')],
+    contactEmail: [validationRules.required('Contact email'), validationRules.email()],
+    phoneNumber: [validationRules.required('Phone number'), validationRules.phone()],
+    password: [validationRules.password()],
+    confirm_password: [validationRules.required('Confirm password')],
+    termsAccepted: [{ validate: v => (v ? null : 'You must accept terms') }],
+  };
 
   const isValid =
     formData.companyName.trim() &&
     formData.industry &&
     formData.companySize &&
     formData.contactPersonName.trim() &&
-    emailValid &&
-    phoneValid &&
     Object.values(passwordRequirements).every(Boolean) &&
-    formData.termsAccepted;
+    formData.termsAccepted &&
+    !errors?.contactEmail &&
+    !errors?.phoneNumber;
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    const newVal = type === 'checkbox' ? checked : value;
+    setFormData((prev) => ({ ...prev, [name]: newVal }));
+
+    if (validationMap[name]) {
+      validateField(name, newVal, validationMap[name]);
+    } else {
+      clearFieldError(name);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -386,7 +391,8 @@ const EmployerForm = () => {
     try {
       const normalized = toE164(formData.phoneNumber, 'GH') || String(formData.phoneNumber).replace(/\D/g, '');
       if (!normalized) {
-        alert('Please enter a valid phone number for the company contact.');
+        toast({ title: 'Invalid phone number', description: 'Please enter a valid phone number.' });
+        setIsSubmitting(false);
         return;
       }
 
@@ -417,18 +423,18 @@ const EmployerForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <InputField label="Company Name" name="companyName" placeholder="Acme Corporation Ltd." required value={formData.companyName} onChange={handleInputChange} />
+      <InputField label="Company Name" name="companyName" placeholder="Acme Corporation Ltd." required value={formData.companyName} onChange={handleInputChange} error={errors?.companyName} />
 
       <div className="grid grid-cols-2 gap-4">
         <SelectField label="Industry" name="industry" value={formData.industry} onChange={handleInputChange} required options={industryOptions} placeholder="Select Industry" />
         <SelectField label="Company Size" name="companySize" value={formData.companySize} onChange={handleInputChange} required options={sizeOptions} placeholder="Select Size" />
       </div>
 
-      <InputField label="Contact Person Name" name="contactPersonName" placeholder="John Doe" required value={formData.contactPersonName} onChange={handleInputChange} />
+      <InputField label="Contact Person Name" name="contactPersonName" placeholder="John Doe" required value={formData.contactPersonName} onChange={handleInputChange} error={errors?.contactPersonName} />
 
       <div className="grid grid-cols-2 gap-4">
-        <InputField label="Contact Email" name="contactEmail" type="email" placeholder="contact@company.com" required value={formData.contactEmail} onChange={handleInputChange} error={formData.contactEmail && !emailValid ? 'Enter a valid email' : ''} />
-        <InputField label="Phone Number" name="phoneNumber" type="tel" placeholder="+233 XX XXX XXXX" required value={formData.phoneNumber} onChange={handleInputChange} error={formData.phoneNumber && !phoneValid ? 'Enter a valid phone number' : ''} />
+        <InputField label="Contact Email" name="contactEmail" type="email" placeholder="contact@company.com" required value={formData.contactEmail} onChange={handleInputChange} error={errors?.contactEmail} />
+        <InputField label="Phone Number" name="phoneNumber" type="tel" placeholder="+233 XX XXX XXXX" required value={formData.phoneNumber} onChange={handleInputChange} error={errors?.phoneNumber} />
       </div>
 
       <InputField label="Password" name="password" type="password" placeholder="Create a strong password" required value={formData.password} onChange={handleInputChange} />
@@ -467,7 +473,7 @@ const EmployerForm = () => {
       </Button>
     </form>
   );
-}
+};
 
 // local RequirementItem reused from ResetPassword
 const RequirementItem = ({ valid, label, matchCheck }) => (
