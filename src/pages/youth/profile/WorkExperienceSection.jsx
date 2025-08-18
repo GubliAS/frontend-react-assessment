@@ -4,7 +4,7 @@ import SelectField from '../../../components/shared/SelectInputField';
 import { Plus, Trash2, Edit } from 'lucide-react';
 import { useWorkExperience } from '../../../redux/workExperienceSection/useWorkExperience'; // <-- your custom hook
 import { addWorkExperience, updateWorkExperience, removeWorkExperience } from '../../../redux/workExperienceSection/WorkExperienceSlice';
-
+import { Card } from '../../../components/ui/card';
 const WorkExperienceSection = () => {
   const { workExperiences, dispatch } = useWorkExperience(); // from Redux
   const [editingId, setEditingId] = useState(null);
@@ -117,7 +117,7 @@ const WorkExperienceSection = () => {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 border border-white/20 p-4 rounded-lg"
+          className="space-y-4 border border-white/20 p-6 bg-white shadow-lg hover:shadow-xl transition-all  text-card-foreground shadow-sm rounded-lg mb-2"
         >
           <InputField
             label="Company"

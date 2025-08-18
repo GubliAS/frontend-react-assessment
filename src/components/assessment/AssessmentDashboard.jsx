@@ -39,7 +39,7 @@ const AssessmentDashboard = ({ onStartAssessment }) => {
   const levelProgress = ((assessmentState.totalPoints % 500) / 500) * 100;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="max-w-6xl mx-auto  space-y-6">
       {/* Header Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -138,6 +138,7 @@ const AssessmentDashboard = ({ onStartAssessment }) => {
                     <Button 
                       onClick={() => onStartAssessment(assessment)}
                       className="w-full"
+                      variant="emeraldGradient"
                       disabled={assessmentState.isActive}
                     >
                       Start Assessment

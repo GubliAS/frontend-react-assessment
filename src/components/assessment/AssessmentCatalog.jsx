@@ -281,6 +281,7 @@ const AssessmentCatalog = ({ onStartAssessment }) => {
                 <Button 
                   onClick={() => onStartAssessment(assessment)}
                   className="w-full"
+                  variant='emeraldGradient'
                 >
                   Start Assessment
                 </Button>

@@ -4,7 +4,7 @@ import SelectField from "../../../components/shared/SelectInputField";
 import PropTypes from "prop-types";
 import { usePersonalInfo } from "../../../redux/personaInfo/usePersonalInfo";
 import { setPersonalInfo } from "../../../redux/personaInfo/PersonalInfoSlice";
-
+import { Card } from "../../../components/ui/card";
 const GHANA_REGIONS = [
   "Greater Accra", "Ashanti", "Western", "Central", "Volta", "Eastern", "Northern",
   "Upper East", "Upper West", "Brong-Ahafo", "Western North", "Ahafo",
@@ -19,7 +19,7 @@ const PersonalInfoSection = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <Card className="space-y-6 p-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Personal Information
@@ -131,7 +131,7 @@ const PersonalInfoSection = () => {
           {personalInfo.bio.length}/500 characters
         </p>
       </div>
-    </div>
+    </Card>
   );
 };
 

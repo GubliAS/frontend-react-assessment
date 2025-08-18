@@ -71,7 +71,7 @@ const Assessments = () => {
     <div >
       {/* <AppHeader /> */}
     
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-7xl mx-auto px-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-7xl mx-auto">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="catalog">Catalog</TabsTrigger>

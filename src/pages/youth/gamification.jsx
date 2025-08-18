@@ -12,15 +12,15 @@ const Gamification = () => {
   const [userId] = useState('mock-user-id');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen ">
       {/* <AppHeader /> */}
       
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
-          <h1 className="text-5xl font-bold text-white mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold text-[var(--ebony-50)] mb-4 ">
             🎮 Talent Hub Arena
           </h1>
-          <p className="text-xl text-blue-200">
+          <p className="text-xl text-[var(--river-bed)]">
             Level up your career journey with rewards and achievements!
           </p>
         </div>
@@ -32,11 +32,11 @@ const Gamification = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full max-w-2xl mx-auto bg-black/30 backdrop-blur-sm">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">Overview</TabsTrigger>
-            <TabsTrigger value="challenges" className="data-[state=active]:bg-purple-600">Challenges</TabsTrigger>
-            <TabsTrigger value="achievements" className="data-[state=active]:bg-purple-600">Achievements</TabsTrigger>
-            <TabsTrigger value="leaderboard" className="data-[state=active]:bg-purple-600">Leaderboard</TabsTrigger>
+          <TabsList className="grid grid-cols-4 w-full max-w-2xl mx-auto bg-white shadow-sm rounded-md">
+            <TabsTrigger value="overview" className="text-gray-700 data-[state=active]:bg-emerald-600 data-[state=active]:text-white">Overview</TabsTrigger>
+            <TabsTrigger value="challenges" className="text-gray-700 data-[state=active]:bg-emerald-600 data-[state=active]:text-white">Challenges</TabsTrigger>
+            <TabsTrigger value="achievements" className="text-gray-700 data-[state=active]:bg-emerald-600 data-[state=active]:text-white">Achievements</TabsTrigger>
+            <TabsTrigger value="leaderboard" className="text-gray-700 data-[state=active]:bg-emerald-600 data-[state=active]:text-white">Leaderboard</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
