@@ -49,7 +49,7 @@ export default function SavedJobs() {
           </div>
         </div>
 
-        <Card className="p-6">
+       
           {savedJobs.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-600">You haven't saved any jobs yet.</p>
@@ -73,7 +73,7 @@ export default function SavedJobs() {
               ))}
             </div>
           )}
-        </Card>
+       
       </div>
   
   );

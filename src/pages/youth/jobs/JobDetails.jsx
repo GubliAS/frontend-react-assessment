@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   MapPin, Clock, DollarSign, Bookmark, BookmarkCheck, ArrowLeft,
   Building2, Users, Calendar, Share2, CheckCircle
 } from 'lucide-react';
+import Button from '../../../components/shared/Button';
 // import AppHeader from '../components/layout/AppHeader';
 // import ApplicationModal from '../components/jobs/ApplicationModal';
 import { getApplicationByJobId } from '../../../utils/ApplicationTracker';
@@ -87,10 +88,10 @@ export default function JobDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div >
       {/* <AppHeader /> */}
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 ">
         {/* Back Button */}
         <div className="mb-6">
           <button
@@ -149,13 +150,16 @@ export default function JobDetailsPage() {
               </div>
 
               {/* Apply Button */}
-              <button
+              <Button
                 onClick={handleApply}
                 disabled={hasApplied}
-                className={`mt-6 w-full sm:w-auto px-4 py-2 text-white rounded ${hasApplied ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                variant="emeraldGradient"
+                size="medium"
+                fullWidth={true}
+                className="mt-6 sm:w-auto w-full"
               >
                 {hasApplied ? 'Already Applied' : 'Apply Now'}
-              </button>
+              </Button>
             </div>
 
             {/* Job Description */}
@@ -215,13 +219,16 @@ export default function JobDetailsPage() {
 
             {/* Quick Apply */}
             <div className="bg-white rounded-lg shadow p-6">
-              <button
+              <Button
                 onClick={handleApply}
                 disabled={hasApplied}
-                className={`w-full px-4 py-2 text-white rounded ${hasApplied ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                variant="emeraldGradient"
+                size="medium"
+                fullWidth={true}
+                startIcon={hasApplied ? <CheckCircle className="w-4 h-4" /> : null}
               >
-                {hasApplied ? <><CheckCircle className="w-4 h-4 inline-block mr-1" /> Applied</> : 'Apply Now'}
-              </button>
+                {hasApplied ? 'Applied' : 'Apply Now'}
+              </Button>
               <p className="text-xs text-gray-500 text-center mt-2">
                 {hasApplied ? 'Application submitted successfully' : 'Complete your profile for faster applications'}
               </p>

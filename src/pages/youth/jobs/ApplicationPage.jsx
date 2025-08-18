@@ -88,8 +88,8 @@ export default function ApplicationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-3xl mx-auto px-4">
+  
+      <div className="mx-auto px-4">
         <div className="bg-white rounded-lg shadow p-6">
           <h1 className="text-2xl font-bold mb-1">Apply for {job.title}</h1>
           <p className="text-sm text-gray-600 mb-6">Company: {job.company}</p>
@@ -181,7 +181,7 @@ export default function ApplicationPage() {
                 <Button type="button" variant="outline" onClick={() => navigate(-1)}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button variant="emeraldGradient" type="submit" disabled={isSubmitting}>
                   {isSubmitting ? 'Submitting...' : 'Submit Application'}
                 </Button>
               </div>
@@ -189,6 +189,6 @@ export default function ApplicationPage() {
           </Form>
         </div>
       </div>
-    </div>
+
   );
 }
