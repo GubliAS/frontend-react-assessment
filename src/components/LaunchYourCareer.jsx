@@ -43,7 +43,7 @@ const LaunchYourCareerSection = () => {
             </Button>
 
             <Button
-              variant="outlineEbony"
+              variant="outlineEmeraldGradient"
               size="medium"
               type="button"
               aria-label="Learn more about Ghana Talent Hub"

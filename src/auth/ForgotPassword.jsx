@@ -17,7 +17,7 @@ const ForgotPasswordPage = () => {
   return (
     <div className="authlayout-bg relative z-10 min-h-screen flex items-center justify-center p-4 pt-20">
       <div className="w-full max-w-7xl grid gap-12 items-center">
-        <div className="rounded-lg text-card-foreground bg-[var(--primary-900)] backdrop-blur-xl border shadow-2xl border-white/20 hover:border-[rgb(151,177,150)]/30 transition-all duration-300 max-w-md mx-auto">
+        <div className="rounded-lg text-card-foreground bg-[var(--primary-600)] backdrop-blur-xl border shadow-2xl border-white/20 hover:border-[rgb(151,177,150)]/30 transition-all duration-300 max-w-md mx-auto">
           {isSubmitted ? (
             // ✅ Confirmation Message
             <div className="p-6 space-y-6 text-center">
@@ -84,7 +84,7 @@ const ForgotPasswordPage = () => {
 
                   <Button
                    type="submit"
-                   variant="gradient"
+                   variant="emeraldGradient"
                    size="large"
                    fullWidth
                    disabled

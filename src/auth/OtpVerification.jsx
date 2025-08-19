@@ -5,6 +5,7 @@ import { verifyOtpSeeker, verifyOtpEmployer } from "../services/auth";
 import { useDispatch } from "react-redux";
 import { setUser, setToken } from "../redux/auth/authSlice";
 import Cookies from "universal-cookie";
+import Button from "../components/shared/Button";
 
 const cookies = new Cookies();
 
@@ -112,7 +113,7 @@ const OTPVerificationPage = () => {
 
   return (
     <div className="authlayout-bg relative z-10 min-h-screen flex items-center justify-center p-4 pt-20">
-      <div className="rounded-lg text-card-foreground bg-[var(--primary-900)] backdrop-blur-xl border border-white/20 hover:border-[rgb(151,177,150)]/30 shadow-2xl transition-all duration-300 max-w-md w-full">
+      <div className="rounded-lg text-card-foreground bg-[var(--primary-600)] backdrop-blur-xl border border-white/20 hover:border-[rgb(151,177,150)]/30 shadow-2xl transition-all duration-300 max-w-md w-full">
         
         {/* Top Section */}
         <div className="flex flex-col p-6 space-y-4 text-center pb-6">
@@ -162,13 +163,15 @@ const OTPVerificationPage = () => {
               </p>
             </div>
 
-            <button
+            <Button
               type="submit"
+              variant="emeraldGradient"
+              size="medium"
               disabled={otp.some((val) => !val) || isSubmitting}
-              className="h-10 px-4 w-full bg-gradient-to-r from-[rgb(151,177,150)] to-emerald-500 hover:from-[rgb(171,197,170)] hover:to-emerald-400 text-white font-semibold py-3 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-[rgb(151,177,150)]/25 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed rounded-md flex items-center justify-center gap-2"
+              className="h-10 px-4 w-full text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Verifying..." : "Verify"}
-            </button>
+            </Button>
           </form>
 
           {error && <div className="text-sm text-red-400 text-center">{error}</div>}

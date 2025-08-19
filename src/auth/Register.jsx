@@ -38,7 +38,7 @@ const CreateAccountForm = () => {
   ];
 
   return (
-    <div className="rounded-lg text-card-foreground bg-[var(--primary-900)] backdrop-blur-xl border border-white/20 shadow-2xl hover:border-[rgb(151,177,150)]/30 transition-all duration-300">
+    <div className="rounded-lg text-card-foreground bg-[var(--primary-600)] backdrop-blur-xl border border-white/20 shadow-2xl hover:border-[rgb(151,177,150)]/30 transition-all duration-300">
       <div className="flex flex-col p-6 space-y-2 text-center pb-6">
         <h3 className="tracking-tight text-3xl font-bold text-white">Create Account</h3>
         <p className="text-sm text-gray-300">Join Ghana's premier talent community</p>
@@ -47,7 +47,7 @@ const CreateAccountForm = () => {
       <div className="p-6 pt-0 space-y-6">
        <div className="flex bg-white/5 rounded-lg p-1 mb-6">
           <Button
-            variant={accountType === "seeker" ? "primary" : "seekerOremployer"}
+            variant={accountType === "seeker" ? "emeraldGradient" : "seekerOremployer"}
             size="medium"
             fullWidth
             className={
@@ -61,7 +61,7 @@ const CreateAccountForm = () => {
           </Button>
 
           <Button
-            variant={accountType === "employer" ? "primary" : "seekerOremployer"}
+            variant={accountType === "employer" ? "emeraldGradient" : "seekerOremployer"}
             size="medium"
             fullWidth
             className={
@@ -299,7 +299,7 @@ const OpportunitySeekerForm = ({ validation }) => {
 
       <Button
         type="submit"
-        variant="gradient"
+        variant="emeraldGradient"
         size="large"
         fullWidth
         disabled={!isValid || isSubmitting}
@@ -463,7 +463,7 @@ const EmployerForm = ({ validation }) => {
 
       <Button
         type="submit"
-        variant="gradient"
+        variant="emeraldGradient"
         size="large"
         fullWidth
         disabled={!isValid || isSubmitting}

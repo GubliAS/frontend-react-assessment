@@ -58,7 +58,7 @@ const ResetPasswordPage = () => {
   return (
     <div className="authlayout-bg relative z-10 min-h-screen flex items-center justify-center p-4 pt-20">
       <div className="w-full max-w-7xl grid gap-12 items-center">
-        <div className="rounded-lg text-card-foreground bg-[var(--primary-900)] backdrop-blur-xl border shadow-2xl border-white/20 hover:border-[rgb(151,177,150)]/30 transition-all duration-300 max-w-md mx-auto">
+        <div className="rounded-lg text-card-foreground bg-[var(--primary-600)] backdrop-blur-xl border shadow-2xl border-white/20 hover:border-[rgb(151,177,150)]/30 transition-all duration-300 max-w-md mx-auto">
           {/* Header */}
           <div className="flex flex-col p-6 space-y-2 text-center">
             <h3 className="tracking-tight text-3xl font-bold text-white">
@@ -130,7 +130,7 @@ const ResetPasswordPage = () => {
               {/* Submit Button */}
               <Button
                 type="submit"
-                variant="gradient"
+                variant="emeraldGradient"
                 disabled={isLoading || !isOnline || !Object.values(passwordRequirements).every((req) => req)}
                 className="w-full font-semibold py-3 transition-all duration-300 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
               >

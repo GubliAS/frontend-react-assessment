@@ -10,14 +10,13 @@ const LeadingTalentPlatformSection = () => {
 
   return (
     <section
-      className="mx-auto w-full max-w-7xl"
+      className="mx-auto w-full max-w-7xl my-12 bg-[var(--primary-600)] shadow-lg"
       style={{
         paddingLeft: "clamp(0.75rem, 4vw, 2rem)",
         paddingRight: "clamp(0.75rem, 4vw, 2rem)",
         paddingTop: "clamp(2rem, 6vw, 4rem)",
         paddingBottom: "clamp(2rem, 6vw, 4rem)",
-        background:
-          "linear-gradient(90deg, rgba(11,55,42,1) 0%, rgba(11,55,42,1) 100%)",
+       
       }}
     >
       <div className="max-w-screen-xl w-full mx-auto text-center">

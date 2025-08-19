@@ -39,8 +39,15 @@ export default function Header() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center gap-2 flex-shrink-0 group cursor-pointer">
+            {/* Logo (navigates home) */}
+            <Link
+              to="/"
+              className="flex items-center gap-2 flex-shrink-0 group"
+              onClick={() => {
+                setOpenMenu(null);
+                setIsMobileMenuOpen(false);
+              }}
+            >
               <div
                 className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:shadow-lg group-hover:shadow-[rgb(151,177,150)]/25"
                 style={{
@@ -65,7 +72,7 @@ export default function Header() {
               >
                 Ghana Talent Hub
               </span>
-            </div>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center flex-1 justify-center">
@@ -165,6 +172,7 @@ export default function Header() {
               {!isAuth && (
                 <Link to="/login">
                   <Button
+                    variant="emeraldGradient"
                     className="border-white/30 hover:border-[rgb(151,177,150)] hover:text-white hover:shadow-lg hover:shadow-[rgb(151,177,150)]/25 rounded-full transition-all duration-300 whitespace-nowrap transform hover:scale-105"
                     style={{
                       fontSize: "clamp(12px, 0.9vw, 14px)",

@@ -54,7 +54,7 @@ const Login = () => {
     <div className="authlayout-bg relative z-10 min-h-screen flex items-center justify-center p-4 pt-20">
       <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-12 items-center">
         <AuthAside />
-        <div className="rounded-lg text-card-foreground bg-[var(--primary-900)] backdrop-blur-xl border border-white/20 shadow-2xl transition-all duration-300">
+        <div className="rounded-lg text-card-foreground bg-[var(--primary-600)] backdrop-blur-xl border border-white/20 shadow-2xl transition-all duration-300">
           <div className="flex flex-col p-6 space-y-2 text-center pb-6">
             <h3 className="tracking-tight text-3xl font-bold text-white">Welcome back</h3>
             <p className="text-sm text-gray-300">Sign in to continue to Ghana Talent Hub</p>
@@ -63,7 +63,7 @@ const Login = () => {
           <div className="p-6 pt-0 space-y-6">
             <div className="flex bg-white/5 rounded-lg p-1 mb-6">
               <Button
-                variant={accountType === 'seeker' ? 'primary' : 'seekerOremployer'}
+                variant={accountType === 'seeker' ? 'emeraldGradient' : 'seekerOremployer'}
                 size="medium"
                 fullWidth
                 className={accountType === 'seeker' ? 'gap-2 bg-gradient-to-r from-[rgb(151,177,150)] to-emerald-500 text-white shadow-lg' : 'gap-2 text-gray-300 hover:text-white hover:bg-white/10'}
@@ -73,7 +73,7 @@ const Login = () => {
               </Button>
 
               <Button
-                variant={accountType === 'employer' ? 'primary' : 'seekerOremployer'}
+                variant={accountType === 'employer' ? 'emeraldGradient' : 'seekerOremployer'}
                 size="medium"
                 fullWidth
                 className={accountType === 'employer' ? 'gap-2 bg-gradient-to-r from-[rgb(151,177,150)] to-emerald-500 text-white shadow-lg' : 'gap-2 text-gray-300 hover:text-white hover:bg-white/10'}
@@ -128,7 +128,7 @@ const Login = () => {
                       onDismiss={() => {}}
                     />}
 
-              <Button type="submit" variant="gradient" size="large" fullWidth disabled={isSubmitting} className="w-full font-semibold py-3">
+              <Button type="submit" variant="emeraldGradient" size="large" fullWidth disabled={isSubmitting} className="w-full font-semibold py-3">
                 {isSubmitting ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>
