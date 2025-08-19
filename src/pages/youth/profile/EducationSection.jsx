@@ -4,7 +4,7 @@ import { addEducation, updateEducation, removeEducation } from '../../../redux/e
 import { useEducation } from '../../../redux/educationSection/useEducationInfo';
 import InputField from '../../../components/shared/InputField';
 import SelectField from '../../../components/shared/SelectInputField';
-
+import Button from '../../../components/shared/Button';
 const GHANA_INSTITUTIONS = [
   'University of Ghana',
   'Kwame Nkrumah University of Science and Technology (KNUST)',
@@ -125,20 +125,29 @@ const EducationSection = () => {
                 <p className="text-gray-600">{edu.institution}</p>
               </div>
               <div className="flex gap-2">
-                <button
-                  className="p-2 border rounded hover:bg-gray-100"
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => handleEdit(edu)}
+                  className="p-2"
                   aria-label="Edit education"
                 >
                   <Edit className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 border rounded hover:bg-gray-100"
+                  <span className="sr-only">Edit</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => dispatch(removeEducation(edu.id))}
+                  className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50"
                   aria-label="Delete education"
                 >
                   <Trash2 className="w-4 h-4" />
-                </button>
+                  <span className="sr-only">Delete</span>
+                </Button>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 text-sm">
@@ -162,13 +171,15 @@ const EducationSection = () => {
       </div>
 
       {!showForm && (
-        <button
-          onClick={() => setShowForm(true)}
-          className="w-full border border-dashed border-gray-400 rounded py-2 flex items-center justify-center text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Education
-        </button>
+       
+            <Button 
+                  onClick={() => setShowForm(true)} 
+                  variant="outline" 
+                  className="w-full border-dashed border-2 hover:border-blue-500 hover:text-blue-600 transition-colors"
+                >
+                  <Plus className="w-4 h-4 mr-2" /> 
+                   Add Education
+                </Button>
       )}
 
       {showForm && (
@@ -254,12 +265,14 @@ const EducationSection = () => {
 
             {/* Form Actions */}
             <div className="flex gap-2 pt-4">
-              <button 
-                type="submit" 
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+             <Button
+                type="submit"
+                variant="emeraldGradient"
+                size="medium"
+                className="px-4 py-2"
               >
                 {editingId ? 'Update Education' : 'Add Education'}
-              </button>
+              </Button>
               <button 
                 type="button" 
                 onClick={handleCancel} 

@@ -38,7 +38,7 @@ const Button = ({
               'transform hover:scale-[1.02] rounded-md',
 
     // NEW: Emerald gradient variant used by JobCard
-    emeraldGradient: 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all duration-200 rounded-xl font-semibold'
+    emeraldGradient: 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all duration-200  font-semibold'
   };
 
   const sizes = {

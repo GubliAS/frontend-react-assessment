@@ -480,6 +480,7 @@ const CertificatesForm = () => {
 
               <div className="flex gap-2 pt-4">
                 <Button 
+                variant='emeraldGradient'
                   type="submit" 
                   disabled={uploading || loading}
                   className="min-w-[120px]"

@@ -59,7 +59,7 @@ const Hero = () => {
           <Button
             role="tab"
             size="small"
-            variant={accountType === "youth" ? "primary" : "seekerOremployer"}
+            variant={accountType === "youth" ? "emeraldGradient" : "seekerOremployer"}
             onClick={() => setAccountType("youth")}
             aria-selected={accountType === "youth"}
             aria-pressed={accountType === "youth"}
@@ -73,7 +73,7 @@ const Hero = () => {
           <Button
             role="tab"
             size="small"
-            variant={accountType === "employer" ? "primary" : "seekerOremployer"}
+            variant={accountType === "employer" ? "emeraldGradient" : "seekerOremployer"}
             onClick={() => setAccountType("employer")}
             aria-selected={accountType === "employer"}
             aria-pressed={accountType === "employer"}
@@ -106,7 +106,7 @@ const Hero = () => {
           <div className="mt-6 flex flex-col sm:flex-row items-center sm:items-start justify-center md:justify-start gap-4">
             <Link to={active.cta.to} className="w-full sm:w-auto">
               <Button
-                variant="primary"
+                variant="emeraldGradient"
                 size="medium"
                 className="rounded-full"
                 style={{

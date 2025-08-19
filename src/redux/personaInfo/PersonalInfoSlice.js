@@ -6,7 +6,11 @@ const initialState = {
     lastName: '',
     dateOfBirth: '',
     gender: '',
+     // optional Ghana Card fields
+    ghanaCardNumber: '',
+    ghanaCardFile: null,
     region: '',
+    district: '',
     city: '',
     phone: '',
     email: '',

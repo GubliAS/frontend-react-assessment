@@ -111,7 +111,8 @@ const AssessmentLauncher = ({ assessment, onStart, onCancel }) => {
             </Button>
             <Button 
               onClick={onStart}
-              className="flex-1 bg-green-600 hover:bg-green-700"
+              className="flex-1 "
+              variant='emeraldGradient'
             >
               Start Assessment
             </Button>

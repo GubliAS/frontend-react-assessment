@@ -9,6 +9,7 @@ import skillsReducer from './skillsInfoSection/SkillSlice';
 import certificatesReducer from './certificateSection/CertificateSlice';
 import photoReducer from './photoSection/PhotoSlice'; // ✅ import Photo slice
 import authReducer from './auth/authSlice'; // <-- add auth slice import
+import careerAspirationReducer from './careerAspiration/careerAspirationSlice'; // <-- add career aspiration reducer
 
 const persistConfig = {
   key: 'root',
@@ -27,6 +28,7 @@ export const store = configureStore({
     skills: makePersistedReducer('skills', skillsReducer),
     certificates: makePersistedReducer('certificates', certificatesReducer),
     photo: makePersistedReducer('photo', photoReducer), // ✅ register photo slice
+    careerAspiration: makePersistedReducer('careerAspiration', careerAspirationReducer), // <-- register career aspiration slice
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -4,6 +4,7 @@ import SelectField from '../../../components/shared/SelectInputField';
 import { Plus, Trash2, Edit } from 'lucide-react';
 import { useWorkExperience } from '../../../redux/workExperienceSection/useWorkExperience'; // <-- your custom hook
 import { addWorkExperience, updateWorkExperience, removeWorkExperience } from '../../../redux/workExperienceSection/WorkExperienceSlice';
+import Button from '../../../components/shared/Button';
 import { Card } from '../../../components/ui/card';
 const WorkExperienceSection = () => {
   const { workExperiences, dispatch } = useWorkExperience(); // from Redux
@@ -63,32 +64,47 @@ const WorkExperienceSection = () => {
 
   return (
     <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Work Experience</h2>
+        <p className="text-gray-600">Add your past and current roles to showcase your professional experience.</p>
+      </div>
       {/* Work Experience List */}
       <div className="space-y-4">
         {workExperiences.map((exp) => (
-          <div key={exp.id} className="border border-white/20 rounded-lg p-4">
+          <div key={exp.id} className=" bg-white shadow-sm hover:shadow-xl transition-all rounded-lg p-4">
             <div className="flex justify-between">
               <div>
                 <h3 className="text-lg font-semibold">{exp.position}</h3>
                 <p className="text-gray-400">{exp.company}</p>
               </div>
               <div className="flex gap-2">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     setEditingId(exp.id);
                     setFormData(exp);
                     setShowForm(true);
                   }}
+                  className="p-2"
+                  aria-label="Edit work experience"
                 >
-                  <Edit size={16} />
-                </button>
-                <button
+                  <Edit className="w-4 h-4" />
+                  <span className="sr-only">Edit</span>
+                </Button>
+
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => dispatch(removeWorkExperience(exp.id))}
+                  className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  aria-label="Delete work experience"
                 >
-                  <Trash2 size={16} />
-                </button>
+                  <Trash2 className="w-4 h-4" />
+                  <span className="sr-only">Delete</span>
+                </Button>
               </div>
             </div>
             <p className="text-sm text-gray-500">
@@ -104,13 +120,15 @@ const WorkExperienceSection = () => {
 
       {/* Add Button */}
       {!showForm && (
-        <button
-          onClick={() => setShowForm(true)}
-          className="w-full border border-dashed border-white/30 p-2 rounded-lg text-gray-300 hover:border-[rgb(151,177,150)]/50"
-        >
-          <Plus size={16} className="inline mr-2" />
-          Add Work Experience
-        </button>
+       
+            <Button 
+                  onClick={() => setShowForm(true)} 
+                  variant="outline" 
+                  className="w-full border-dashed border-2 hover:border-blue-500 hover:text-blue-600 transition-colors"
+                >
+                  <Plus className="w-4 h-4 mr-2" /> 
+                  Add Work Experience
+                </Button>
       )}
 
       {/* Form */}

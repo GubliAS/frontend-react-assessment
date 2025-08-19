@@ -145,7 +145,7 @@ const PhotoUpload = ({ updateProfilePhoto }) => {
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+            <Button variant='emeraldGradient' onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
               <Camera className="w-4 h-4 mr-2" />
               {profilePhotoUrl ? 'Change Photo' : 'Upload Photo'}
             </Button>

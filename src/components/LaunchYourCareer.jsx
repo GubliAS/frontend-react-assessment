@@ -28,7 +28,7 @@ const LaunchYourCareerSection = () => {
           {/* Buttons: stacked on very small screens, inline on sm+ */}
           <div className="mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
             <Button
-              variant="primary"
+              variant="emeraldGradient"
               size="medium"
               type="button"
               aria-label="Get started with Ghana Talent Hub for free"

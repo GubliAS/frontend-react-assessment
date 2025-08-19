@@ -69,6 +69,27 @@ const PersonalInfoSection = () => {
           value={personalInfo.gender}
           onChange={(e) => handleInputChange("gender", e.target.value)}
         />
+          {/* Optional Ghana Card */}
+       <InputField
+         label="Ghana Card Number (optional)"
+         name="ghanaCardNumber"
+         value={personalInfo.ghanaCardNumber}
+         onChange={(e) => handleInputChange("ghanaCardNumber", e.target.value)}
+         placeholder="Enter Ghana Card number"
+       />
+
+       <div className="space-y-2">
+         <label htmlFor="ghanaCardFile" className="text-sm font-medium text-gray-200">Upload Ghana Card (optional)</label>
+         <input
+           id="ghanaCardFile"
+           name="ghanaCardFile"
+           type="file"
+           accept="image/*,application/pdf"
+           onChange={(e) => handleInputChange("ghanaCardFile", e.target.files?.[0] || null)}
+           className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-gradient-to-r file:from-green-600 file:to-emerald-600  file:text-white"
+         />
+       </div>
+       
 
         <SelectField
           label="Region"
@@ -81,13 +102,20 @@ const PersonalInfoSection = () => {
           value={personalInfo.region}
           onChange={(e) => handleInputChange("region", e.target.value)}
         />
+         <InputField
+       label="District"
+       name="district"
+       value={personalInfo.district}
+         onChange={(e) => handleInputChange("district", e.target.value)}
+       placeholder="Enter your district"
+     />
 
         <InputField
-          label="City"
+          label="City/Town"
           name="city"
           value={personalInfo.city}
           onChange={(e) => handleInputChange("city", e.target.value)}
-          placeholder="Enter your city"
+          placeholder="Enter your city/town"
         />
 
         <InputField
@@ -96,7 +124,7 @@ const PersonalInfoSection = () => {
           name="phone"
           value={personalInfo.phone}
           onChange={(e) => handleInputChange("phone", e.target.value)}
-          placeholder="+233 XXX XXX XXX"
+          placeholder="233 XXX XXX XXX"
         />
 
         <InputField

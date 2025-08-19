@@ -10,13 +10,16 @@ import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { useToast } from "../../../hooks/use-toast";
 import SkillForm from "./SkillsSections";
 import CertificatesForm from "./CertificateSection";
+import CareerAspirationsForm from "./CareerAspirationSection"; // Placeholder for Career Aspirations section
 import PhotoUpload from "./PhotoUpload"; // Placeholder for Photo upload section
+
 const steps = [
   { id: 'personal', title: 'Personal Info', description: 'Basic information' },
   { id: 'experience', title: 'Experience', description: 'Work history' },
   { id: 'education', title: 'Education', description: 'Academic background' },
   { id: 'skills', title: 'Skills', description: 'Technical & soft skills' },    
   { id: 'certificates', title: 'Certificates', description: 'Professional certificates' },
+  { id: 'career', title: 'Career Aspirations', description: 'Your career goals' },
   {id: 'photo', title: 'Profile Photo', description: 'Upload your profile photo'},
   { id: 'review', title: 'Review', description: 'Final review' }
 ];
@@ -144,6 +147,9 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
        />)
        case 6:
         return (
+        <CareerAspirationsForm />)
+      case 7:
+        return (
        <PhotoUpload
        mode="create"
        data={formData.certificate}
@@ -151,7 +157,7 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
         onValidate={(isValid) => handleStepValidation(4, isValid)}
          showActions={false}
        />)
-      case 7:
+      case 8:
          return (
           <Card className="shadow-form">
             <CardContent className="p-8 space-y-6">
@@ -200,7 +206,8 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
                 </Button>
                 <Button
                   onClick={handleComplete}
-                  className="flex items-center space-x-2 bg-gradient-primary"
+                  variant="emeraldGradient"
+                  className="flex items-center space-x-2"
                 >
                   <span>Create Profile</span>
                 </Button>
@@ -244,6 +251,7 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
 
         {currentStep < steps.length && (
           <Button
+          variant="emeraldGradient"
             onClick={handleNext}
             disabled={isNextDisabled()}
             className="flex items-center space-x-2"

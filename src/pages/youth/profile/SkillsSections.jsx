@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSkills } from '../../../redux/skillsInfoSection/useSkill';
 import Button from '../../../components/shared/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
@@ -16,8 +16,11 @@ const SkillForm= () => {
   const [currentCategory, setCurrentCategory] = useState('technical');
   const [currentLevel, setCurrentLevel] = useState('intermediate');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showLimitWarning, setShowLimitWarning] = useState(false);
   const [draggedItem, setDraggedItem] = useState(null);
   const inputRef = useRef(null);
+  const MAX_PER_CATEGORY = 10;
+  const currentCount = skills.filter(s => s.category === currentCategory).length;
 
   const predefinedSkills = {
     technical: ['JavaScript','TypeScript','React','Node.js','Python','Java','C++','SQL','MongoDB','PostgreSQL','AWS','Docker','Kubernetes','Git','HTML','CSS','Angular','Vue.js','Express.js','Django','Spring Boot','Machine Learning','Data Analysis','Cybersecurity','DevOps','Mobile Development','UI/UX Design'],
@@ -44,6 +47,10 @@ const SkillForm= () => {
 
   const handleAddSkill = (skillName) => {
     if (!skillName.trim()) return;
+    if (currentCount >= MAX_PER_CATEGORY) {
+      setShowLimitWarning(true);
+      return;
+    }
     dispatch(addSkill({ name: skillName.trim(), category: currentCategory, level: currentLevel }));
     setCurrentInput('');
     setShowSuggestions(false);
@@ -56,7 +63,7 @@ const SkillForm= () => {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && currentInput.trim()) {
       e.preventDefault();
-      handleAddSkill(currentInput);
+      if (currentCount < MAX_PER_CATEGORY) handleAddSkill(currentInput);
     }
   };
 
@@ -75,6 +82,11 @@ const SkillForm= () => {
   };
 
   const getSkillsByCategory = (category) => skills.filter(s => s.category === category);
+
+  useEffect(() => {
+    // clear warning when user switches category or count changes
+    if (currentCount < MAX_PER_CATEGORY) setShowLimitWarning(false);
+  }, [currentCategory, currentCount]);
 
   return (
     <div className="space-y-6">
@@ -122,6 +134,9 @@ const SkillForm= () => {
                       ))}
                     </div>
                   )}
+                  {currentCount >= MAX_PER_CATEGORY && (
+                    <p className="mt-2 text-sm text-red-600">Maximum of {MAX_PER_CATEGORY} items reached for {categoryLabels[currentCategory].toLowerCase()}.</p>
+                  )}
                 </div>
 
                 <div>
@@ -139,7 +154,11 @@ const SkillForm= () => {
                 </div>
               </div>
 
-              <Button onClick={() => handleAddSkill(currentInput)} disabled={!currentInput.trim()}>
+              <Button
+                variant='emeraldGradient'
+                onClick={() => handleAddSkill(currentInput)}
+                disabled={!currentInput.trim() || currentCount >= MAX_PER_CATEGORY}
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Add {categoryLabels[currentCategory]}
               </Button>
@@ -157,7 +176,7 @@ const SkillForm= () => {
                         onDragStart={e => handleDragStart(e, skill.id)}
                         onDragOver={handleDragOver}
                         onDrop={e => handleDrop(e, skill.id)}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border cursor-move hover:bg-gray-100 transition-colors"
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-move hover:bg-gray-100 transition-colors"
                       >
                         <div className="flex items-center space-x-3">
                           <GripVertical className="w-4 h-4 text-gray-400" />

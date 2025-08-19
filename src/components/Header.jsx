@@ -42,7 +42,7 @@ export default function Header() {
             {/* Logo */}
             <div className="flex items-center gap-2 flex-shrink-0 group cursor-pointer">
               <div
-                className="bg-[var(--gold-400)] rounded-xl flex items-center justify-center transition-all duration-300 group-hover:shadow-lg group-hover:shadow-[rgb(151,177,150)]/25"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:shadow-lg group-hover:shadow-[rgb(151,177,150)]/25"
                 style={{
                   width: "clamp(32px, 2.5vw, 40px)",
                   height: "clamp(32px, 2.5vw, 40px)",
@@ -52,7 +52,7 @@ export default function Header() {
                   style={{
                     width: "clamp(16px, 1.2vw, 20px)",
                     height: "clamp(16px, 1.2vw, 20px)",
-                    color: "var(--ebony-50)",
+                    color: "white",
                   }}
                   className="flex items-center justify-center"
                 >

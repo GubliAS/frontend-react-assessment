@@ -1,5 +1,6 @@
 import React from "react";
 import { FileText, Upload, ArrowRight } from "lucide-react";
+import Button from "../../../components/shared/Button";
 
 export const CreationModeSelector = ({ onModeSelect }) => {
   return (
@@ -38,13 +39,14 @@ export const CreationModeSelector = ({ onModeSelect }) => {
               <p>✓ No existing documents needed</p>
             </div>
 
-            <button
+            <Button
               onClick={() => onModeSelect("manual")}
-              className="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-md transition"
+              variant="emeraldGradient"
+              fullWidth
+              endIcon={<ArrowRight className="h-4 w-4" />}
             >
-              <span>Start Manual Creation</span>
-              <ArrowRight className="h-4 w-4" />
-            </button>
+              Start Manual Creation
+            </Button>
 
             <p className="text-xs text-gray-400">
               Estimated time: 10-15 minutes
@@ -77,13 +79,14 @@ export const CreationModeSelector = ({ onModeSelect }) => {
               <p>✓ Quick profile creation</p>
             </div>
 
-            <button
+            <Button
               onClick={() => onModeSelect("upload")}
-              className="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-md transition"
+              variant="emeraldGradient"
+              fullWidth
+              endIcon={<ArrowRight className="h-4 w-4" />}
             >
-              <span>Upload Resume</span>
-              <ArrowRight className="h-4 w-4" />
-            </button>
+              Upload Resume
+            </Button>
 
             <p className="text-xs text-gray-400">
               Estimated time: 3-5 minutes
