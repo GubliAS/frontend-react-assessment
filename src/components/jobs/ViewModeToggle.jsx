@@ -4,9 +4,9 @@ import Button from "../shared/Button"; // your custom Button component
 
 const ViewModeToggle = ({ viewMode, onViewModeChange }) => {
   return (
-    <div className="flex items-center border rounded-md overflow-hidden">
+    <div className="flex items-center bg-white shadow-sm rounded-md overflow-hidden">
       <Button
-        variant={viewMode === "list" ? "emerald" : "ghost"}
+        variant={viewMode === "list" ? "emeraldGradient" : "ghost"}
         size="small"
         onClick={() => onViewModeChange("list")}
         className="rounded-r-none"
@@ -14,7 +14,7 @@ const ViewModeToggle = ({ viewMode, onViewModeChange }) => {
         <List className="w-4 h-4" />
       </Button>
       <Button
-        variant={viewMode === "grid" ? "primary" : "ghost"}
+        variant={viewMode === "grid" ? "emeraldGradient" : "ghost"}
         size="small"
         onClick={() => onViewModeChange("grid")}
         className="rounded-l-none"

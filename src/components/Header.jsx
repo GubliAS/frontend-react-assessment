@@ -30,6 +30,11 @@ export default function Header() {
   const [openMenu, setOpenMenu] = useState(null);
   const isAuth = useSelector((state) => state?.auth?.isAuthenticated);
 
+  // include Dashboard in the nav for authenticated users
+  const navToRender = isAuth
+    ? [{ to: "/youth/dashboard", label: "Dashboard" }, ...navigation]
+    : navigation;
+
   const toggleMenu = (menuName) => {
     setOpenMenu(openMenu === menuName ? null : menuName);
   };
@@ -80,7 +85,7 @@ export default function Header() {
                 className="flex items-center"
                 style={{ gap: "clamp(16px, 2vw, 32px)" }}
               >
-                {navigation.map((nav) =>
+                {navToRender.map((nav) =>
                   nav.type === "dropdown" ? (
                     <div key={nav.label} className="relative group">
                       <button
@@ -202,7 +207,7 @@ export default function Header() {
           {isMobileMenuOpen && (
             <div className="md:hidden bg-slate-800/95 backdrop-blur-md border-t border-white/10">
               <div className="px-2 pt-2 pb-3 space-y-1">
-                {navigation.map((nav) =>
+                {navToRender.map((nav) =>
                   nav.type === "dropdown" ? (
                     <div key={nav.label}>
                       <div
