@@ -10,6 +10,7 @@ import certificatesReducer from './certificateSection/CertificateSlice';
 import photoReducer from './photoSection/PhotoSlice'; // ✅ import Photo slice
 import authReducer from './auth/authSlice'; // <-- add auth slice import
 import careerAspirationReducer from './careerAspiration/careerAspirationSlice'; // <-- add career aspiration reducer
+import assessmentReducer from './assessmentSection/AssessmentSlice'; // <-- new assessment slice
 
 const persistConfig = {
   key: 'root',
@@ -21,14 +22,15 @@ const makePersistedReducer = (key, reducer) =>
 
 export const store = configureStore({
   reducer: {
-    auth: makePersistedReducer('auth', authReducer), // <-- register auth slice
+    auth: makePersistedReducer('auth', authReducer),
     workExperience: makePersistedReducer('workExperience', workExperienceReducer),
     personalInfo: makePersistedReducer('personalInfo', personalInfoReducer),
     education: makePersistedReducer('education', educationReducer),
     skills: makePersistedReducer('skills', skillsReducer),
     certificates: makePersistedReducer('certificates', certificatesReducer),
-    photo: makePersistedReducer('photo', photoReducer), // ✅ register photo slice
-    careerAspiration: makePersistedReducer('careerAspiration', careerAspirationReducer), // <-- register career aspiration slice
+    photo: makePersistedReducer('photo', photoReducer),
+    careerAspiration: makePersistedReducer('careerAspiration', careerAspirationReducer),
+    assessment: makePersistedReducer('assessment', assessmentReducer), // <-- register assessment slice
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

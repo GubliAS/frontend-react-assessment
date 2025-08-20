@@ -75,7 +75,7 @@ const WorkExperienceSection = () => {
             <div className="flex justify-between">
               <div>
                 <h3 className="text-lg font-semibold">{exp.position}</h3>
-                <p className="text-gray-400">{exp.company}</p>
+                <p className="text-gray-600">{exp.company}</p>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -143,6 +143,7 @@ const WorkExperienceSection = () => {
             value={formData.company}
             onChange={(e) => handleInputChange('company', e.target.value)}
             required
+            variant="light"
           />
           <InputField
             label="Position"
@@ -150,6 +151,7 @@ const WorkExperienceSection = () => {
             value={formData.position}
             onChange={(e) => handleInputChange('position', e.target.value)}
             required
+            variant="light"
           />
           <SelectField
             label="Location"
@@ -161,6 +163,7 @@ const WorkExperienceSection = () => {
               { value: 'london', label: 'London' },
               { value: 'remote', label: 'Remote' },
             ]}
+            variant="light"
           />
           <InputField
             type="date"
@@ -169,6 +172,7 @@ const WorkExperienceSection = () => {
             value={formData.startDate}
             onChange={(e) => handleInputChange('startDate', e.target.value)}
             required
+            variant="light"
           />
           <InputField
             type="date"
@@ -177,6 +181,7 @@ const WorkExperienceSection = () => {
             value={formData.endDate}
             onChange={(e) => handleInputChange('endDate', e.target.value)}
             disabled={formData.current}
+            variant="light"
           />
           <div className="flex items-center gap-2">
             <input
@@ -184,7 +189,7 @@ const WorkExperienceSection = () => {
               checked={formData.current}
               onChange={(e) => handleInputChange('current', e.target.checked)}
             />
-            <span className="text-sm text-gray-300">I currently work here</span>
+            <span className="text-sm text-gray-700">I currently work here</span>
           </div>
           <InputField
             label="Description"
@@ -192,18 +197,19 @@ const WorkExperienceSection = () => {
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
             placeholder="Describe your role..."
+            variant="light"
           />
           <div className="flex gap-2">
             <button
               type="submit"
-              className="bg-[rgb(151,177,150)] px-4 py-2 rounded text-black"
+              className="bg-[rgb(151,177,150)] px-4 py-2 rounded text-white"
             >
               {editingId ? 'Update' : 'Add'}
             </button>
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="border border-white/30 px-4 py-2 rounded text-gray-300"
+              className="border border-gray-200 px-4 py-2 rounded text-gray-700 hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>

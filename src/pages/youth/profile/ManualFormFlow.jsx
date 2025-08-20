@@ -13,7 +13,7 @@ import SkillForm from "./SkillsSections";
 import CertificatesForm from "./CertificateSection";
 import CareerAspirationsForm from "./CareerAspirationSection"; // Placeholder for Career Aspirations section
 import PhotoUpload from "./PhotoUpload"; // Placeholder for Photo upload section
-
+import AssessmentForm from "./AssessmentScoresSection"; // Placeholder for Assessment section
 // redux hooks/selectors
 import { usePersonalInfo } from "../../../redux/personaInfo/usePersonalInfo";
 import { useWorkExperience } from "../../../redux/workExperienceSection/useWorkExperience";
@@ -22,6 +22,7 @@ import { useSkills } from "../../../redux/skillsInfoSection/useSkill";
 import { useCertificates } from "../../../redux/certificateSection/useCertificate";
 import { usePhoto } from "../../../redux/photoSection/usePhoto";
 import { useCareerAspiration } from "../../../redux/careerAspiration/useCareerAspiration";
+import { useAssessment } from "../../../redux/assessmentSection/useAssessment";
 
 // actions
 import { setPersonalInfo } from "../../../redux/personaInfo/PersonalInfoSlice";
@@ -31,6 +32,7 @@ import { setSkills } from "../../../redux/skillsInfoSection/SkillSlice";
 import { setCertificates } from "../../../redux/certificateSection/CertificateSlice";
 import { setPhotoUrl } from "../../../redux/photoSection/PhotoSlice";
 import { setCareerAspiration } from "../../../redux/careerAspiration/careerAspirationSlice";
+import { setAssessmentScores } from "../../../redux/assessmentSection/AssessmentSlice"; // Placeholder for Assessment action
 
 const steps = [
   { id: 'personal', title: 'Personal Info', description: 'Basic information' },
@@ -39,6 +41,7 @@ const steps = [
   { id: 'skills', title: 'Skills', description: 'Technical & soft skills' },    
   { id: 'certificates', title: 'Certificates', description: 'Professional certificates' },
   { id: 'career', title: 'Career Aspirations', description: 'Your career goals' },
+  { id: 'assessment', title: 'Assessments Scores', description: 'Your assessment scores' },
   {id: 'photo', title: 'Profile Photo', description: 'Upload your profile photo'},
   { id: 'review', title: 'Review', description: 'Final review' }
 ];
@@ -59,6 +62,8 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
   const { certificates } = useCertificates();
   const { profilePhotoUrl } = usePhoto();
   const { careerAspiration } = useCareerAspiration();
+  const { assessmentScores } = useAssessment();
+
 
   const handleNext = () => {
     if (currentStep < steps.length) {
@@ -109,6 +114,11 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
     reduxDispatch(setCareerAspiration(data));
   };
 
+  const handleAssessmentUpdate = (data) => {
+    // replace the assessment scores list in the slice
+    reduxDispatch(setAssessmentScores(data));
+  };
+  
   const assembleProfile = () => ({
     personalInfo: personalInfo || {},
     workExperience: workExperiences || [],
@@ -117,6 +127,7 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
     certificates: certificates || [],
     photoUrl: profilePhotoUrl || '',
     careerAspiration: careerAspiration || {}
+   , assessmentScores: assessmentScores || []
   });
 
   const handlePreview = () => {
@@ -204,7 +215,17 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
             showActions={false}
           />
         );
-      case 7:
+        case 7:
+        return (
+          <AssessmentForm
+            mode="create"
+            data={assessmentScores}
+            onUpdate={handleAssessmentUpdate}
+            onValidate={(isValid) => handleStepValidation(7, isValid)}
+            showActions={false}
+          />
+        );    
+      case 8:
         return (
          <PhotoUpload
            mode="create"
@@ -214,7 +235,7 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
            showActions={false}
          />
         );
-      case 8:
+      case 9:
          return (
           <div>
              <div className="text-left text-[var(--ebony-50)] space-y-2">

@@ -120,6 +120,7 @@ const SkillForm= () => {
                     }}
                     onKeyPress={handleKeyPress}
                     placeholder={`Enter ${categoryLabels[currentCategory].toLowerCase()}...`}
+                    variant="light"
                   />
                   {showSuggestions && filteredSuggestions.length > 0 && (
                     <div className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto">
@@ -140,9 +141,9 @@ const SkillForm= () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="skill-level">Proficiency Level</Label>
+                  <Label htmlFor="skill-level" className="text-sm text-gray-700">Proficiency Level</Label>
                   <Select value={currentLevel} onValueChange={setCurrentLevel}>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full h-10 bg-white text-gray-900">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -164,7 +165,7 @@ const SkillForm= () => {
               </Button>
 
               <div>
-                <Label>Current {categoryLabels[currentCategory]} ({getSkillsByCategory(currentCategory).length})</Label>
+                <Label className="text-sm text-gray-700">Current {categoryLabels[currentCategory]} ({getSkillsByCategory(currentCategory).length})</Label>
                 {getSkillsByCategory(currentCategory).length === 0 ? (
                   <p className="text-gray-500 text-sm italic">No {categoryLabels[currentCategory].toLowerCase()} added yet.</p>
                 ) : (

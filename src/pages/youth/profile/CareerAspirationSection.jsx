@@ -50,10 +50,8 @@ const CareerAspirationsForm = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4">
-          <Target className="w-8 h-8 text-blue-600" />
-        </div>
+      <div className=" mb-8">
+       
         <h2 className="text-2xl font-bold text-gray-900">Career Aspirations</h2>
         <p className="text-gray-600 mt-2">
           Help us understand your career goals to provide personalized recommendations and identify skill gaps
@@ -75,34 +73,39 @@ const CareerAspirationsForm = () => {
                 value={careerAspiration.desiredRole}
                 onChange={(e) => handleInputChange("desiredRole", e.target.value)}
                 placeholder="e.g., Senior Software Engineer"
+                variant="light"
               />
             </div>
 
             <div>
               <SelectField
+                variant="light"
                 label="Target Industry *"
                 name="targetIndustry"
                 value={careerAspiration.targetIndustry}
                 onChange={(e) => handleInputChange("targetIndustry", e.target.value)}
                 options={[
+                  // ensure select uses light styling on white cards
                   { value: "technology", label: "Technology" },
-                  { value: "finance", label: "Finance" },
-                  { value: "healthcare", label: "Healthcare" },
-                  { value: "education", label: "Education" },
-                  { value: "manufacturing", label: "Manufacturing" },
-                  { value: "retail", label: "Retail" },
-                  { value: "consulting", label: "Consulting" },
-                  { value: "media", label: "Media & Entertainment" },
-                  { value: "nonprofit", label: "Non-profit" },
-                  { value: "government", label: "Government" },
-                  { value: "other", label: "Other" },
+                   { value: "finance", label: "Finance" },
+                   { value: "healthcare", label: "Healthcare" },
+                   { value: "education", label: "Education" },
+                   { value: "manufacturing", label: "Manufacturing" },
+                   { value: "retail", label: "Retail" },
+                   { value: "consulting", label: "Consulting" },
+                   { value: "media", label: "Media & Entertainment" },
+                   { value: "nonprofit", label: "Non-profit" },
+                   { value: "government", label: "Government" },
+                   { value: "other", label: "Other" },
                 ]}
                 required
+                
               />
             </div>
 
             <div>
               <SelectField
+                variant="light"
                 label="Career Level *"
                 name="careerLevel"
                 value={careerAspiration.careerLevel}
@@ -134,6 +137,7 @@ const CareerAspirationsForm = () => {
                 value={careerAspiration.targetSalary}
                 onChange={(e) => handleInputChange("targetSalary", e.target.value)}
                 placeholder="e.g., $80,000 - $120,000"
+                variant="light"
               />
             </div>
 
@@ -144,11 +148,13 @@ const CareerAspirationsForm = () => {
                 value={careerAspiration.location}
                 onChange={(e) => handleInputChange("location", e.target.value)}
                 placeholder="e.g., Remote, New York"
+                variant="light"
               />
             </div>
 
             <div>
               <SelectField
+                variant="light"
                 label="Work Type"
                 name="workType"
                 value={careerAspiration.workType}
@@ -167,6 +173,7 @@ const CareerAspirationsForm = () => {
 
             <div>
               <SelectField
+                variant="light"
                 label="Timeline to Achieve"
                 name="timeframe"
                 value={careerAspiration.timeframe}
@@ -194,6 +201,7 @@ const CareerAspirationsForm = () => {
           <InputField
             name="newSkill"
             className="flex-1"
+            variant="light"
             value={newSkill}
             onChange={(e) => setNewSkill(e.target.value)}
             placeholder="Enter a skill (e.g., React)"
@@ -234,6 +242,7 @@ const CareerAspirationsForm = () => {
           <InputField
             name="newCertification"
             className="flex-1"
+            variant="light"
             value={newCertification}
             onChange={(e) => setNewCertification(e.target.value)}
             placeholder="Enter certification (e.g., AWS Solutions Architect)"

@@ -37,6 +37,7 @@ const PersonalInfoSection = () => {
           onChange={(e) => handleInputChange("firstName", e.target.value)}
           placeholder="Enter your first name"
           required
+         variant="light"
         />
 
         <InputField
@@ -46,6 +47,7 @@ const PersonalInfoSection = () => {
           onChange={(e) => handleInputChange("lastName", e.target.value)}
           placeholder="Enter your last name"
           required
+         variant="light"
         />
 
         <InputField
@@ -55,6 +57,7 @@ const PersonalInfoSection = () => {
           value={personalInfo.dateOfBirth}
           onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
           required
+         variant="light"
         />
 
         <SelectField
@@ -68,6 +71,7 @@ const PersonalInfoSection = () => {
           ]}
           value={personalInfo.gender}
           onChange={(e) => handleInputChange("gender", e.target.value)}
+         variant="light"
         />
           {/* Optional Ghana Card */}
        <InputField
@@ -76,17 +80,18 @@ const PersonalInfoSection = () => {
          value={personalInfo.ghanaCardNumber}
          onChange={(e) => handleInputChange("ghanaCardNumber", e.target.value)}
          placeholder="Enter Ghana Card number"
+        variant="light"
        />
 
        <div className="space-y-2">
-         <label htmlFor="ghanaCardFile" className="text-sm font-medium text-gray-200">Upload Ghana Card (optional)</label>
+         <label htmlFor="ghanaCardFile" className="text-sm font-medium text-gray-700">Upload Ghana Card (optional)</label>
          <input
            id="ghanaCardFile"
            name="ghanaCardFile"
            type="file"
            accept="image/*,application/pdf"
            onChange={(e) => handleInputChange("ghanaCardFile", e.target.files?.[0] || null)}
-           className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-gradient-to-r file:from-green-600 file:to-emerald-600  file:text-white"
+           className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-gradient-to-r file:from-green-600 file:to-emerald-600  file:text-white"
          />
        </div>
        
@@ -101,6 +106,7 @@ const PersonalInfoSection = () => {
           }))}
           value={personalInfo.region}
           onChange={(e) => handleInputChange("region", e.target.value)}
+         variant="light"
         />
          <InputField
        label="District"
@@ -108,6 +114,7 @@ const PersonalInfoSection = () => {
        value={personalInfo.district}
          onChange={(e) => handleInputChange("district", e.target.value)}
        placeholder="Enter your district"
+      variant="light"
      />
 
         <InputField
@@ -116,6 +123,7 @@ const PersonalInfoSection = () => {
           value={personalInfo.city}
           onChange={(e) => handleInputChange("city", e.target.value)}
           placeholder="Enter your city/town"
+         variant="light"
         />
 
         <InputField
@@ -125,6 +133,7 @@ const PersonalInfoSection = () => {
           value={personalInfo.phone}
           onChange={(e) => handleInputChange("phone", e.target.value)}
           placeholder="233 XXX XXX XXX"
+         variant="light"
         />
 
         <InputField
@@ -134,6 +143,7 @@ const PersonalInfoSection = () => {
           value={personalInfo.email}
           onChange={(e) => handleInputChange("email", e.target.value)}
           placeholder="your.email@example.com"
+         variant="light"
         />
       </div>
 
@@ -148,11 +158,7 @@ const PersonalInfoSection = () => {
           onChange={(e) => handleInputChange("bio", e.target.value)}
           placeholder="Write a brief description about yourself, your career goals, and what makes you unique..."
           rows={4}
-          className="flex w-full rounded-md border px-3 py-2 text-sm 
-            bg-white/10 border-white/20 text-white placeholder:text-gray-400 
-            focus:border-[rgb(151,177,150)] focus:ring-[rgb(151,177,150)]/50 
-            focus:bg-white/15 hover:border-[rgb(151,177,150)]/50 
-            backdrop-blur-sm transition-all duration-300"
+          className="flex w-full rounded-md border px-3 py-2 text-sm bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-[rgb(151,177,150)] focus:ring-[rgb(151,177,150)]/50 hover:border-[rgb(151,177,150)]/50 transition-all duration-300"
           required
         />
         <p className="text-xs text-gray-500">

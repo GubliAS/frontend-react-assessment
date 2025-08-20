@@ -365,6 +365,7 @@ const CertificatesForm = () => {
                   placeholder="e.g., AWS Certified Solutions Architect"
                   error={formErrors.name}
                   required
+                  variant="light"
                 />
 
                 <InputField
@@ -375,6 +376,7 @@ const CertificatesForm = () => {
                   placeholder="e.g., Amazon Web Services"
                   error={formErrors.issuer}
                   required
+                  variant="light"
                 />
 
                 <InputField
@@ -385,6 +387,7 @@ const CertificatesForm = () => {
                   onChange={handleInputChange}
                   error={formErrors.issueDate}
                   required
+                  variant="light"
                 />
 
                 <InputField
@@ -394,6 +397,7 @@ const CertificatesForm = () => {
                   value={formData.expirationDate}
                   onChange={handleInputChange}
                   error={formErrors.expirationDate}
+                  variant="light"
                 />
 
                 <InputField
@@ -403,6 +407,7 @@ const CertificatesForm = () => {
                   onChange={handleInputChange}
                   placeholder="e.g., ABC123XYZ789"
                   className="md:col-span-2"
+                  variant="light"
                 />
               </div>
 

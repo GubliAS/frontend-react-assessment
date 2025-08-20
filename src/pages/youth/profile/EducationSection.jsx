@@ -197,6 +197,7 @@ const EducationSection = () => {
                 onChange={(e) => handleInputChange('institution', e.target.value)}
                 options={GHANA_INSTITUTIONS.map(inst => ({ value: inst, label: inst }))}
                 required
+               variant="light"
               />
               
               <SelectField
@@ -206,6 +207,7 @@ const EducationSection = () => {
                 onChange={(e) => handleInputChange('degree', e.target.value)}
                 options={DEGREE_LEVELS.map(deg => ({ value: deg, label: deg }))}
                 required
+               variant="light"
               />
             </div>
 
@@ -217,6 +219,7 @@ const EducationSection = () => {
               onChange={(e) => handleInputChange('fieldOfStudy', e.target.value)}
               placeholder="Enter your field of study"
               required
+         variant="light"
             />
 
             {/* Grade */}
@@ -226,6 +229,7 @@ const EducationSection = () => {
               value={formData.grade}
               onChange={(e) => handleInputChange('grade', e.target.value)}
               placeholder="Enter your grade (e.g., 3.5 GPA, First Class, etc.)"
+             variant="light"
             />
 
             {/* Date Fields */}
@@ -237,6 +241,7 @@ const EducationSection = () => {
                 value={formData.startDate}
                 onChange={(e) => handleInputChange('startDate', e.target.value)}
                 required
+              variant="light"
               />
 
               <InputField
@@ -246,6 +251,7 @@ const EducationSection = () => {
                 value={formData.endDate}
                 onChange={(e) => handleInputChange('endDate', e.target.value)}
                 disabled={formData.current}
+              variant="light"
               />
             </div>
 
