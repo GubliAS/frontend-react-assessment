@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { CreationModeSelector } from "./ProfileCreateMode"; // Adjust path
 import { ManualFormFlow } from "./ManualFormFlow"; // Adjust path
-
+import ResumeUploadPage  from "./AIProfileCreateFlow"; // Adjust path
 const ProfileCreation = () => {
   const [mode, setMode] = useState("selection"); // 'selection' | 'manual' | 'upload' | 'preview'
   const [profileData, setProfileData] = useState(null);
@@ -63,23 +63,7 @@ const ProfileCreation = () => {
               <div className="h-6 w-px bg-gray-300" />
               <h1 className="text-2xl font-semibold">AI Resume Upload</h1>
             </div>
-            <div className="max-w-2xl mx-auto">
-              <div className="text-center py-16">
-                <h2 className="text-xl font-semibold mb-4">
-                  Upload Feature Coming Soon
-                </h2>
-                <p className="text-gray-500">
-                  The AI-powered resume upload feature is currently under development.
-                  Please use the manual form creation for now.
-                </p>
-                <button
-                  onClick={() => setMode("manual")}
-                  className="mt-6 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-md"
-                >
-                  Use Manual Creation Instead
-                </button>
-              </div>
-            </div>
+         <ResumeUploadPage/>
           </div>
         );
 
