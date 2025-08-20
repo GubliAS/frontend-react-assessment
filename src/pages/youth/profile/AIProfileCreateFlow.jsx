@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card } from '../../../components/ui/card';
 import  Button  from '../../../components/shared/Button';
 import { Input } from '../../../components/ui/input';
@@ -22,6 +22,8 @@ import { setWorkExperiences } from '../../../redux/workExperienceSection/WorkExp
 import { setSkills } from '../../../redux/skillsInfoSection/SkillSlice';
 import { setCertificates } from '../../../redux/certificateSection/CertificateSlice';
 import { setPhotoUrl } from '../../../redux/photoSection/PhotoSlice'; // optional
+import {ManualFormFlow} from './ManualFormFlow';
+
 
 const ResumeUploadPage = ({ onBackToSelection, onExtractComplete }) => {
   const [file, setFile] = useState(null);
@@ -30,8 +32,20 @@ const ResumeUploadPage = ({ onBackToSelection, onExtractComplete }) => {
   const [extractionStep, setExtractionStep] = useState('idle'); // idle, uploading, extracting, complete, error
   const [extractedData, setExtractedData] = useState(null);
   const [extractionDetails, setExtractionDetails] = useState({});
+  const [showEditor, setShowEditor] = useState(false);
   const dispatch = useDispatch();
   const { toast } = useToast();
+  const photoObjectUrlRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      // revoke any created object URL when component unmounts
+      if (photoObjectUrlRef.current) {
+        URL.revokeObjectURL(photoObjectUrlRef.current);
+        photoObjectUrlRef.current = null;
+      }
+    };
+  }, []);
 
   const resetUpload = () => {
     setFile(null);
@@ -160,50 +174,164 @@ const ResumeUploadPage = ({ onBackToSelection, onExtractComplete }) => {
     }
   };
 
+  const isFileLike = (val) => {
+    if (!val || typeof val !== 'object') return false;
+    // browser File object normally has name/size/type/lastModified
+    return (val instanceof File) || ('name' in val && 'size' in val && ('lastModified' in val || 'lastModifiedDate' in val));
+  };
+
+  // Deep clone function to prevent mutations
+  const deepClone = (obj) => {
+    if (obj === null || typeof obj !== 'object') return obj;
+    if (obj instanceof Date) return new Date(obj.getTime());
+    if (obj instanceof Array) return obj.map(item => deepClone(item));
+    if (typeof obj === 'object') {
+      const cloned = {};
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          cloned[key] = deepClone(obj[key]);
+        }
+      }
+      return cloned;
+    }
+    return obj;
+  };
+
+  const sanitizeList = (list) => {
+    if (!Array.isArray(list)) return [];
+    return list.map(item => deepClone(item));
+  };
+
   const handleUseExtractedData = () => {
     if (!extractedData) return;
 
-    // Personal info
-    if (extractedData.personalInfo) {
-      dispatch(setPersonalInfo(extractedData.personalInfo));
-    }
+    try {
+      // Deep clone and sanitize personalInfo
+      const rawPI = extractedData.personalInfo || {};
+      const personalInfo = deepClone(rawPI);
 
-    // Education (replace list)
-    if (extractedData.education) {
-      dispatch(setEducationList(extractedData.education));
-    }
+      // If photo is a File-like object, create an object URL and remove file from personal info
+      let photoUrl = '';
+      if (personalInfo.photoUrl && isFileLike(personalInfo.photoUrl)) {
+        const file = personalInfo.photoUrl;
+        try {
+          if (photoObjectUrlRef.current) {
+            URL.revokeObjectURL(photoObjectUrlRef.current);
+            photoObjectUrlRef.current = null;
+          }
+          photoUrl = URL.createObjectURL(file);
+          photoObjectUrlRef.current = photoUrl;
+        } catch (e) {
+          console.error('Error creating object URL:', e);
+          photoUrl = '';
+        }
+        // remove the file reference so we don't store it in Redux
+        delete personalInfo.photoUrl;
+      } else {
+        photoUrl = personalInfo.photoUrl || '';
+        delete personalInfo.photoUrl; // keep photoUrl in photo slice only
+      }
 
-    // Work experience (replace list)
-    if (extractedData.workExperience) {
-      const workList = extractedData.workExperience.map((w) => ({
-        ...w,
-        startDate: w.startDate || '', // ensure startDate is a string
-        endDate: w.endDate || '',     // ensure endDate is a string
-      }));
-      dispatch(setWorkExperiences(workList));
-    }
+      // dispatch sanitized data (avoid storing File objects in Redux)
+      if (Object.keys(personalInfo).length > 0) {
+        dispatch(setPersonalInfo(personalInfo));
+      }
 
-    // Skills (replace list)
-    if (extractedData.skills) {
-      dispatch(setSkills(extractedData.skills));
-    }
+      if (extractedData.education) {
+        const educationList = sanitizeList(extractedData.education);
+        dispatch(setEducationList(educationList));
+      }
 
-    // Certificates (replace list)
-    if (extractedData.certificates) {
-      dispatch(setCertificates(extractedData.certificates));
-    }
+      if (extractedData.workExperience) {
+        const workList = sanitizeList(extractedData.workExperience).map(w => ({
+          ...w,
+          startDate: w.startDate || '',
+          endDate: w.endDate || '',
+        }));
+        dispatch(setWorkExperiences(workList));
+      }
 
-    // Photo URL (optional)
-    if (extractedData.personalInfo?.photoUrl) {
-      dispatch(setPhotoUrl(extractedData.personalInfo.photoUrl));
-    }
+      if (extractedData.skills) {
+        const skillsList = sanitizeList(extractedData.skills);
+        dispatch(setSkills(skillsList));
+      }
 
-    onExtractComplete('resume');
+      if (extractedData.certificates) {
+        const certificatesList = sanitizeList(extractedData.certificates);
+        dispatch(setCertificates(certificatesList));
+      }
+
+      if (photoUrl) {
+        dispatch(setPhotoUrl(photoUrl));
+      }
+
+      setShowEditor(true);
+
+      if (typeof onExtractComplete === 'function') {
+        onExtractComplete('resume');
+      }
+    } catch (error) {
+      console.error('Error in handleUseExtractedData:', error);
+      toast({
+        title: "Error",
+        description: "There was an error processing the extracted data.",
+        variant: "destructive",
+      });
+    }
   };
 
+  const handleEditorComplete = (assembledProfile) => {
+    // revoke object URL if any (profile saved, no longer needed in memory)
+    if (photoObjectUrlRef.current) {
+      URL.revokeObjectURL(photoObjectUrlRef.current);
+      photoObjectUrlRef.current = null;
+    }
+    setShowEditor(false);
+    toast({
+      title: "Profile saved",
+      description: "Your edits have been applied.",
+    });
+    if (typeof onExtractComplete === 'function') {
+      onExtractComplete('edited_resume');
+    }
+  };
+
+  const handleEditorPreview = (profile) => {
+    // Parent preview handler or simple console log — replace with modal if desired
+    console.log('Preview from editor:', profile);
+    toast({
+      title: "Preview opened",
+      description: "Previewing edited profile in new view.",
+    });
+  };
+
+  // Add the missing handlePreviewData function
   const handlePreviewData = () => {
-    console.log('Preview extracted data:', extractedData);
+    if (extractedData) {
+      console.log('Extracted Data Preview:', extractedData);
+      toast({
+        title: "Preview Data",
+        description: "Check the console for detailed extracted data.",
+      });
+    }
   };
+
+  // If editor is open render the ManualFormFlow (it reads Redux slices for data)
+  if (showEditor) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <ManualFormFlow
+            onComplete={handleEditorComplete}
+            onPreview={handleEditorPreview}
+          />
+          <div className="mt-4 text-center">
+            <Button variant="ghost" onClick={() => setShowEditor(false)}>Close Editor</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (extractionStep === 'uploading' || extractionStep === 'extracting') {
     return (

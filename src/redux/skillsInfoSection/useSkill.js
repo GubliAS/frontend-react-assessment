@@ -1,10 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 
-// Typed versions
 export const useAppDispatch = () => useDispatch();
 export const useAppSelector = useSelector;
 
-// Skills Hook
 export const useSkills = () => {
   const dispatch = useAppDispatch();
   const skills = useAppSelector(state => state.skills.skills);
@@ -14,13 +12,5 @@ export const useSkills = () => {
   const showForm = useAppSelector(state => state.skills.showForm);
   const formData = useAppSelector(state => state.skills.formData);
 
-  return {
-    skills,
-    isLoading,
-    error,
-    editingId,
-    showForm,
-    formData,
-    dispatch
-  };
+  return { dispatch, skills, isLoading, error, editingId, showForm, formData };
 };

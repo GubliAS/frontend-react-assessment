@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import Button from "../../../components/shared/Button";
 import { Card, CardContent } from "../../../components/ui/card";
 // import { StepIndicator } from "@/components/ui/step-indicator";
@@ -12,6 +13,24 @@ import SkillForm from "./SkillsSections";
 import CertificatesForm from "./CertificateSection";
 import CareerAspirationsForm from "./CareerAspirationSection"; // Placeholder for Career Aspirations section
 import PhotoUpload from "./PhotoUpload"; // Placeholder for Photo upload section
+
+// redux hooks/selectors
+import { usePersonalInfo } from "../../../redux/personaInfo/usePersonalInfo";
+import { useWorkExperience } from "../../../redux/workExperienceSection/useWorkExperience";
+import { useEducation } from "../../../redux/educationSection/useEducationInfo";
+import { useSkills } from "../../../redux/skillsInfoSection/useSkill";
+import { useCertificates } from "../../../redux/certificateSection/useCertificate";
+import { usePhoto } from "../../../redux/photoSection/usePhoto";
+import { useCareerAspiration } from "../../../redux/careerAspiration/useCareerAspiration";
+
+// actions
+import { setPersonalInfo } from "../../../redux/personaInfo/PersonalInfoSlice";
+import { setWorkExperiences } from "../../../redux/workExperienceSection/WorkExperienceSlice";
+import { setEducationList } from "../../../redux/educationSection/EducationSlice";
+import { setSkills } from "../../../redux/skillsInfoSection/SkillSlice";
+import { setCertificates } from "../../../redux/certificateSection/CertificateSlice";
+import { setPhotoUrl } from "../../../redux/photoSection/PhotoSlice";
+import { setCareerAspiration } from "../../../redux/careerAspiration/careerAspirationSlice";
 
 const steps = [
   { id: 'personal', title: 'Personal Info', description: 'Basic information' },
@@ -27,24 +46,19 @@ const steps = [
 export const ManualFormFlow = ({ onComplete, onPreview }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState([]);
-  const [formData, setFormData] = useState({
-    personalInfo: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      location: '',
-      title: '',
-      summary: ''
-    },
-    workExperience: [], // ✅ Changed from object to array
-    education: [], // ✅ ensures no undefined access
-    skills: [], // Uncomment if you want to include skills in the form
-    certificate: [], // Uncomment if you want to include certificates in the form
-     photo: null // Uncomment if you want to include photo in the form
-  });
   const [stepValidation, setStepValidation] = useState({});
   const { toast } = useToast();
+
+  const reduxDispatch = useDispatch();
+
+  // selectors from redux
+  const { personalInfo } = usePersonalInfo();
+  const { workExperiences } = useWorkExperience();
+  const { educationList } = useEducation();
+  const { skills } = useSkills();
+  const { certificates } = useCertificates();
+  const { profilePhotoUrl } = usePhoto();
+  const { careerAspiration } = useCareerAspiration();
 
   const handleNext = () => {
     if (currentStep < steps.length) {
@@ -65,20 +79,53 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
     setStepValidation(prev => ({ ...prev, [step]: isValid }));
   };
 
-  const handleWorkExperienceUpdate = (data) => {
-    setFormData(prev => ({ ...prev, workExperience: data }));
+  // Handlers that update redux slices (replace previous local form updates)
+  const handlePersonalUpdate = (data) => {
+    reduxDispatch(setPersonalInfo(data));
   };
 
-  const handlePersonalInfoUpdate = (data) => {
-    setFormData(prev => ({ ...prev, personalInfo: data }));
+  const handleWorkUpdate = (data) => {
+    reduxDispatch(setWorkExperiences(data));
   };
+
+  const handleEducationUpdate = (data) => {
+    reduxDispatch(setEducationList(data));
+  };
+
+  const handleSkillsUpdate = (data) => {
+    reduxDispatch(setSkills(data));
+  };
+
+  const handleCertificatesUpdate = (data) => {
+    reduxDispatch(setCertificates(data));
+  };
+
+  const handlePhotoUpdate = (urlOrFile) => {
+    // PhotoSlice.setPhotoUrl expects a url string; adapt if component sends file
+    reduxDispatch(setPhotoUrl(urlOrFile));
+  };
+
+  const handleCareerUpdate = (data) => {
+    reduxDispatch(setCareerAspiration(data));
+  };
+
+  const assembleProfile = () => ({
+    personalInfo: personalInfo || {},
+    workExperience: workExperiences || [],
+    education: educationList || [],
+    skills: skills || [],
+    certificates: certificates || [],
+    photoUrl: profilePhotoUrl || '',
+    careerAspiration: careerAspiration || {}
+  });
 
   const handlePreview = () => {
-    onPreview(formData);
+    onPreview(assembleProfile());
   };
 
   const handleComplete = () => {
-    if (!formData.personalInfo.firstName || !formData.personalInfo.lastName || !formData.personalInfo.email) {
+    const pi = personalInfo || {};
+    if (!pi.firstName || !pi.lastName || !pi.email) {
       toast({
         title: "Missing Required Information",
         description: "Please complete the personal information section.",
@@ -88,7 +135,7 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
       return;
     }
 
-    onComplete(formData);
+    onComplete(assembleProfile());
     toast({
       title: "Profile Created Successfully",
       description: "Your GTH profile has been created and saved.",
@@ -101,8 +148,8 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
         return (
           <PersonalInfoSection
             mode="create"
-            data={formData.personalInfo}
-            onUpdate={handlePersonalInfoUpdate}
+            data={personalInfo}
+            onUpdate={handlePersonalUpdate}
             onValidate={(isValid) => handleStepValidation(1, isValid)}
             showActions={false}
           />
@@ -111,8 +158,8 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
         return (
           <WorkExperienceSection
             mode="create"
-            data={formData.workExperience}
-            onUpdate={handleWorkExperienceUpdate}
+            data={workExperiences}
+            onUpdate={handleWorkUpdate}
             onValidate={(isValid) => handleStepValidation(2, isValid)}
             showActions={false}
           />
@@ -121,8 +168,8 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
         return (
           <EducationSection
             mode="create"
-            data={formData.education}   
-            onUpdate={(data) => setFormData(prev => ({ ...prev, education: data }))}
+            data={educationList}
+            onUpdate={handleEducationUpdate}
             onValidate={(isValid) => handleStepValidation(3, isValid)}
             showActions={false}
           />
@@ -130,66 +177,167 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
       case 4:
         return (
           <SkillForm
-          mode="create"
-            data={formData.skills}   
-            onUpdate={(data) => setFormData(prev => ({ ...prev, skills: data }))}
-            onValidate={(isValid) => handleStepValidation(3, isValid)}
-            showActions={false}/>
+            mode="create"
+            data={skills}
+            onUpdate={handleSkillsUpdate}
+            onValidate={(isValid) => handleStepValidation(4, isValid)}
+            showActions={false}
+          />
         );
       case 5:
         return (
-       <CertificatesForm
-       mode="create"
-       data={formData.certificate}
-         onUpdate={(data) => setFormData(prev => ({ ...prev, certificate: data }))}
-            onValidate={(isValid) => handleStepValidation(4, isValid)}
-         showActions={false}
-       />)
-       case 6:
+         <CertificatesForm
+           mode="create"
+           data={certificates}
+           onUpdate={handleCertificatesUpdate}
+           onValidate={(isValid) => handleStepValidation(5, isValid)}
+           showActions={false}
+         />
+        );
+      case 6:
         return (
-        <CareerAspirationsForm />)
+          <CareerAspirationsForm
+            mode="create"
+            data={careerAspiration}
+            onUpdate={handleCareerUpdate}
+            onValidate={(isValid) => handleStepValidation(6, isValid)}
+            showActions={false}
+          />
+        );
       case 7:
         return (
-       <PhotoUpload
-       mode="create"
-       data={formData.certificate}
-        onUpdate={(data) => setFormData(prev => ({ ...prev, photo: data }))}
-        onValidate={(isValid) => handleStepValidation(4, isValid)}
-         showActions={false}
-       />)
+         <PhotoUpload
+           mode="create"
+           data={profilePhotoUrl}
+           onUpdate={handlePhotoUpdate}
+           onValidate={(isValid) => handleStepValidation(7, isValid)}
+           showActions={false}
+         />
+        );
       case 8:
          return (
-          <Card className="shadow-form">
-            <CardContent className="p-8 space-y-6">
-              <div className="text-center space-y-2">
+          <div>
+             <div className="text-left text-[var(--ebony-50)] space-y-2">
                 <h3 className="text-2xl font-semibold">Review Your Profile</h3>
                 <p className="text-muted-foreground">
                   Review your information before creating your GTH profile.
                 </p>
               </div>
-              
+              <Card className="shadow-form mt-6">
+            <CardContent className="p-8 space-y-6">
+             
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-3">
-                  <h4 className="font-medium">Personal Information</h4>
+                  <h4 className="font-medium text-[var(--ebony-50)]">Personal Information</h4>
                   <div className="text-sm space-y-1">
-                    <p><span className="font-medium">Name:</span> {formData.personalInfo.firstName} {formData.personalInfo.lastName}</p>
-                    <p><span className="font-medium">Email:</span> {formData.personalInfo.email}</p>
-                    {formData.personalInfo.phone && (
-                      <p><span className="font-medium">Phone:</span> {formData.personalInfo.phone}</p>
+                    <p><span className="font-medium">Name:</span> {personalInfo?.firstName} {personalInfo?.lastName}</p>
+                    <p><span className="font-medium">Email:</span> {personalInfo?.email}</p>
+                    {personalInfo?.phone && (
+                      <p><span className="font-medium">Phone:</span> {personalInfo.phone}</p>
                     )}
-                    {formData.personalInfo.location && (
-                      <p><span className="font-medium">Location:</span> {formData.personalInfo.location}</p>
+                    {personalInfo?.region && (
+                      <p><span className="font-medium">Region:</span> {personalInfo.region}</p>
+                    )}
+                    {personalInfo?.city && (
+                      <p><span className="font-medium">City:</span> {personalInfo.city}</p>
+                    )}
+                    {personalInfo?.bio && (
+                      <p><span className="font-medium">Bio:</span> {personalInfo.bio}</p>
                     )}
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
-                  <h4 className="font-medium">Work Experience</h4>
+                  <h4 className="font-medium text-[var(--ebony-50)]">Profile Photo</h4>
                   <div className="text-sm">
-                    {formData.workExperience.length > 0 ? (
-                      <p>{formData.workExperience.length} experience(s) added</p>
+                    {profilePhotoUrl ? (
+                      <img src={profilePhotoUrl} alt="Profile" className="w-32 h-32 object-cover rounded-md" />
+                    ) : (
+                      <p className="text-muted-foreground">No profile photo uploaded</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-medium text-[var(--ebony-50)]">Work Experience</h4>
+                  <div className="text-sm space-y-2">
+                    {workExperiences && workExperiences.length > 0 ? (
+                      workExperiences.map((we) => (
+                        <div key={we.id || `${we.company}-${we.position}`} className="space-y-1">
+                          <p className="font-semibold">{we.position} — {we.company}</p>
+                          <p className="text-muted-foreground text-xs">{we.startDate || 'N/A'} — {we.isCurrentlyWorking ? 'Present' : (we.endDate || 'N/A')}</p>
+                          {we.description && <p className="text-sm">{we.description}</p>}
+                        </div>
+                      ))
                     ) : (
                       <p className="text-muted-foreground">No work experience added</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-medium text-[var(--ebony-50)]">Education</h4>
+                  <div className="text-sm space-y-2">
+                    {educationList && educationList.length > 0 ? (
+                      educationList.map((edu) => (
+                        <div key={edu.id || `${edu.institution}-${edu.degree}`} className="space-y-1">
+                          <p className="font-semibold">{edu.degree} — {edu.institution}</p>
+                          <p className="text-muted-foreground text-xs">{edu.startDate || 'N/A'} — {edu.isCurrentlyStudying ? 'Present' : (edu.endDate || 'N/A')}</p>
+                          {edu.grade && <p className="text-sm">Grade: {edu.grade}</p>}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-muted-foreground">No education added</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-medium text-[var(--ebony-50)]">Skills</h4>
+                  <div className="text-sm">
+                    {skills && skills.length > 0 ? (
+                      <ul className="list-disc pl-5">
+                        {skills.map(s => <li key={s.id || s.name}>{s.name}{s.proficiency ? ` — ${s.proficiency}` : ''}</li>)}
+                      </ul>
+                    ) : (
+                      <p className="text-muted-foreground">No skills added</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-medium text-[var(--ebony-50)]">Certificates</h4>
+                  <div className="text-sm">
+                    {certificates && certificates.length > 0 ? (
+                      <ul className="space-y-1">
+                        {certificates.map(c => (
+                          <li key={c.id || c.name}>
+                            <p className="font-semibold">{c.name} — {c.issuingOrganization}</p>
+                            <p className="text-muted-foreground text-xs">{c.issueDate || 'N/A'}{c.expiryDate ? ` — ${c.expiryDate}` : ''}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-muted-foreground">No certificates added</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-3 md:col-span-2">
+                  <h4 className="font-medium text-[var(--ebony-50)]">Career Aspirations</h4>
+                  <div className="text-sm space-y-1">
+                    <p><span className="font-medium">Desired Role:</span> {careerAspiration?.desiredRole || '—'}</p>
+                    <p><span className="font-medium">Industry:</span> {careerAspiration?.targetIndustry || '—'}</p>
+                    <p><span className="font-medium">Career Level:</span> {careerAspiration?.careerLevel || '—'}</p>
+                    <p><span className="font-medium">Target Salary:</span> {careerAspiration?.targetSalary || '—'}</p>
+                    <p><span className="font-medium">Timeframe:</span> {careerAspiration?.timeframe || '—'}</p>
+                    <p><span className="font-medium">Work Type:</span> {careerAspiration?.workType || '—'}</p>
+                    {careerAspiration?.keySkillsToGain?.length > 0 && (
+                      <p><span className="font-medium">Skills to gain:</span> {careerAspiration.keySkillsToGain.join(', ')}</p>
+                    )}
+                    {careerAspiration?.certificationGoals?.length > 0 && (
+                      <p><span className="font-medium">Certification goals:</span> {careerAspiration.certificationGoals.join(', ')}</p>
                     )}
                   </div>
                 </div>
@@ -214,8 +362,10 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
               </div>
             </CardContent>
           </Card>
+          </div>
+          
         );
-        default:
+      default:
         return null;
     }
   };
@@ -251,7 +401,7 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
 
         {currentStep < steps.length && (
           <Button
-          variant="emeraldGradient"
+            variant="emeraldGradient"
             onClick={handleNext}
             disabled={isNextDisabled()}
             className="flex items-center space-x-2"
