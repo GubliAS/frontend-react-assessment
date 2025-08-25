@@ -41,51 +41,152 @@ const DEGREE_LEVELS = [
   'Vocational Training'
 ];
 
+const currentYear = new Date().getFullYear();
+const YEARS = [
+  { value: '', label: 'Year' },
+  ...Array.from({ length: 60 }, (_, i) => {
+    const y = String(currentYear - i);
+    return { value: y, label: y };
+  })
+];
+
 const EducationSection = () => {
   const { educationList, dispatch } = useEducation();
 
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    institution: '',
-    degree: '',
-    fieldOfStudy: '',
-    startDate: '',
-    endDate: '',
-    grade: '',
-    current: false
-  });
+const [formData, setFormData] = useState({
+  institution: '',
+  degree: '',
+  fieldOfStudy: '',
+  startYear: '', // Use empty string instead of null
+  endYear: '',   // Use empty string instead of null
+  grade: '',
+  isCurrent: false,
+});
+
+  // parse year from multiple possible stored formats (yyyy, yyyy-mm-dd, dd/mm/yyyy, Date string)
+  const parseYear = (v) => {
+    if (!v && v !== 0) return '';
+    const s = String(v).trim();
+    if (/^\d{4}$/.test(s)) return s;
+    // ISO like 2024-04-01 or 2024-04
+    const iso = s.match(/^(\d{4})-/);
+    if (iso) return iso[1];
+    // dd/mm/yyyy
+    const dm = s.match(/\/(\d{4})$/);
+    if (dm) return dm[1];
+    // fallback Date parse
+    const d = new Date(s);
+    if (!isNaN(d)) return String(d.getFullYear());
+    return '';
+  };
 
   const handleInputChange = (field, value) => {
+    // when toggling "currently studying here", set endYear to current year (string for selects)
+    if (field === 'isCurrent') {
+      const isCurr = !!value;
+      setFormData((prev) => ({
+        ...prev,
+        isCurrent: isCurr,
+        endYear: isCurr ? String(currentYear) : null,
+      }));
+      console.log(currentYear)
+      return;
+    }
+
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const validateForm = () => {
-    const { institution, degree, fieldOfStudy, startDate } = formData;
-    if (!institution || !degree || !fieldOfStudy || !startDate) {
-      alert('Please fill in all required fields');
+  const validateForm = (data = formData) => {
+    const { institution, degree, fieldOfStudy } = data;
+    const startY = parseYear(data.startYear);
+    if (!institution || !degree || !fieldOfStudy || !startY) {
+      alert('Please fill in all required fields (ensure Start Year is set)');
       return false;
     }
+    // if not current, ensure end year is parsable
+    if (!data.isCurrent) {
+      const endY = parseYear(data.endYear);
+      if (!endY) {
+        alert('Please provide a valid End Year, or mark "Currently studying here".');
+        return false;
+      }
+      // optional: ensure end >= start
+      if (Number(endY) < Number(startY)) {
+        alert('End year cannot be before start year.');
+        return false;
+      }
+    }
     return true;
+  };
+
+  // helper: read missing values directly from DOM (covers browser autofill)
+  const readFormFallback = (formEl) => {
+    const names = ['institution', 'degree', 'fieldOfStudy', 'startYear', 'endYear', 'grade', 'isCurrent'];
+    const updates = {};
+    names.forEach((n) => {
+      // form controls created with name prop
+      const el = formEl.elements?.[n];
+      if (!el) return;
+      const val = el.type === 'checkbox' ? el.checked : el.value;
+      // only use fallback if state value empty/undefined
+      if (
+        formData[n] === undefined ||
+        formData[n] === '' ||
+        formData[n] === null
+      ) {
+        updates[n] = val;
+      }
+    });
+    return { ...formData, ...updates };
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    // merge state with any DOM values (handles autofill)
+    const merged = readFormFallback(e.target);
+
+    if (!validateForm(merged)) return;
+
+    // normalize isCurrent (checkbox/dom may give boolean or string)
+    const isCurr = merged.isCurrent === true || merged.isCurrent === 'true';
+    // convert years to numbers for backend; ensure present students get currentYear
+    const startYearNum = Number(parseYear(merged.startYear));
+    const endYearNum = isCurr ? currentYear : Number(parseYear(merged.endYear));
+
+    const payload = {
+      ...merged,
+      startYear: startYearNum,
+      endYear: endYearNum,
+      isCurrent: !!isCurr
+    };
 
     if (editingId) {
-      dispatch(updateEducation({ id: editingId, updatedData: formData }));
+      // reducer expects { id, data }
+      dispatch(updateEducation({ id: editingId, data: payload }));
       setEditingId(null);
     } else {
-      dispatch(addEducation({ ...formData, id: Date.now().toString() }));
+      // let the slice generate the id (slice already creates one)
+      dispatch(addEducation(payload));
     }
 
     resetForm();
   };
 
   const handleEdit = (edu) => {
-    setFormData(edu);
+    // populate form with normalized year strings (handles storage in different formats)
+    const sYear = parseYear(edu.startYear) || edu.startYear || '';
+    let eYear = parseYear(edu.endYear) || edu.endYear || '';
+    // if this entry is marked current, ensure the form endYear shows the current year
+    if (edu.isCurrent && !eYear) eYear = String(currentYear);
+    setFormData({
+      ...edu,
+      startYear: sYear,
+      endYear: eYear,
+      isCurrent: !!edu.isCurrent
+    });
     setEditingId(edu.id);
     setShowForm(true);
   };
@@ -99,15 +200,15 @@ const EducationSection = () => {
       institution: '',
       degree: '',
       fieldOfStudy: '',
-      startDate: '',
-      endDate: '',
+      startYear: null,
+      endYear: null,
       grade: '',
-      current: false
+      isCurrent: false
     });
     setEditingId(null);
     setShowForm(false);
   };
-
+  console.log()
   return (
     <div className="space-y-6">
       <div>
@@ -162,7 +263,7 @@ const EducationSection = () => {
               <div className="col-span-1 md:col-span-2">
                 <span className="font-medium">Period:</span>
                 <p>
-                  {edu.startDate} - {edu.current ? 'Present' : edu.endDate || 'Not specified'}
+                  {edu.startYear} - {edu.isCurrent ? 'Present' : edu.endYear || 'Not specified'}
                 </p>
               </div>
             </div>
@@ -191,7 +292,7 @@ const EducationSection = () => {
             {/* Institution and Degree */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <SelectField
-                label="Institution *"
+                label="Institution"
                 name="institution"
                 value={formData.institution}
                 onChange={(e) => handleInputChange('institution', e.target.value)}
@@ -201,7 +302,7 @@ const EducationSection = () => {
               />
               
               <SelectField
-                label="Degree Level *"
+                label="Degree Level"
                 name="degree"
                 value={formData.degree}
                 onChange={(e) => handleInputChange('degree', e.target.value)}
@@ -213,7 +314,7 @@ const EducationSection = () => {
 
             {/* Field of Study */}
             <InputField
-              label="Field of Study *"
+              label="Field of Study"
               name="fieldOfStudy"
               value={formData.fieldOfStudy}
               onChange={(e) => handleInputChange('fieldOfStudy', e.target.value)}
@@ -234,37 +335,52 @@ const EducationSection = () => {
 
             {/* Date Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputField
-                label="Start Date *"
-                type="month"
-                name="startDate"
-                value={formData.startDate}
-                onChange={(e) => handleInputChange('startDate', e.target.value)}
-                required
-              variant="light"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Year</label>
+                <select
+                  name="startYear"
+                  value={formData.startYear}
+                  onChange={(e) => handleInputChange('startYear', e.target.value)}
+                  required
+                  className="block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                >
+                  {YEARS.map(year => (
+                    <option key={year.value} value={year.value} disabled={year.value === ''}>
+                      {year.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <InputField
-                label="End Date"
-                type="month"
-                name="endDate"
-                value={formData.endDate}
-                onChange={(e) => handleInputChange('endDate', e.target.value)}
-                disabled={formData.current}
-              variant="light"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">End Year</label>
+                <select
+                  name="endYear"
+                  value={formData.endYear}
+                  onChange={(e) => handleInputChange('endYear', e.target.value)}
+                  disabled={formData.isCurrent}
+                  className="block w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+                >
+                  {YEARS.map(year => (
+                    <option key={year.value} value={year.value} disabled={year.value === ''}>
+                      {year.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Current Checkbox */}
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
-                checked={formData.current}
-                onChange={(e) => handleInputChange('current', e.target.checked)}
-                id="current"
+                checked={formData.isCurrent}
+                onChange={(e) => handleInputChange('isCurrent', e.target.checked)}
+                id="isCurrent"
+                name="isCurrent"
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <label htmlFor="current" className="text-sm">
+              <label htmlFor="isCurrent" className="text-sm">
                 Currently studying here
               </label>
             </div>

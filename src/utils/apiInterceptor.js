@@ -5,7 +5,9 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 // Fix: Use import.meta.env.VITE_API_BASE for Vite environment variables
-const BASE = import.meta.env.VITE_API_BASE || 'http://localhost:9000';
+// const BASE = import.meta.env.VITE_API_BASE || 'http://localhost:9000';
+
+const BASE = 'http://localhost:9000';
 
 const api = axios.create({
   baseURL: BASE,
@@ -35,11 +37,14 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       try {
         // Call refresh token API
-        const refreshToken = cookies.get("refresh_token");
+        const refreshToken = cookies.get("refreshToken");
+        console.log()
         if (refreshToken) {
           const { data } = await axios.post(`${BASE}/refresh`, { 
             refresh_token: refreshToken // Fix: was "refre{" - incomplete variable name
           });
+
+          console.log(data);
           
           // Save new tokens in cookies
           cookies.set("auth_token", data.access_token, { 

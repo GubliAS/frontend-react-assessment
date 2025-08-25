@@ -1,11 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { CreationModeSelector } from "./ProfileCreateMode"; // Adjust path
 import { ManualFormFlow } from "./ManualFormFlow"; // Adjust path
 import ResumeUploadPage  from "./AIProfileCreateFlow"; // Adjust path
+import { createProfile } from "../../../services/profile"; // <-- new
+import { useToast } from "../../../hooks/use-toast"; // optional: consistent toast UI
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loadProfile } from "../../../redux/profile/profileActions"; // new
+
 const ProfileCreation = () => {
   const [mode, setMode] = useState("selection"); // 'selection' | 'manual' | 'upload' | 'preview'
   const [profileData, setProfileData] = useState(null);
+
+  const dispatch = useDispatch();
+  const personalInfo = useSelector((s) => s.personalInfo?.personalInfo);
+
+  const { toast } = useToast(); // <-- new
+  const navigate = useNavigate(); // <-- new
+
+  // load profile on mount and populate slices
+  useEffect(() => {
+    dispatch(loadProfile());
+  }, [dispatch]);
+
+  // if personal info exists after load, switch to manual edit mode so inputs are populated
+  useEffect(() => {
+    if (personalInfo && (personalInfo.firstName || personalInfo.email)) {
+      setMode("manual");
+    }
+  }, [personalInfo]);
 
   const handleModeSelect = (selectedMode) => {
     setMode(selectedMode);
@@ -15,10 +39,27 @@ const ProfileCreation = () => {
     setMode("selection");
   };
 
-  const handleFormComplete = (data) => {
+  // Make this async and call API to persist profile
+  const handleFormComplete = async (data) => {
     setProfileData(data);
-    console.log("Profile created:", data);
-    // Save to database here
+    try {
+      const res = await createProfile(data);
+      // success feedback
+      toast?.({
+        title: "Profile created",
+        description: "Your GTH profile was created successfully.",
+      });
+      // navigate to a suitable page (adjust path if needed)
+      navigate("/youth/dashboard");
+      console.log("Profile created:", res);
+    } catch (err) {
+      console.error("Failed to create profile:", err);
+      toast?.({
+        title: "Failed to create profile",
+        description: err?.message || "An error occurred while creating your profile.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handlePreview = (data) => {
@@ -90,7 +131,7 @@ const ProfileCreation = () => {
               </button>
             </div>
 
-            {profileData && (
+            {personalInfo && (
               <div className="max-w-4xl mx-auto">
                 <div className="grid gap-6">
                   {/* Personal Info Preview */}
@@ -102,49 +143,49 @@ const ProfileCreation = () => {
                       <div>
                         <span className="text-sm font-medium text-gray-500">Name</span>
                         <p>
-                          {profileData.personalInfo.firstName}{" "}
-                          {profileData.personalInfo.lastName}
+                          {personalInfo?.firstName}{" "}
+                          {personalInfo?.lastName}
                         </p>
                       </div>
                       <div>
                         <span className="text-sm font-medium text-gray-500">Email</span>
-                        <p>{profileData.personalInfo.email}</p>
+                        <p>{personalInfo?.email}</p>
                       </div>
-                      {profileData.personalInfo.phone && (
+                      {personalInfo?.phoneNumber && (
                         <div>
                           <span className="text-sm font-medium text-gray-500">Phone</span>
-                          <p>{profileData.personalInfo.phone}</p>
+                          <p>{personalInfo.phoneNumber}</p>
                         </div>
                       )}
-                      {profileData.personalInfo.location && (
+                      {personalInfo?.location && (
                         <div>
                           <span className="text-sm font-medium text-gray-500">
                             Location
                           </span>
-                          <p>{profileData.personalInfo.location}</p>
+                          <p>{personalInfo.location}</p>
                         </div>
                       )}
                     </div>
-                    {profileData.personalInfo.title && (
+                    {personalInfo?.title && (
                       <div className="mt-4">
                         <span className="text-sm font-medium text-gray-500">Title</span>
-                        <p>{profileData.personalInfo.title}</p>
+                        <p>{personalInfo.title}</p>
                       </div>
                     )}
-                    {profileData.personalInfo.summary && (
+                    {personalInfo?.summary && (
                       <div className="mt-4">
                         <span className="text-sm font-medium text-gray-500">Summary</span>
-                        <p className="mt-1">{profileData.personalInfo.summary}</p>
+                        <p className="mt-1">{personalInfo.summary}</p>
                       </div>
                     )}
                   </div>
 
                   {/* Work Experience Preview */}
-                  {profileData.workExperience.length > 0 && (
+                  {personalInfo.workExperience?.length > 0 && (
                     <div className="bg-white rounded-lg p-6 shadow">
                       <h3 className="text-lg font-semibold mb-4">Work Experience</h3>
                       <div className="space-y-4">
-                        {profileData.workExperience.map((exp, index) => (
+                        {workExperience.map((exp, index) => (
                           <div
                             key={index}
                             className="border-l-2 border-emerald-500 pl-4"
@@ -153,8 +194,8 @@ const ProfileCreation = () => {
                               {exp.position} at {exp.company}
                             </h4>
                             <p className="text-sm text-gray-500">
-                              {exp.startDate} -{" "}
-                              {exp.isCurrent ? "Present" : exp.endDate}
+                              {exp.startYear} -{" "}
+                              {exp.isCurrent ? "Present" : exp.endYear}
                               {exp.location && ` • ${exp.location}`}
                             </p>
                             {exp.description && (

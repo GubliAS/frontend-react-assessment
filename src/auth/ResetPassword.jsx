@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import InputField from "../components/shared/InputField";
 import Button from "../components/shared/Button";
 import { Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
 import { LoadingSpinner } from "../components/LoadingComponents";
+import { resetPassword } from "../services/auth"; // added
 
 const ResetPasswordPage = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -11,6 +13,7 @@ const ResetPasswordPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
+  const [error, setError] = useState(null); // added
   const [passwordRequirements, setPasswordRequirements] = useState({
     length: false,
     uppercase: false,
@@ -18,6 +21,10 @@ const ResetPasswordPage = () => {
     number: false,
     match: false,
   });
+
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const token = searchParams.get("token") || "";
 
   // Update password requirements in real-time
   useEffect(() => {
@@ -44,15 +51,40 @@ const ResetPasswordPage = () => {
     };
   }, []);
 
-  const handlePasswordReset = (e) => {
+  const handlePasswordReset = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    setError(null);
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Password reset:", newPassword);
+    if (!token) {
+      setError("Reset token is missing. Use the link from your email.");
+      return;
+    }
+
+    // basic validation
+    if (!newPassword || !confirmPassword) {
+      setError("Please enter and confirm your new password.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    if (!Object.values(passwordRequirements).every(Boolean)) {
+      setError("Password does not meet requirements.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // backend expects { token, password, confirmPassword } (adjust if your API differs)
+      await resetPassword({ token: token, newPassword: newPassword});
+      // on success redirect to login
+      navigate("/login", { replace: true });
+    } catch (err) {
+      setError(err.message || "Failed to reset password");
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -124,6 +156,13 @@ const ResetPasswordPage = () => {
                       <RequirementItem valid={passwordRequirements.match} label="Passwords match" matchCheck />
                     )}
                   </div>
+                </div>
+              )}
+
+              {/* Error Message */}
+              {error && (
+                <div className="p-4 text-sm text-red-500 bg-red-100 rounded-lg">
+                  {error}
                 </div>
               )}
 

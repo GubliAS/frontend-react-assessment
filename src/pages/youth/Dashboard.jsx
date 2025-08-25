@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { use } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../components/shared/Button';
 import SkillDevelopmentTracker from '../../components/progress/SkillDevelopmentTracker';
+import { usePersonalInfo } from '../../redux/personaInfo/usePersonalInfo'
+import { selectUser } from '../../redux/auth/authSlice';
+import { useSelector } from 'react-redux';
 const YouthDashboard = () => {
   // Mock data
   const stats = [
@@ -36,13 +39,17 @@ const YouthDashboard = () => {
     { id: 2, position: 'Mobile Developer', company: 'AppCraft', status: 'Interview Scheduled', date: '1 week ago' },
   ];
 
+  const {personalInfo} = usePersonalInfo()
+  const user = useSelector(selectUser)
+  console.log(user)
+
    // Mock user data for development when not authenticated
   const displayUser =  {
-    firstName: 'Demo',
-    lastName: 'User',
-    email: 'demo@example.com',
-    phone: '+233123456789',
-    ghanaCard: '1234567890123',
+    firstName: personalInfo?.firstName || user?.firstName || 'Demo',
+    lastName: personalInfo?.lastName || user?.lastName || 'User',
+    email: personalInfo?.email || user?.email || 'demo@example.com',
+    phone: personalInfo?.phoneNumber || user?.phoneNumber || '+233123456789',
+    ghanaCard: personalInfo?.ghanaCardNumber || '1234567890123',
     isVerified: true
   };
 

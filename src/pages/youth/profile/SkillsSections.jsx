@@ -141,12 +141,13 @@ const SkillForm= () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="skill-level" className="text-sm text-gray-700">Proficiency Level</Label>
+
                   <Select value={currentLevel} onValueChange={setCurrentLevel}>
                     <SelectTrigger className="w-full h-10 bg-white text-gray-900">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="Proficiency Level" disabled className="text-gray-500">Proficiency Level</SelectItem>
                       <SelectItem value="beginner">Beginner</SelectItem>
                       <SelectItem value="intermediate">Intermediate</SelectItem>
                       <SelectItem value="advanced">Advanced</SelectItem>
@@ -177,7 +178,7 @@ const SkillForm= () => {
                         onDragStart={e => handleDragStart(e, skill.id)}
                         onDragOver={handleDragOver}
                         onDrop={e => handleDrop(e, skill.id)}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-move hover:bg-gray-100 transition-colors"
+                        className="flex items-center justify-between p-3 bg-gray-200 rounded-lg cursor-move hover:bg-gray-300 transition-colors"
                       >
                         <div className="flex items-center space-x-3">
                           <GripVertical className="w-4 h-4 text-gray-400" />
@@ -186,16 +187,7 @@ const SkillForm= () => {
                         </div>
 
                         <div className="flex items-center space-x-2">
-                          <Select value={skill.level} onValueChange={value => handleUpdateLevel(skill.id, value)}>
-                            <SelectTrigger className="w-32 h-8">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="beginner">Beginner</SelectItem>
-                              <SelectItem value="intermediate">Intermediate</SelectItem>
-                              <SelectItem value="advanced">Advanced</SelectItem>
-                            </SelectContent>
-                          </Select>
+                        
                           <Button variant="outline" size="sm" onClick={() => handleRemoveSkill(skill.id)}>
                             <X className="w-4 h-4" />
                           </Button>

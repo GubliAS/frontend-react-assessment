@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import CopyrightFooter from '../components/CopyrightFooter';
 import { 
@@ -17,7 +17,9 @@ import {
   StarIcon
 } from '@heroicons/react/24/outline';
 import LogoutButton from '../components/LogoutButton';
-
+import { usePersonalInfo } from '../redux/personaInfo/usePersonalInfo'
+import { useSelector } from 'react-redux';
+import { selectUser } from '../redux/auth/authSlice';
 
 const navigation = [
   { 
@@ -86,8 +88,9 @@ const YouthLayout = () => {
 
 // Determine if sidebar should appear expanded (no hover behavior)
 const isExpanded = !collapsed;
-
-
+const user = useSelector(selectUser)
+const { personalInfo } = usePersonalInfo();
+console.log("Logged in user:", personalInfo);
   return (
     // ensure content sits below the fixed header added in Header.jsx
     <div
@@ -119,7 +122,7 @@ const isExpanded = !collapsed;
             <div className="relative">
               <button className="flex items-center space-x-2 focus:outline-none">
                 <div className="h-8 w-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white flex items-center justify-center">
-                  <span className="text-sm font-medium">Y</span>
+                  <span className="text-sm font-medium">{user?.firstName?.charAt(0) || personalInfo?.firstName?.charAt(0) ||  "Y"}{ user?.lastName?.charAt(0) || personalInfo?.lastName?.charAt(0)}</span>
                 </div>
                 <span className="hidden md:inline-block text-sm font-medium text-gray-700">Youth</span>
               </button>
@@ -175,11 +178,11 @@ const isExpanded = !collapsed;
             <div className="mt-6 pt-4 border-t border-gray-100">
               <div className="flex items-center">
                 <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm font-medium">Y</span>
+                  <span className="text-sm font-medium">{user?.firstName?.charAt(0) || personalInfo?.firstName?.charAt(0) || "Y"}{user?.lastName?.charAt(0) || personalInfo?.lastName?.charAt(0)}</span>
                 </div>
                 <div className="ml-3 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">Youth User</p>
-                  <p className="text-xs text-gray-500 truncate">youth@example.com</p>
+                  <p className="text-sm font-medium text-gray-900 truncate">{user?.firstName || personalInfo?.firstName || "Youth"} </p>
+                  <p className="text-xs text-gray-500 truncate">{user?.email || personalInfo?.email || "youth@example.com"}</p>
                 </div>
                 <div className="ml-auto">
                   <LogoutButton className="p-2 text-gray-500 hover:text-gray-700" />
@@ -246,13 +249,13 @@ const isExpanded = !collapsed;
           <div className="flex-shrink-0 border-t border-gray-200 p-4">
             <div className="flex items-center">
               <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white flex items-center justify-center flex-shrink-0">
-                <span className="text-sm font-medium">Y</span>
+                <span className="text-sm font-medium">{user?.firstName?.charAt(0) || personalInfo?.firstName?.charAt(0) || "Y"}{user?.lastName?.charAt(0) || personalInfo?.lastName?.charAt(0)}</span>
               </div>
               {isExpanded && (
                 <>
                   <div className="ml-3 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">Youth User</p>
-                    <p className="text-xs text-gray-500 truncate">youth@example.com</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{user?.firstName ||  personalInfo?.firstName || "Youth"} </p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email || personalInfo?.email || "youth@example.com"} </p>
                   </div>
                   <LogoutButton className="ml-auto p-1 text-gray-400 hover:text-gray-500 focus:outline-none" />
                 </>

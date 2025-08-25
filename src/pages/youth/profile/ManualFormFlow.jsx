@@ -120,14 +120,15 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
   };
   
   const assembleProfile = () => ({
-    personalInfo: personalInfo || {},
+    // spread personalInfo fields to top-level so assembled payload uses those keys directly
+    ...(personalInfo || {}),
     workExperience: workExperiences || [],
     education: educationList || [],
     skills: skills || [],
-    certificates: certificates || [],
+    // certificates: certificates || [],
     photoUrl: profilePhotoUrl || '',
-    careerAspiration: careerAspiration || {}
-   , assessmentScores: assessmentScores || []
+    // careerAspiration: careerAspiration || {}
+   assessmentScores: assessmentScores || []
   });
 
   const handlePreview = () => {
@@ -257,14 +258,14 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
                     {personalInfo?.phone && (
                       <p><span className="font-medium">Phone:</span> {personalInfo.phone}</p>
                     )}
-                    {personalInfo?.region && (
-                      <p><span className="font-medium">Region:</span> {personalInfo.region}</p>
+                    {personalInfo?.address?.region && (
+                      <p><span className="font-medium">Region:</span> {personalInfo.address.region}</p>
                     )}
-                    {personalInfo?.city && (
-                      <p><span className="font-medium">City:</span> {personalInfo.city}</p>
+                    {personalInfo?.address?.city && (
+                      <p><span className="font-medium">City:</span> {personalInfo.address.city}</p>
                     )}
-                    {personalInfo?.bio && (
-                      <p><span className="font-medium">Bio:</span> {personalInfo.bio}</p>
+                    {personalInfo?.address?.district && (
+                      <p><span className="font-medium">District:</span> {personalInfo.address.district}</p>
                     )}
                   </div>
                 </div>

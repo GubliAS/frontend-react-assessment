@@ -45,6 +45,12 @@ export const logoutSeeker = (body) =>
 export const logoutEmployer = (body) =>
   api.post('/employer/logout', body).then(handleResponse).catch(handleError);
 
+export const requestPasswordReset = (body) => 
+  api.post('/request/password/reset', body).then(handleResponse).catch(handleError);
+
+export const resetPassword = (body) =>
+  api.post('/reset/password', body).then(handleResponse).catch(handleError);
+
 export default {
   registerSeeker,
   registerEmployer,

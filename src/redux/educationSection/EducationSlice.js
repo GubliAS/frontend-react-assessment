@@ -10,10 +10,10 @@ const initialState = {
     institution: '',
     degree: '',
     fieldOfStudy: '',
-    startDate: '',
-    endDate: '',
+    startYear: '',
+    endYear: '',
     grade: '',
-    current: false
+    isCurrent: false
   }
 };
 

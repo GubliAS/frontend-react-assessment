@@ -3,15 +3,30 @@ import Button from "../components/shared/Button";
 import InputField from "../components/shared/InputField";
 import "../styles/authlayout.css";
 import { Mail, ArrowLeft } from "lucide-react";
+import { requestPasswordReset } from "../services/auth"; // added
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // added
+  const [error, setError] = useState(null); // added
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Password reset link sent to:", email);
-    setIsSubmitted(true); // Switch to confirmation message
+    setError(null);
+    if (!email) {
+      setError("Please enter your email");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await requestPasswordReset({ email });
+      setIsSubmitted(true); // Switch to confirmation message
+    } catch (err) {
+      setError(err.message || "Failed to send reset link");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -82,17 +97,19 @@ const ForgotPasswordPage = () => {
                     startIcon={<Mail className="w-4 h-4" />}
                   />
 
+                  {error && <p className="text-sm text-red-400">{error}</p>}
+
                   <Button
                    type="submit"
                    variant="emeraldGradient"
                    size="large"
                    fullWidth
-                   disabled
+                   disabled={!email || isLoading} // updated
                    className=" w-full 
                               font-semibold py-3 transition-all duration-300 
                               disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                  >
-                    Send Reset Link
+                    {isLoading ? "Sending..." : "Send Reset Link"}
                   </Button>
                 </form>
 

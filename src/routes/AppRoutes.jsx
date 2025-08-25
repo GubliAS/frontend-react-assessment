@@ -76,7 +76,7 @@ const AppRoutes = () => {
 
         <Route path="/account-activation" element={<AccountActivationPage/>} />
         <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} /> 
         <Route path="otp-verification" element={<OTPVerificationPage/>} />
 
         {/* Admin Routes */}

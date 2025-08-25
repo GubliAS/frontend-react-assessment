@@ -2,7 +2,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  skills: [], // all skills (technical, soft, language)
+  technicalSkills: [], // array for technical skills
+  softSkills: [],      // array for soft skills
+  languages: [],       // array for language skills
   isLoading: false,
   error: null,
   editingId: null,
@@ -19,27 +21,56 @@ const skillsSlice = createSlice({
   initialState,
   reducers: {
     addSkill: (state, action) => {
+      const payload = action.payload || {};
       const newSkill = {
-        ...action.payload,
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+        ...payload,
+        id: payload.id || Date.now().toString() + Math.random().toString(36).substr(2, 9),
       };
-      state.skills.push(newSkill);
+
+      const category = payload.category || 'technical';
+      if (category === 'technical') state.technicalSkills.push(newSkill);
+      else if (category === 'soft') state.softSkills.push(newSkill);
+      else if (category === 'language') state.languages.push(newSkill);
+      else {
+        // fallback: put into technical
+        state.technicalSkills.push(newSkill);
+      }
     },
 
     updateSkill: (state, action) => {
       const { id, data } = action.payload;
-      const index = state.skills.findIndex(skill => skill.id === id);
-      if (index !== -1) {
-        state.skills[index] = { ...state.skills[index], ...data };
-      }
+      const updateInArray = (arr) => {
+        const idx = arr.findIndex(s => s.id === id || s._id === id);
+        if (idx !== -1) arr[idx] = { ...arr[idx], ...data };
+        return idx !== -1;
+      };
+
+      if (updateInArray(state.technicalSkills)) return;
+      if (updateInArray(state.softSkills)) return;
+      updateInArray(state.languages);
     },
 
     removeSkill: (state, action) => {
-      state.skills = state.skills.filter(skill => skill.id !== action.payload);
+      const id = action.payload;
+      state.technicalSkills = state.technicalSkills.filter(s => s.id !== id && s._id !== id);
+      state.softSkills = state.softSkills.filter(s => s.id !== id && s._id !== id);
+      state.languages = state.languages.filter(s => s.id !== id && s._id !== id);
     },
 
     setSkills: (state, action) => {
-      state.skills = action.payload;
+      const payload = action.payload;
+      // payload may be an array of mixed skills, or an object with categorized arrays
+      if (Array.isArray(payload)) {
+        // distribute by category property on items (fallback to technical)
+        state.technicalSkills = payload.filter(s => (s.category || s.type) === 'technical');
+        state.softSkills = payload.filter(s => (s.category || s.type) === 'soft');
+        state.languages = payload.filter(s => (s.category || s.type) === 'language');
+      } else if (payload && typeof payload === 'object') {
+        // accept shape { technicalSkills: [], softSkills: [], languages: [] }
+        state.technicalSkills = payload.technicalSkills || [];
+        state.softSkills = payload.softSkills || [];
+        state.languages = payload.languages || [];
+      }
     },
 
     setShowForm: (state, action) => {
@@ -73,11 +104,28 @@ const skillsSlice = createSlice({
     },
 
     reorderSkills: (state, action) => {
-      state.skills = action.payload;
+      const payload = action.payload;
+      // payload may be a full combined array -> distribute by category
+      if (Array.isArray(payload)) {
+        state.technicalSkills = payload.filter(s => (s.category || 'technical') === 'technical');
+        state.softSkills = payload.filter(s => (s.category) === 'soft');
+        state.languages = payload.filter(s => (s.category) === 'language');
+      } else if (payload && payload.category && Array.isArray(payload.items)) {
+        if (payload.category === 'technical') state.technicalSkills = payload.items;
+        if (payload.category === 'soft') state.softSkills = payload.items;
+        if (payload.category === 'language') state.languages = payload.items;
+      }
     },
 
     importSkills: (state, action) => {
-      state.skills = [...state.skills, ...action.payload];
+      const items = Array.isArray(action.payload) ? action.payload : [];
+      items.forEach(item => {
+        const cat = item.category || 'technical';
+        const enhanced = { ...item, id: item.id || item._id || Date.now().toString() + Math.random().toString(36).substr(2, 9) };
+        if (cat === 'technical') state.technicalSkills.push(enhanced);
+        else if (cat === 'soft') state.softSkills.push(enhanced);
+        else if (cat === 'language') state.languages.push(enhanced);
+      });
     },
 
     resetSkills: () => initialState,
