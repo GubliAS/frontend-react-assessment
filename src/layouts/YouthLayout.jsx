@@ -18,8 +18,9 @@ import {
 } from '@heroicons/react/24/outline';
 import LogoutButton from '../components/LogoutButton';
 import { usePersonalInfo } from '../redux/personaInfo/usePersonalInfo'
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../redux/auth/authSlice';
+import { loadProfile } from '../redux/profile/profileActions';
 
 const navigation = [
   { 
@@ -83,14 +84,21 @@ const navigation = [
 const YouthLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-
+ 
   const location = useLocation();
-
-// Determine if sidebar should appear expanded (no hover behavior)
-const isExpanded = !collapsed;
-const user = useSelector(selectUser)
-const { personalInfo } = usePersonalInfo();
-console.log("Logged in user:", personalInfo);
+ 
+ // Determine if sidebar should appear expanded (no hover behavior)
+ const isExpanded = !collapsed;
+ const user = useSelector(selectUser)
+  const dispatch = useDispatch();
+  // ensure profile is loaded as soon as user is available so Dashboard/layout children can use it
+  React.useEffect(() => {
+    if (user) {
+      dispatch(loadProfile());
+    }
+  }, [dispatch, user]);
+ const { personalInfo } = usePersonalInfo();
+ console.log("Logged in user:", personalInfo);
   return (
     // ensure content sits below the fixed header added in Header.jsx
     <div

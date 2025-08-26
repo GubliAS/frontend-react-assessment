@@ -1,6 +1,7 @@
 import React from "react";
 import InputField from "../../../components/shared/InputField";
 import SelectField from "../../../components/shared/SelectInputField";
+import Button from "../../../components/shared/Button";
 import PropTypes from "prop-types";
 import { usePersonalInfo } from "../../../redux/personaInfo/usePersonalInfo";
 import { setPersonalInfo } from "../../../redux/personaInfo/PersonalInfoSlice";
@@ -252,6 +253,16 @@ const PersonalInfoSection = () => {
         <p className="text-xs text-gray-500">
           {personalInfo.professionalBio?.length || 0}/500 characters
         </p>
+      </div>
+
+      {/* Actions: Save / Cancel like other sections */}
+      <div className="flex justify-end gap-2 pt-4">
+        <Button
+          variant="emeraldGradient"
+          onClick={() => dispatch(setPersonalInfo(personalInfo))}
+        >
+          Save Personal Info
+        </Button>
       </div>
     </Card>
   );

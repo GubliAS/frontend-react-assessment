@@ -27,8 +27,13 @@ const CertificatesForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     issuer: '',
+    // store issue/expiration as ISO yyyy-mm-01; keep month/year parts for UI
     issueDate: '',
+    issueMonth: '',
+    issueYear: '',
     expirationDate: '',
+    expirationMonth: '',
+    expirationYear: '',
     credentialId: '',
     file: null,
     fileUrl: ''
@@ -44,6 +49,22 @@ const CertificatesForm = () => {
     }
   };
 
+  // handle month/year selects for issue/expiration
+  const handleMonthYearChange = (dateField, part, value) => {
+    // dateField: 'issue' or 'expiration'
+    const monthKey = dateField === 'issue' ? 'issueMonth' : 'expirationMonth';
+    const yearKey = dateField === 'issue' ? 'issueYear' : 'expirationYear';
+
+    setFormData((prev) => {
+      const next = { ...prev };
+      if (part === 'month') next[monthKey] = value;
+      else next[yearKey] = value;
+      // build ISO only when both present
+      next[dateField + 'Date'] = (next[monthKey] && next[yearKey]) ? `${next[yearKey]}-${next[monthKey]}-01` : '';
+      return next;
+    });
+  };
+
   const validateForm = () => {
     const errors = {};
 
@@ -55,15 +76,17 @@ const CertificatesForm = () => {
       errors.issuer = 'Issuing organization is required';
     }
 
-    if (!formData.issueDate) {
-      errors.issueDate = 'Issue date is required';
+    // require issue month & year
+    if (!formData.issueMonth || !formData.issueYear) {
+      errors.issueDate = 'Issue month and year are required';
     }
 
     // Check if expiration date is after issue date
-    if (formData.expirationDate && formData.issueDate) {
-      const issueDate = new Date(formData.issueDate);
-      const expirationDate = new Date(formData.expirationDate);
-      
+    if ((formData.expirationMonth && formData.expirationYear) && (formData.issueMonth && formData.issueYear)) {
+      const issueIso = buildIsoFromMY({ m: formData.issueMonth, y: formData.issueYear });
+      const expIso = buildIsoFromMY({ m: formData.expirationMonth, y: formData.expirationYear });
+      const issueDate = new Date(issueIso);
+      const expirationDate = new Date(expIso);
       if (expirationDate <= issueDate) {
         errors.expirationDate = 'Expiration date must be after issue date';
       }
@@ -141,11 +164,15 @@ const CertificatesForm = () => {
     }
 
     try {
+      // build ISO dates from month/year parts
+      const issueIso = buildIsoFromMY({ m: formData.issueMonth, y: formData.issueYear });
+      const expirationIso = (formData.expirationMonth && formData.expirationYear) ? buildIsoFromMY({ m: formData.expirationMonth, y: formData.expirationYear }) : null;
+
       const certificateData = {
         name: formData.name.trim(),
         issuer: formData.issuer.trim(),
-        issueDate: formData.issueDate,
-        expirationDate: formData.expirationDate || null,
+        issueDate: issueIso,
+        expirationDate: expirationIso,
         credentialId: formData.credentialId.trim() || null,
         file: formData.file,
         fileUrl: formData.fileUrl
@@ -182,7 +209,11 @@ const CertificatesForm = () => {
       name: '',
       issuer: '',
       issueDate: '',
+      issueMonth: '',
+      issueYear: '',
       expirationDate: '',
+      expirationMonth: '',
+      expirationYear: '',
       credentialId: '',
       file: null,
       fileUrl: ''
@@ -379,26 +410,71 @@ const CertificatesForm = () => {
                   variant="light"
                 />
 
-                <InputField
-                  label="Issue Date"
-                  name="issueDate"
-                  type="date"
-                  value={formData.issueDate}
-                  onChange={handleInputChange}
-                  error={formErrors.issueDate}
-                  required
-                  variant="light"
-                />
+                {/* Issue Date: Month/Year */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Issue Date *</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <select
+                      name="issueMonth"
+                      value={formData.issueMonth || parseMonthYear(formData.issueDate).m}
+                      onChange={(e) => handleMonthYearChange('issue', 'month', e.target.value)}
+                      className="block w-full p-3 border border-gray-300 rounded-md bg-white"
+                      required
+                    >
+                      {MONTHS.map((month) => (
+                        <option key={month.value} value={month.value} disabled={month.value === ''}>
+                          {month.label}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      name="issueYear"
+                      value={formData.issueYear || parseMonthYear(formData.issueDate).y}
+                      onChange={(e) => handleMonthYearChange('issue', 'year', e.target.value)}
+                      className="block w-full p-3 border border-gray-300 rounded-md bg-white"
+                      required
+                    >
+                      {YEARS.map((year) => (
+                        <option key={year.value} value={year.value} disabled={year.value === ''}>
+                          {year.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {formErrors.issueDate && <p className="mt-1 text-sm text-red-600">{formErrors.issueDate}</p>}
+                </div>
 
-                <InputField
-                  label="Expiration Date (Optional)"
-                  name="expirationDate"
-                  type="date"
-                  value={formData.expirationDate}
-                  onChange={handleInputChange}
-                  error={formErrors.expirationDate}
-                  variant="light"
-                />
+                {/* Expiration Date: Month/Year (optional) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Expiration Date (Optional)</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <select
+                      name="expirationMonth"
+                      value={formData.expirationMonth || parseMonthYear(formData.expirationDate).m}
+                      onChange={(e) => handleMonthYearChange('expiration', 'month', e.target.value)}
+                      className="block w-full p-3 border border-gray-300 rounded-md bg-white"
+                    >
+                      {MONTHS.map((month) => (
+                        <option key={month.value} value={month.value} disabled={month.value === ''}>
+                          {month.label}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      name="expirationYear"
+                      value={formData.expirationYear || parseMonthYear(formData.expirationDate).y}
+                      onChange={(e) => handleMonthYearChange('expiration', 'year', e.target.value)}
+                      className="block w-full p-3 border border-gray-300 rounded-md bg-white"
+                    >
+                      {YEARS.map((year) => (
+                        <option key={year.value} value={year.value} disabled={year.value === ''}>
+                          {year.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {formErrors.expirationDate && <p className="mt-1 text-sm text-red-600">{formErrors.expirationDate}</p>}
+                </div>
 
                 <InputField
                   label="Credential ID (Optional)"
@@ -528,3 +604,45 @@ const CertificatesForm = () => {
 };
 
 export default CertificatesForm;
+
+// helper: parse month/year from an ISO or Date-like value
+const parseMonthYear = (d) => {
+  if (!d) return { m: '', y: '' };
+  const s = String(d);
+  const isoMatch = s.match(/^(\d{4})-(\d{2})(?:-(\d{2}))?$/);
+  if (isoMatch) return { m: isoMatch[2], y: isoMatch[1] };
+  const parsed = new Date(d);
+  if (!isNaN(parsed)) {
+    return { m: String(parsed.getMonth() + 1).padStart(2, '0'), y: parsed.getFullYear() };
+  }
+  return { m: '', y: '' };
+};
+
+// Month and Year options (used by the form)
+const MONTHS = [
+  { value: '', label: 'Month' },
+  { value: '01', label: 'January' },
+  { value: '02', label: 'February' },
+  { value: '03', label: 'March' },
+  { value: '04', label: 'April' },
+  { value: '05', label: 'May' },
+  { value: '06', label: 'June' },
+  { value: '07', label: 'July' },
+  { value: '08', label: 'August' },
+  { value: '09', label: 'September' },
+  { value: '10', label: 'October' },
+  { value: '11', label: 'November' },
+  { value: '12', label: 'December' },
+];
+
+const currentYear = new Date().getFullYear();
+const YEARS = [
+  { value: '', label: 'Year' },
+  ...Array.from({ length: 60 }, (_, i) => ({
+    value: String(currentYear - i),
+    label: String(currentYear - i)
+  }))
+];
+
+// build ISO date string from month/year parts
+const buildIsoFromMY = ({ m, y }) => (m && y) ? `${y}-${m}-01` : '';

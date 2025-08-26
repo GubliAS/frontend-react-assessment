@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { setUser, setToken } from "../redux/auth/authSlice";
 import Cookies from "universal-cookie";
 import Button from "../components/shared/Button";
+import { createProfile } from "../services/profile";
 
 const cookies = new Cookies();
 
@@ -89,6 +90,17 @@ const OTPVerificationPage = () => {
         cookies.set("user", JSON.stringify(user), { path: "/", sameSite: "lax" });
       }
 
+      // Ensure a first, empty profile instance is created for newly registered seekers.
+      // Do this non-blocking: log errors but don't prevent navigation.
+      if (accountType === "seeker") {
+        try {
+          // backend links profile to current authenticated user (token used by api interceptor)
+          // backend requires a region enum — provide default to satisfy validation
+          await createProfile({ address: { region: "Greater Accra" } });
+        } catch (err) {
+          console.error("Failed to create initial profile:", err);
+        }
+      }
       // redirect based on accountType
       if (accountType === "seeker") {
         navigate("/youth/dashboard", { replace: true });
