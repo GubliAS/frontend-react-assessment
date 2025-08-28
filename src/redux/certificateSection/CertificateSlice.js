@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  certificates: [],
+  certifications: [],
   isLoading: false,
   error: null,
 };
@@ -11,13 +11,13 @@ const certificatesSlice = createSlice({
   initialState,
   reducers: {
     addCertificate: (state, action) => {
-      state.certificates.push(action.payload);
+      state.certifications.push(action.payload);
     },
     removeCertificate: (state, action) => {
-      state.certificates = state.certificates.filter(cert => cert.id !== action.payload);
+      state.certifications = state.certifications.filter(cert => cert.id !== action.payload);
     },
     setCertificates: (state, action) => {
-      state.certificates = action.payload;
+      state.certifications = action.payload;
     },
     resetCertificates: () => initialState,
     setLoading: (state, action) => {

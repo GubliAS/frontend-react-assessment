@@ -6,6 +6,12 @@ import { useWorkExperience } from '../../../redux/workExperienceSection/useWorkE
 import { addWorkExperience, updateWorkExperience, removeWorkExperience } from '../../../redux/workExperienceSection/WorkExperienceSlice';
 import Button from '../../../components/shared/Button';
 import { Card } from '../../../components/ui/card';
+import { updateProfile } from '../../../services/profile';
+import { useToast } from '../../../hooks/use-toast';
+import PersonalInfoSection from './PersonalInfoSection';
+import { usePersonalInfo } from '../../../redux/personaInfo/usePersonalInfo';
+import { useDispatch } from 'react-redux';
+import { loadProfile } from '../../../redux/profile/profileActions';
 
 // helper: normalize various date values to yyyy-MM-dd for <input type="date">
 function formatDateForInput(v) {
@@ -47,6 +53,9 @@ const YEARS = [
 
 const WorkExperienceSection = () => {
   const { workExperiences, dispatch } = useWorkExperience(); // from Redux
+  const { personalInfo } = usePersonalInfo();
+  const { toast } = useToast();
+  const storeDispatch = useDispatch();
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -143,6 +152,26 @@ const WorkExperienceSection = () => {
     }
   };
 
+  // Persist work experience list to profile API
+  const persistWorkExperiences = async (list) => {
+    try {
+      // send updated workExperience array to backend
+      const res = await updateProfile({ workExperience: list});
+      // Refresh canonical profile so all slices stay in sync
+      await storeDispatch(loadProfile());
+      toast?.({ title: 'Profile updated', description: 'Work experience saved.' });
+      return res;
+    } catch (err) {
+      console.error('Failed to save work experience to profile:', err);
+      toast?.({
+        title: 'Save failed',
+        description: err?.message || 'Failed to save work experience.',
+        variant: 'destructive',
+      });
+      throw err;
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -173,12 +202,21 @@ const WorkExperienceSection = () => {
     };
 
     if (editingId) {
-      // keep same shape as education reducer: { id, data }
+      // compute updated list for persistence
+      const updatedList = workExperiences.map((exp) =>
+        exp.id === editingId ? { ...exp, ...payload } : exp
+      );
+      // update local slice
       dispatch(updateWorkExperience({ id: editingId, data: payload }));
       setEditingId(null);
+      // persist canonical list
+      persistWorkExperiences(updatedList).catch(() => {});
     } else {
       // let slice create the id if it does so — pass payload only
       dispatch(addWorkExperience(payload));
+      // optimistic local list for persistence
+      const newList = [...workExperiences, payload];
+      persistWorkExperiences(newList);
     }
 
     // Reset form
@@ -274,13 +312,18 @@ console.log("start date", formData.startDate)
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => dispatch(removeWorkExperience(exp.id))}
-                  className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                  aria-label="Delete work experience"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  <span className="sr-only">Delete</span>
-                </Button>
+                  onClick={async () => {
+                    // compute new list and persist after removing locally
+                    const updatedList = workExperiences.filter((w) => w.id !== exp.id);
+                    dispatch(removeWorkExperience(exp.id));
+                    await persistWorkExperiences(updatedList);
+                  }}
+                   className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                   aria-label="Delete work experience"
+                 >
+                   <Trash2 className="w-4 h-4" />
+                   <span className="sr-only">Delete</span>
+                 </Button>
               </div>
             </div>
             <p className="text-sm text-gray-500">
@@ -439,19 +482,23 @@ console.log("start date", formData.startDate)
 
           {/* Form Actions */}
           <div className="flex gap-2">
-            <button
+            <Button
               type="submit"
-              className="bg-[rgb(151,177,150)] px-4 py-2 rounded text-white hover:bg-[rgb(131,157,130)] transition-colors"
+              variant="emeraldGradient"
+              size="medium"
+              className="px-4 py-2 rounded"
             >
               {editingId ? 'Update' : 'Add'}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={handleCancel}
-              className="border border-gray-200 px-4 py-2 rounded text-gray-700 hover:bg-gray-50 transition-colors"
+              variant="outlineEbony"
+              size="medium"
+              className="px-4 py-2 rounded text-gray-700"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       )}

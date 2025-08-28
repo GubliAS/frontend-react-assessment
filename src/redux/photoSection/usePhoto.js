@@ -13,13 +13,13 @@ export const useAppSelector = useSelector;
 
 export const usePhoto = () => {
   const dispatch = useAppDispatch();
-  const profilePhotoFile = useAppSelector(state => state.photo.profilePhotoFile);
+  const profilePhoto = useAppSelector(state => state.photo.profilePhoto);
   const profilePhotoUrl = useAppSelector(state => state.photo.profilePhotoUrl);
   const isUploading = useAppSelector(state => state.photo.isUploading);
   const error = useAppSelector(state => state.photo.error);
 
   return {
-    profilePhotoFile,
+    profilePhoto,
     profilePhotoUrl,
     isUploading,
     error,

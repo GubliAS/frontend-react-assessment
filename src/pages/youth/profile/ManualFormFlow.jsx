@@ -60,7 +60,7 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
   const { educationList } = useEducation();
   const { skills } = useSkills();
   const { certificates } = useCertificates();
-  const { profilePhotoUrl } = usePhoto();
+  const { profilePhoto } = usePhoto();
   const { careerAspiration } = useCareerAspiration();
   const { assessmentScores } = useAssessment();
 
@@ -230,7 +230,7 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
         return (
          <PhotoUpload
            mode="create"
-           data={profilePhotoUrl}
+           data={profilePhoto}
            onUpdate={handlePhotoUpdate}
            onValidate={(isValid) => handleStepValidation(7, isValid)}
            showActions={false}
@@ -273,8 +273,8 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
                 <div className="space-y-3">
                   <h4 className="font-medium text-[var(--ebony-50)]">Profile Photo</h4>
                   <div className="text-sm">
-                    {profilePhotoUrl ? (
-                      <img src={profilePhotoUrl} alt="Profile" className="w-32 h-32 object-cover rounded-md" />
+                    {profilePhoto ? (
+                      <img src={profilePhoto} alt="Profile" className="w-32 h-32 object-cover rounded-md" />
                     ) : (
                       <p className="text-muted-foreground">No profile photo uploaded</p>
                     )}

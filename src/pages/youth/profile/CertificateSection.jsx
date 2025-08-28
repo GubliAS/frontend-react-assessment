@@ -6,16 +6,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui
 import { Plus, Trash2, FileText, Upload, Eye, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
 import { useToast } from '../../../hooks/use-toast';
+import { updateProfile, createProfile } from '../../../services/profile';
+import { useDispatch } from 'react-redux';
+import { loadProfile } from '../../../redux/profile/profileActions';
 
 const CertificatesForm = () => {
   const {
-    certificates,
+    certifications,
     addCertificate,
     removeCertificate,
     loading,
     error
   } = useCertificates();
 
+  console.log('Current certifications from store:', certifications);
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -23,10 +27,11 @@ const CertificatesForm = () => {
   const [formErrors, setFormErrors] = useState({});
   const fileInputRef = useRef(null);
   const { toast } = useToast();
+  const storeDispatch = useDispatch();
 
   const [formData, setFormData] = useState({
     name: '',
-    issuer: '',
+    issuingOrganization: '',
     // store issue/expiration as ISO yyyy-mm-01; keep month/year parts for UI
     issueDate: '',
     issueMonth: '',
@@ -72,8 +77,8 @@ const CertificatesForm = () => {
       errors.name = 'Certificate name is required';
     }
 
-    if (!formData.issuer.trim()) {
-      errors.issuer = 'Issuing organization is required';
+    if (!formData.issuingOrganization.trim()) {
+      errors.issuingOrganization = 'Issuing organization is required';
     }
 
     // require issue month & year
@@ -81,7 +86,7 @@ const CertificatesForm = () => {
       errors.issueDate = 'Issue month and year are required';
     }
 
-    // Check if expiration date is after issue date
+  // Check if expiration date is after issue date
     if ((formData.expirationMonth && formData.expirationYear) && (formData.issueMonth && formData.issueYear)) {
       const issueIso = buildIsoFromMY({ m: formData.issueMonth, y: formData.issueYear });
       const expIso = buildIsoFromMY({ m: formData.expirationMonth, y: formData.expirationYear });
@@ -151,8 +156,39 @@ const CertificatesForm = () => {
     }
   };
 
+  // Persist certificates to profile API (update -> fallback to create on 404)
+  const persistCertificates = async (list) => {
+    try {
+      console.log('Persisting certificates to profile:', list);
+      // backend expects payload.certificates
+      await updateProfile({ certifications: list });
+      await storeDispatch(loadProfile());
+      toast?.({ title: 'Profile updated', description: 'Certificates saved.' });
+    } catch (err) {
+      const status = err?.status || err?.response?.status;
+      if (status === 404) {
+        try {
+          await createProfile({ certifications: list });
+          await storeDispatch(loadProfile());
+          toast?.({ title: 'Profile created', description: 'Certificates saved.' });
+          return;
+        } catch (createErr) {
+          console.error('Failed to create profile with certificates:', createErr);
+          toast?.({ title: 'Save failed', description: createErr?.message || 'Failed to save certificates.', variant: 'destructive' });
+          throw createErr;
+        }
+      }
+
+      console.error('Failed to save certificates to profile:', err);
+      toast?.({ title: 'Save failed', description: err?.message || 'Failed to save certificates.', variant: 'destructive' });
+      throw err;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // make a client id for optimistic list + persistence
+    const clientId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
     if (!validateForm()) {
       toast({
@@ -169,21 +205,29 @@ const CertificatesForm = () => {
       const expirationIso = (formData.expirationMonth && formData.expirationYear) ? buildIsoFromMY({ m: formData.expirationMonth, y: formData.expirationYear }) : null;
 
       const certificateData = {
+        id: clientId,
         name: formData.name.trim(),
-        issuer: formData.issuer.trim(),
+        issuingOrganization: formData.issuingOrganization.trim(),
         issueDate: issueIso,
         expirationDate: expirationIso,
         credentialId: formData.credentialId.trim() || null,
         file: formData.file,
         fileUrl: formData.fileUrl
       };
-
       if (editingId) {
-        // Update existing certificate (if editing functionality is needed)
+        // TODO: support editing existing certificate via hook if implemented
         // updateCertificate(editingId, certificateData);
       } else {
         await addCertificate(certificateData);
       }
+
+      // optimistic list for persistence (use current certificates + new item if adding)
+      const optimisticList = editingId
+        ? certifications.map(c => (c.id === editingId || c._id === editingId ? { ...c, ...certificateData } : c))
+        : [...(certifications || []), certificateData];
+
+      // persist (don't block UI)
+      persistCertificates(optimisticList).catch(() => {});
 
       handleCancel();
       toast({
@@ -207,7 +251,7 @@ const CertificatesForm = () => {
     
     setFormData({
       name: '',
-      issuer: '',
+      issuingOrganization: '',
       issueDate: '',
       issueMonth: '',
       issueYear: '',
@@ -222,16 +266,19 @@ const CertificatesForm = () => {
     setEditingId(null);
     setShowForm(false);
   };
-
+ 
   const handleRemove = async (id) => {
     try {
-      const certificate = certificates.find(cert => cert.id === id);
+      const certificate = certifications.find(cert => cert.id === id);
       
       if (certificate?.fileUrl && certificate.file) {
         URL.revokeObjectURL(certificate.fileUrl);
       }
       
       await removeCertificate(id);
+      // optimistic list after removal -> persist
+      const updatedList = (certifications || []).filter(cert => cert.id !== id && cert._id !== id);
+      persistCertificates(updatedList).catch(() => {});
       
       toast({
         title: "Certificate removed",
@@ -297,7 +344,7 @@ const CertificatesForm = () => {
 
       {/* Existing certificates */}
       <div className="space-y-4">
-        {certificates?.map(certificate => (
+        {certifications?.map(certificate => (
           <Card key={certificate.id} className="hover:shadow-md transition-shadow">
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
@@ -357,7 +404,7 @@ const CertificatesForm = () => {
           </Card>
         ))}
         
-        {certificates?.length === 0 && !loading && (
+        {certifications?.length === 0 && !loading && (
           <div className="text-center py-8 text-gray-500">
             <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
             <p>No certificates added yet. Add your first certificate to get started.</p>
@@ -401,7 +448,7 @@ const CertificatesForm = () => {
 
                 <InputField
                   label="Issuing Organization"
-                  name="issuer"
+                  name="issuingOrganization"
                   value={formData.issuer}
                   onChange={handleInputChange}
                   placeholder="e.g., Amazon Web Services"

@@ -5,6 +5,12 @@ import { useEducation } from '../../../redux/educationSection/useEducationInfo';
 import InputField from '../../../components/shared/InputField';
 import SelectField from '../../../components/shared/SelectInputField';
 import Button from '../../../components/shared/Button';
+// Added imports to persist education to backend and show toast
+import { updateProfile } from '../../../services/profile';
+import { useToast } from '../../../hooks/use-toast';
+import { useDispatch } from 'react-redux';
+import { loadProfile } from '../../../redux/profile/profileActions';
+
 const GHANA_INSTITUTIONS = [
   'University of Ghana',
   'Kwame Nkrumah University of Science and Technology (KNUST)',
@@ -52,6 +58,10 @@ const YEARS = [
 
 const EducationSection = () => {
   const { educationList, dispatch } = useEducation();
+
+  // added toast + store dispatch for reloading canonical profile
+  const { toast } = useToast();
+  const storeDispatch = useDispatch();
 
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -142,7 +152,26 @@ const [formData, setFormData] = useState({
     return { ...formData, ...updates };
   };
 
-  const handleSubmit = (e) => {
+  // persist education list to profile API (mirrors WorkExperienceSection approach)
+  const persistEducation = async (list) => {
+    try {
+      console.log('Persisting education list to profile:', list);
+      await updateProfile({ education: list });
+      // refresh canonical profile so all slices remain in sync
+      await storeDispatch(loadProfile());
+      toast?.({ title: 'Profile updated', description: 'Education saved.' });
+    } catch (err) {
+      console.error('Failed to save education to profile:', err);
+      toast?.({
+        title: 'Save failed',
+        description: err?.message || 'Failed to save education.',
+        variant: 'destructive',
+      });
+      throw err;
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // merge state with any DOM values (handles autofill)
@@ -166,10 +195,19 @@ const [formData, setFormData] = useState({
     if (editingId) {
       // reducer expects { id, data }
       dispatch(updateEducation({ id: editingId, data: payload }));
+      // build updated list for persistence
+      const updatedList = educationList.map((ed) =>
+        ed.id === editingId ? { ...ed, ...payload } : ed
+      );
       setEditingId(null);
+      // persist canonical list (don't block UI)
+      persistEducation(updatedList).catch(() => {});
     } else {
       // let the slice generate the id (slice already creates one)
       dispatch(addEducation(payload));
+      // optimistic list for persistence
+      const newList = [...(educationList || []), payload];
+      persistEducation(newList).catch(() => {});
     }
 
     resetForm();
@@ -242,7 +280,12 @@ const [formData, setFormData] = useState({
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => dispatch(removeEducation(edu.id))}
+                  onClick={async () => {
+                    // compute new list and persist after removing locally
+                    const updatedList = (educationList || []).filter((w) => w.id !== edu.id);
+                    dispatch(removeEducation(edu.id));
+                    await persistEducation(updatedList).catch(() => {});
+                  }}
                   className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50"
                   aria-label="Delete education"
                 >

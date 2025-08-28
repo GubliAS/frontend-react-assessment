@@ -57,6 +57,63 @@ export function sanitizePersonalInfo(rawPersonal = {}) {
   return sanitized;
 }
 
+export function sanitizeCareerAspiration(careerAspiration = {}) {
+  const sanitized = {};
+
+  // List of allowed career aspiration fields that backend expects
+  const ALLOWED_CAREER_FIELDS = [
+    'careerField',
+    'careerInterests',
+    'desiredJobTitles', 
+    'targetIndustries',
+    'preferredJobLocations',
+    'preferredJobTypes',
+    'expectedSalary',
+    'keySkillsToGain',
+    'certifications'
+  ];
+
+  for (const key of ALLOWED_CAREER_FIELDS) {
+    const val = careerAspiration[key];
+
+    if (val === undefined || val === null) continue;
+
+    // Handle arrays
+    if (Array.isArray(val)) {
+      const filtered = val.filter(item => 
+        item !== null && 
+        item !== undefined && 
+        (typeof item === 'string' ? item.trim().length > 0 : true)
+      );
+      if (filtered.length > 0) {
+        sanitized[key] = filtered;
+      }
+    }
+    // Handle expectedSalary object
+    else if (key === 'expectedSalary' && typeof val === 'object') {
+      const salaryObj = {};
+      if (typeof val.min === 'number' && val.min > 0) salaryObj.min = val.min;
+      if (typeof val.max === 'number' && val.max > 0) salaryObj.max = val.max;
+      if (Object.keys(salaryObj).length > 0) {
+        sanitized[key] = salaryObj;
+      }
+    }
+    // Handle strings
+    else if (typeof val === 'string') {
+      const trimmed = val.trim();
+      if (trimmed.length > 0) {
+        sanitized[key] = trimmed;
+      }
+    }
+    // Handle other types as-is
+    else {
+      sanitized[key] = val;
+    }
+  }
+
+  return sanitized;
+}
+
 export function sanitizeProfileForCreate(profile = {}) {
   // Accept either nested { personalInfo: {...} } or flat top-level personal fields
   const payload = {};
@@ -78,6 +135,7 @@ export function sanitizeProfileForCreate(profile = {}) {
   }
 
   if (Array.isArray(profile.education) && profile.education.length > 0) {
+    console.log('Including education in payload:', profile.education);
     payload.education = profile.education;
   }
 
@@ -118,12 +176,36 @@ export function sanitizeProfileForCreate(profile = {}) {
     if (lang.length) payload.languages = lang;
   }
 
-  if (Array.isArray(profile.certificates) && profile.certificates.length > 0) {
-    payload.certificates = profile.certificates;
+  if (Array.isArray(profile.certifications) && profile.certifications.length > 0) {
+    payload.certifications = profile.certifications;
   }
 
   if (profile.careerAspiration && Object.keys(profile.careerAspiration).length > 0) {
     payload.careerAspiration = profile.careerAspiration;
+  }
+   // Also handle individual career fields passed directly at top level
+  const directCareerFields = [
+    'careerField', 'careerInterests', 'desiredJobTitles', 
+    'targetIndustries', 'preferredJobLocations', 'preferredJobTypes',
+    'expectedSalary', 'keySkillsToGain'
+  ];
+  
+  directCareerFields.forEach(field => {
+    if (profile[field] !== undefined) {
+      const careerObj = { [field]: profile[field] };
+      const sanitized = sanitizeCareerAspiration(careerObj);
+      if (sanitized[field] !== undefined) {
+        payload[field] = sanitized[field];
+      }
+    }
+  });
+
+  // include profile photo when provided as a File/Blob (keep as-is so objectToFormData can append it)
+  if (profile.profilePhoto instanceof File || profile.profilePhoto instanceof Blob) {
+    payload.profilePhoto = profile.profilePhoto;
+  } else if (typeof profile.profilePhoto === 'string' && profile.profilePhoto.trim()) {
+    // allow sending an existing URL or base64 string if caller wants to keep it as string
+    payload.profilePhoto = profile.profilePhoto.trim();
   }
 
   // intentionally exclude fields backend doesn't support (e.g. bio)

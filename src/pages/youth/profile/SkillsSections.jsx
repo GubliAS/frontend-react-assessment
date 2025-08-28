@@ -9,9 +9,17 @@ import { Label } from '../../../components/ui/label';
 import InputField from '../../../components/shared/InputField'; // <- Use your custom InputField
 import { X, Plus, GripVertical } from 'lucide-react';
 import { addSkill, removeSkill, updateSkill, reorderSkills } from '../../../redux/skillsInfoSection/SkillSlice';
+// Added imports for persisting skills
+import { updateProfile, createProfile } from '../../../services/profile';
+import { useToast } from '../../../hooks/use-toast';
+import { useDispatch } from 'react-redux';
+import { loadProfile } from '../../../redux/profile/profileActions';
 
 const SkillForm= () => {
   const { skills, dispatch } = useSkills();
+  const { toast } = useToast();
+  const storeDispatch = useDispatch();
+
   const [currentInput, setCurrentInput] = useState('');
   const [currentCategory, setCurrentCategory] = useState('technical');
   const [currentLevel, setCurrentLevel] = useState('intermediate');
@@ -45,20 +53,95 @@ const SkillForm= () => {
              !skills.some(s => s.name.toLowerCase() === skill.toLowerCase())
   );
 
+  // helper to create an id consistent with slice fallback
+  const createClientId = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
+
+  // Build categorized arrays expected by backend
+  const categorize = (list = []) => {
+    const tech = [];
+    const soft = [];
+    const lang = [];
+    (list || []).forEach(item => {
+      const cat = (item && (item.category || item.type) || 'technical').toString().toLowerCase();
+      const normalized = { ...item };
+      // ensure minimal shape: name + optional level
+      if (typeof normalized === 'string') normalized.name = normalized;
+      if (cat === 'technical') tech.push(normalized);
+      else if (cat === 'soft') soft.push(normalized);
+      else if (cat === 'language') lang.push(normalized);
+      else tech.push(normalized);
+    });
+    return { tech, soft, lang };
+  };
+
+  // Persist skills to profile (update -> fallback create on 404)
+  const persistSkills = async (list) => {
+    const { tech, soft, lang } = categorize(list);
+    // Send empty arrays when clearing last items to ensure server sync
+    const payload = {
+      technicalSkills: tech,
+      softSkills: soft,
+      languages: lang,
+    };
+
+    try {
+      await updateProfile(payload);
+      await storeDispatch(loadProfile());
+      toast?.({ title: 'Profile updated', description: 'Skills saved.' });
+    } catch (err) {
+      const status = err?.status || err?.response?.status;
+      if (status === 404) {
+        try {
+          await createProfile(payload);
+          await storeDispatch(loadProfile());
+          toast?.({ title: 'Profile created', description: 'Skills saved.' });
+          return;
+        } catch (createErr) {
+          console.error('Failed to create profile with skills:', createErr);
+          toast?.({ title: 'Save failed', description: createErr?.message || 'Failed to save skills.', variant: 'destructive' });
+          throw createErr;
+        }
+      }
+      console.error('Failed to save skills to profile:', err);
+      toast?.({ title: 'Save failed', description: err?.message || 'Failed to save skills.', variant: 'destructive' });
+      throw err;
+    }
+  };
+
   const handleAddSkill = (skillName) => {
     if (!skillName.trim()) return;
     if (currentCount >= MAX_PER_CATEGORY) {
       setShowLimitWarning(true);
       return;
     }
-    dispatch(addSkill({ name: skillName.trim(), category: currentCategory, level: currentLevel }));
+
+    // create an id locally so we can build optimistic payload for persistence
+    const clientId = createClientId();
+    const payload = { id: clientId, name: skillName.trim(), category: currentCategory, level: currentLevel };
+
+    dispatch(addSkill(payload));
     setCurrentInput('');
     setShowSuggestions(false);
     inputRef.current?.focus();
+
+    // optimistic persistence (don't block UI)
+    const newList = [...skills, payload];
+    persistSkills(newList).catch(() => {});
   };
 
-  const handleRemoveSkill = (id) => dispatch(removeSkill(id));
-  const handleUpdateLevel = (id, level) => dispatch(updateSkill({ id, level }));
+  const handleRemoveSkill = (id) => {
+    // compute optimistic list then dispatch + persist
+    const updatedList = skills.filter(s => s.id !== id && s._id !== id);
+    dispatch(removeSkill(id));
+    persistSkills(updatedList).catch(() => {});
+  };
+
+  const handleUpdateLevel = (id, level) => {
+    // update locally then persist new list
+    dispatch(updateSkill({ id, data: { level } }));
+    const updatedList = skills.map(s => (s.id === id || s._id === id ? { ...s, level } : s));
+    persistSkills(updatedList).catch(() => {});
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && currentInput.trim()) {
@@ -77,7 +160,9 @@ const SkillForm= () => {
     const newSkills = [...skills];
     const [removed] = newSkills.splice(draggedIndex, 1);
     newSkills.splice(targetIndex, 0, removed);
+    // update local slice and persist
     dispatch(reorderSkills(newSkills));
+    persistSkills(newSkills).catch(() => {});
     setDraggedItem(null);
   };
 

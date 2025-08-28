@@ -14,12 +14,12 @@ export const useAppSelector = useSelector;
 
 export const useCertificates = () => {
   const dispatch = useAppDispatch();
-  const certificates = useAppSelector(state => state.certificates.certificates);
+  const certifications = useAppSelector(state => state.certificates.certifications);
   const isLoading = useAppSelector(state => state.certificates.isLoading);
   const error = useAppSelector(state => state.certificates.error);
 
   return {
-    certificates,
+    certifications,
     isLoading,
     error,
     addCertificate: (cert) => dispatch(addCertificate(cert)),

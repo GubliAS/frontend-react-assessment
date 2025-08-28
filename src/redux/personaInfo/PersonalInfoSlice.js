@@ -19,7 +19,7 @@ const initialState = {
     lastName: '',
     dateOfBirth: '',
     gender: '',
-     // optional Ghana Card fields
+    // optional Ghana Card fields - keep serializable metadata shape by default
     ghanaCardNumber: '',
     ghCardUploadFront: null,
     ghCardUploadBack: null,
@@ -31,6 +31,7 @@ const initialState = {
     email: '',
     professionalBio: ''
   },
+  profileCompletion: 0, // percentage 0-100
   isLoading: false,
   error: null
 };
@@ -42,6 +43,28 @@ const personalInfoSlice = createSlice({
     setPersonalInfo: (state, action) => {
       const payload = action.payload || {};
       const { address: addrPayload, region, district, city, dateOfBirth, ...rest } = payload;
+
+      // helper: keep file-like fields serializable (store metadata / url only)
+      const normalizeFileMeta = (val) => {
+        if (val === null || val === undefined) return val;
+        if (typeof val === 'string') return { name: '', size: 0, type: '', lastModified: null, url: val, isFile: false };
+        // File objects from inputs: store serializable metadata only
+        if (typeof File !== 'undefined' && val instanceof File) {
+          return { name: val.name || '', size: val.size || 0, type: val.type || '', lastModified: val.lastModified || null, url: '', isFile: true };
+        }
+        // If already a metadata-like object, keep only expected keys
+        if (typeof val === 'object') {
+          return {
+            name: val.name || '',
+            size: val.size || 0,
+            type: val.type || '',
+            lastModified: val.lastModified ?? null,
+            url: val.url || '',
+            isFile: !!val.isFile,
+          };
+        }
+        return val;
+      };
 
       // merge nested address or flat fields into state.personalInfo.address
       if (addrPayload && typeof addrPayload === 'object') {
@@ -64,6 +87,16 @@ const personalInfoSlice = createSlice({
       // Normalize dateOfBirth to yyyy-MM-dd so <input type="date"> displays it
       if (dateOfBirth !== undefined) {
         state.personalInfo.dateOfBirth = formatDateForInput(dateOfBirth);
+      }
+
+      // If payload includes gh card files, normalize them to metadata before merging
+      if (rest.ghCardUploadFront !== undefined) {
+        state.personalInfo.ghCardUploadFront = normalizeFileMeta(rest.ghCardUploadFront);
+        delete rest.ghCardUploadFront;
+      }
+      if (rest.ghCardUploadBack !== undefined) {
+        state.personalInfo.ghCardUploadBack = normalizeFileMeta(rest.ghCardUploadBack);
+        delete rest.ghCardUploadBack;
       }
 
       // merge other top-level personal fields (strings/files/etc.)

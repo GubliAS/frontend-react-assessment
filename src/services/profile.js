@@ -32,9 +32,12 @@ export const createProfile = (rawBody) => {
 
   if (hasFile) {
     const fd = objectToFormData(sanitized);
-    return api.post('/api/youth/profiles', fd).then(handleResponse).catch(handleError);
+    console.log('FormData entries:', fd);
+    return api.post('/api/youth/profiles', fd, {
+      headers: { 'Content-Type': 'multipart/form-data' } // axios will append the boundary
+    }).then(handleResponse).catch(handleError);
   }
-
+  
   return api.post('/api/youth/profiles', sanitized).then(handleResponse).catch(handleError);
 };
 // optional helpers you can add later
@@ -60,10 +63,13 @@ export const updateProfile = (rawBody) => {
 
   if (hasFile) {
     const fd = objectToFormData(sanitized);
-    return api.put('/api/youth/profiles', fd).then(handleResponse).catch(handleError);
+    console.log('FormData entries:', fd);
+    return api.patch('/api/youth/profiles', fd, {
+      headers: { 'Content-Type': 'multipart/form-data' } // axios will append the boundary
+    }).then(handleResponse).catch(handleError);
   }
-
-  return api.put('/api/youth/profiles', sanitized).then(handleResponse).catch(handleError);
+  
+  return api.patch('/api/youth/profiles', sanitized).then(handleResponse).catch(handleError);
 };
 
 export default {

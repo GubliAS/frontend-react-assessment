@@ -5,6 +5,11 @@ import Button from "../../../components/shared/Button";
 import PropTypes from "prop-types";
 import { usePersonalInfo } from "../../../redux/personaInfo/usePersonalInfo";
 import { setPersonalInfo } from "../../../redux/personaInfo/PersonalInfoSlice";
+import { updateProfile } from "../../../services/profile";
+import { setLoading, setError, clearError } from "../../../redux/personaInfo/PersonalInfoSlice";
+import { useToast } from "../../../hooks/use-toast";
+import { useDispatch } from "react-redux";
+import { loadProfile } from "../../../redux/profile/profileActions";
 import { Card } from "../../../components/ui/card";
 
 const GHANA_REGIONS = [
@@ -36,6 +41,39 @@ const GENDER_OPTIONS = [
 
 const PersonalInfoSection = () => {
   const { personalInfo, dispatch } = usePersonalInfo();
+  const storeDispatch = useDispatch();
+  const { toast } = useToast();
+
+  const handleSavePersonalInfo = async () => {
+    dispatch(clearError());
+    dispatch(setLoading(true));
+    try {
+    console.log(personalInfo)
+      // updateProfile will sanitize payload and send appropriate request (formdata if files present)
+      const updated = await updateProfile(personalInfo);
+      // merge server response back into slice so UI shows latest persisted state
+      if (updated) {
+        // Refresh canonical profile from server so all slices stay in sync
+        await storeDispatch(loadProfile());
+      }
+      // optionally log success
+      console.log("Personal info saved", updated);
+      toast?.({
+        title: "Profile updated",
+        description: "Your personal information was saved.",
+      });
+    } catch (err) {
+      console.error("Failed to update personal info:", err);
+      dispatch(setError(err?.message || "Failed to save personal info"));
+      toast?.({
+        title: "Save failed",
+        description: err?.message || "Failed to save personal info.",
+        variant: "destructive",
+      });
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 
   const handleInputChange = (field, value) => {
     dispatch(setPersonalInfo({ [field]: value }));
@@ -259,7 +297,7 @@ const PersonalInfoSection = () => {
       <div className="flex justify-end gap-2 pt-4">
         <Button
           variant="emeraldGradient"
-          onClick={() => dispatch(setPersonalInfo(personalInfo))}
+          onClick={handleSavePersonalInfo}
         >
           Save Personal Info
         </Button>

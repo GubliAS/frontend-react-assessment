@@ -5,6 +5,7 @@ import { setEducationList } from '../educationSection/EducationSlice';
 import { setSkills } from '../skillsInfoSection/SkillSlice';
 import { setCertificates } from '../certificateSection/CertificateSlice';
 import { setCareerAspiration } from '../careerAspiration/careerAspirationSlice';
+import { setPhotoFile } from '../photoSection/PhotoSlice';
 
 // Thunk-style loader that maps backend profile fields into slices
 export const loadProfile = () => {
@@ -62,6 +63,11 @@ export const loadProfile = () => {
 
       if (profile.careerAspiration) {
         dispatch(setCareerAspiration(profile.careerAspiration));
+      }
+
+      if (profile.profilePhoto) {
+        // profile photo is handled in photo slice
+        dispatch(setPhotoFile(profile.profilePhoto));
       }
 
       return profile;

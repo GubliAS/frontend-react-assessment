@@ -293,6 +293,7 @@ const AssessmentTakingInterface = ({ assessment, onComplete, onExit }) => {
                 onClick={handleSubmit}
                 disabled={isSubmitting || answeredQuestions === 0}
                 className="flex items-center gap-2"
+                variant='emeraldGradient'
               >
                 <Flag className="w-4 h-4" />
                 {isSubmitting ? 'Submitting...' : 'Submit Assessment'}
@@ -301,6 +302,7 @@ const AssessmentTakingInterface = ({ assessment, onComplete, onExit }) => {
               <Button
                 onClick={handleNextQuestion}
                 className="flex items-center gap-2"
+                variant='emeraldGradient'
               >
                 Next
                 <ArrowRight className="w-4 h-4" />
