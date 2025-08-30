@@ -60,11 +60,10 @@ export const updateProfile = (rawBody) => {
     if (v instanceof File || v instanceof Blob) return '__FILE__';
     return v;
   }).includes('__FILE__');
-
+  console.log('Sanitized profile payload for update:', sanitized);
   if (hasFile) {
-    const fd = objectToFormData(sanitized);
-    console.log('FormData entries:', fd);
-    return api.patch('/api/youth/profiles', fd, {
+
+    return api.patch('/api/youth/profiles', sanitized, {
       headers: { 'Content-Type': 'multipart/form-data' } // axios will append the boundary
     }).then(handleResponse).catch(handleError);
   }

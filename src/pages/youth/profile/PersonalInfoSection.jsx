@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import InputField from "../../../components/shared/InputField";
 import SelectField from "../../../components/shared/SelectInputField";
 import Button from "../../../components/shared/Button";
@@ -53,31 +53,75 @@ const PersonalInfoSection = () => {
     dispatch(setPersonalInfo({ [field]: value }));
   };
 
-  const FileUploadField = ({ label, name, value, onChange, accept = "image/*,application/pdf" }) => (
-    <div className="space-y-2">
-      <label htmlFor={name} className="text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <div className="relative">
-        <input
-          id={name}
-          name={name}
-          type="file"
-          accept={accept}
-          onChange={(e) => onChange(e.target.files?.[0] || null)}
-          className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-gradient-to-r file:from-green-600 file:to-emerald-600 file:text-white hover:file:from-green-700 hover:file:to-emerald-700 transition-all duration-200"
-        />
-        {value && (
-          <div className="mt-2 text-xs text-green-600 flex items-center">
-            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            File selected: {value.name}
-          </div>
-        )}
+  const FileUploadField = ({ label, name, value, onChange, accept = "image/*,application/pdf" }) => {
+    const [previewUrl, setPreviewUrl] = useState(null);
+
+    useEffect(() => {
+      let objectUrl = null;
+      if (!value) {
+        setPreviewUrl(null);
+        return;
+      }
+
+      // string URL (backend) or metadata object with url
+      if (typeof value === 'string') {
+        setPreviewUrl(value);
+        return;
+      }
+      if (typeof value === 'object' && value.url) {
+        setPreviewUrl(value.url);
+        return;
+      }
+
+      // File/Blob selected client-side -> create blob URL
+      if (typeof File !== 'undefined' && value instanceof File) {
+        objectUrl = URL.createObjectURL(value);
+        setPreviewUrl(objectUrl);
+      } else if (typeof Blob !== 'undefined' && value instanceof Blob) {
+        objectUrl = URL.createObjectURL(value);
+        setPreviewUrl(objectUrl);
+      } else {
+        setPreviewUrl(null);
+      }
+
+      return () => {
+        if (objectUrl) {
+          URL.revokeObjectURL(objectUrl);
+        }
+      };
+    }, [value]);
+
+    return (
+      <div className="space-y-2">
+        <label htmlFor={name} className="text-sm font-medium text-gray-700">
+          {label}
+        </label>
+        <div className="relative">
+          <input
+            id={name}
+            name={name}
+            type="file"
+            accept={accept}
+            onChange={(e) => onChange(e.target.files?.[0] || null)}
+            className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-gradient-to-r file:from-green-600 file:to-emerald-600 file:text-white hover:file:from-green-700 hover:file:to-emerald-700 transition-all duration-200"
+          />
+
+          {previewUrl ? (
+            <div className="mt-2 flex items-center gap-3">
+              <img src={previewUrl} alt={`${label} preview`} className="w-16 h-10 object-cover rounded border" />
+              <div className="text-xs text-green-600">
+                {typeof value === 'object' && value.name ? `File: ${value.name}` : 'Uploaded'}
+              </div>
+            </div>
+          ) : value && typeof value === 'object' && value.name ? (
+            <div className="mt-2 text-xs text-green-600 flex items-center">
+              File selected: {value.name}
+            </div>
+          ) : null}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <Card className="space-y-6 p-6">

@@ -21,8 +21,8 @@ const initialState = {
     gender: '',
     // optional Ghana Card fields - keep serializable metadata shape by default
     ghanaCardNumber: '',
-    ghCardUploadFront: null,
-    ghCardUploadBack: null,
+    ghCardUploadFront: "",
+    ghCardUploadBack: "",
     address: {
        region: '',
         district: '',
@@ -48,9 +48,12 @@ const personalInfoSlice = createSlice({
       const normalizeFileMeta = (val) => {
         if (val === null || val === undefined) return val;
         if (typeof val === 'string') return { name: '', size: 0, type: '', lastModified: null, url: val, isFile: false };
-        // File objects from inputs: store serializable metadata only
+        // If it's a File/Blob, keep the File/Blob so objectToFormData can append it as a file
         if (typeof File !== 'undefined' && val instanceof File) {
-          return { name: val.name || '', size: val.size || 0, type: val.type || '', lastModified: val.lastModified || null, url: '', isFile: true };
+          return val;
+        }
+        if (typeof Blob !== 'undefined' && val instanceof Blob) {
+          return val;
         }
         // If already a metadata-like object, keep only expected keys
         if (typeof val === 'object') {
