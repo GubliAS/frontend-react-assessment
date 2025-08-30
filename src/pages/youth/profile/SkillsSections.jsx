@@ -14,6 +14,7 @@ import { updateProfile, createProfile } from '../../../services/profile';
 import { useToast } from '../../../hooks/use-toast';
 import { useDispatch } from 'react-redux';
 import { loadProfile } from '../../../redux/profile/profileActions';
+import { PREDEFINED_SKILLS } from '../../../utils/constants';
 
 const SkillForm= () => {
   const { skills, dispatch } = useSkills();
@@ -30,12 +31,8 @@ const SkillForm= () => {
   const MAX_PER_CATEGORY = 10;
   const currentCount = skills.filter(s => s.category === currentCategory).length;
 
-  const predefinedSkills = {
-    technical: ['JavaScript','TypeScript','React','Node.js','Python','Java','C++','SQL','MongoDB','PostgreSQL','AWS','Docker','Kubernetes','Git','HTML','CSS','Angular','Vue.js','Express.js','Django','Spring Boot','Machine Learning','Data Analysis','Cybersecurity','DevOps','Mobile Development','UI/UX Design'],
-    soft: ['Communication','Leadership','Teamwork','Problem Solving','Critical Thinking','Time Management','Adaptability','Creativity','Public Speaking','Negotiation','Project Management','Emotional Intelligence','Conflict Resolution','Mentoring','Strategic Planning','Decision Making','Customer Service','Analytical Thinking'],
-    language: ['English','Spanish','French','German','Chinese','Japanese','Korean','Arabic','Portuguese','Italian','Russian','Dutch','Swedish','Norwegian','Hindi','Bengali','Turkish','Polish','Hebrew','Thai','Vietnamese']
-  };
-
+  // Use shared PREDEFINED_SKILLS from utils/constants
+ 
   const levelColors = {
     beginner: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     intermediate: 'bg-blue-100 text-blue-800 border-blue-200',
@@ -48,7 +45,7 @@ const SkillForm= () => {
     language: 'Languages'
   };
 
-  const filteredSuggestions = predefinedSkills[currentCategory].filter(
+  const filteredSuggestions = (PREDEFINED_SKILLS[currentCategory] || []).filter(
     skill => skill.toLowerCase().includes(currentInput.toLowerCase()) &&
              !skills.some(s => s.name.toLowerCase() === skill.toLowerCase())
   );

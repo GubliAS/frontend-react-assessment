@@ -256,7 +256,7 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
                     <p><span className="font-medium">Name:</span> {personalInfo?.firstName} {personalInfo?.lastName}</p>
                     <p><span className="font-medium">Email:</span> {personalInfo?.email}</p>
                     {personalInfo?.phone && (
-                      <p><span className="font-medium">Phone:</span> {personalInfo.phone}</p>
+                      <p><span className="font-medium">Phone:</span> {personalInfo.phoneNumber}</p>
                     )}
                     {personalInfo?.address?.region && (
                       <p><span className="font-medium">Region:</span> {personalInfo.address.region}</p>

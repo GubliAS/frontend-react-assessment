@@ -114,6 +114,63 @@ export function sanitizeCareerAspiration(careerAspiration = {}) {
   return sanitized;
 }
 
+// Add work-experience sanitizer that strips endDate when isCurrent === true
+function sanitizeWorkExperience(list = []) {
+  if (!Array.isArray(list)) return [];
+  const ALLOWED = ['company','position','startDate','endDate','isCurrent','description','location','title','department'];
+  return list.map(item => {
+    if (!item || typeof item !== 'object') return null;
+    const out = {};
+    const isCurr = item.isCurrent === true || item.current === true;
+    for (const key of ALLOWED) {
+      if (key === 'endDate' && isCurr) continue; // omit endDate when current
+      const val = item[key];
+      if (val === undefined || val === null) continue;
+      if (typeof val === 'string') {
+        const trimmed = val.trim();
+        if (trimmed.length === 0) continue;
+        out[key] = trimmed;
+      } else {
+        out[key] = val;
+      }
+    }
+    if (isCurr) out.isCurrent = true;
+    return out;
+  }).filter(Boolean);
+}
+
+// New: education sanitizer — strip endYear when isCurrent === true and whitelist fields
+export function sanitizeEducation(list = []) {
+  if (!Array.isArray(list)) return [];
+  const ALLOWED = ['id','institution','degree','fieldOfStudy','startYear','endYear','isCurrent','grade','location','notes'];
+  return list.map(item => {
+    if (!item || typeof item !== 'object') return null;
+    const out = {};
+    const isCurr = item.isCurrent === true || item.current === true;
+    for (const key of ALLOWED) {
+      if (key === 'endYear' && isCurr) continue; // omit endYear when current
+      const val = item[key];
+      if (val === undefined || val === null) continue;
+      if (typeof val === 'string') {
+        const trimmed = val.trim();
+        if (trimmed.length === 0) continue;
+        // try to normalize numeric year strings to numbers for startYear/endYear
+        if ((key === 'startYear' || key === 'endYear') && /^\d{4}$/.test(trimmed)) {
+          out[key] = Number(trimmed);
+        } else {
+          out[key] = trimmed;
+        }
+      } else if (typeof val === 'number') {
+        out[key] = val;
+      } else {
+        out[key] = val;
+      }
+    }
+    if (isCurr) out.isCurrent = true;
+    return out;
+  }).filter(Boolean);
+}
+
 export function sanitizeProfileForCreate(profile = {}) {
   // Accept either nested { personalInfo: {...} } or flat top-level personal fields
   const payload = {};
@@ -131,12 +188,18 @@ export function sanitizeProfileForCreate(profile = {}) {
   }
 
   if (Array.isArray(profile.workExperience) && profile.workExperience.length > 0) {
-    payload.workExperience = profile.workExperience;
+    const sanitizedWork = sanitizeWorkExperience(profile.workExperience);
+    console.log('Including sanitized work in payload:', sanitizedWork);
+    if (sanitizedWork.length > 0) payload.workExperience = sanitizedWork;
   }
 
+  // Replace direct passthrough with sanitizer that strips endYear when isCurrent true
   if (Array.isArray(profile.education) && profile.education.length > 0) {
-    console.log('Including education in payload:', profile.education);
-    payload.education = profile.education;
+    const sanitizedEducation = sanitizeEducation(profile.education);
+    if (sanitizedEducation.length > 0) {
+      console.log('Including sanitized education in payload:', sanitizedEducation);
+      payload.education = sanitizedEducation;
+    }
   }
 
   // handle skills: accept either categorized arrays (technicalSkills/softSkills/languages)

@@ -11,33 +11,7 @@ import { useToast } from "../../../hooks/use-toast";
 import { useDispatch } from "react-redux";
 import { loadProfile } from "../../../redux/profile/profileActions";
 import { Card } from "../../../components/ui/card";
-
-const GHANA_REGIONS = [
-   "Greater Accra",
-  "Ashanti",
-  "Western",
-  "Eastern",
-  "Central",
-  "Volta",
-  "Northern",
-  "Upper East",
-  "Upper West",
-  "Bono",
-  "Ahafo",
-  "Bono East",
-  "Oti",
-  "Western North",
-  "Savannah",
-  "North East",
-];
-
-const GENDER_OPTIONS = [
-  { value: '', label: 'Select gender' },
-  { value: "Male", label: "Male" },
-  { value: "Female", label: "Female" },
-  { value: "Other", label: "Other" },
-  { value: "Prefer not to say", label: "Prefer not to say" },
-];
+import { GHANA_REGIONS, GENDER_OPTIONS } from "../../../utils/constants";
 
 const PersonalInfoSection = () => {
   const { personalInfo, dispatch } = usePersonalInfo();

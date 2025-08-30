@@ -12,7 +12,7 @@ const initialState = {
     position: '',
     startDate: '',
     endDate: '',
-    current: false,
+    isCurrent: false,
     description: '',
     location: '',
   }
@@ -55,9 +55,19 @@ const workExperienceSlice = createSlice({
     },
 
     setFormData: (state, action) => {
-      state.formData = { ...state.formData, ...action.payload };
-    },
+      const payload = action.payload || {};
+      // merge incoming form fields
+      state.formData = { ...state.formData, ...payload };
 
+      // if client toggles "isCurrent" (or legacy "current") to true, clear endDate
+      if (payload.isCurrent === true || payload.current === true) {
+        state.formData.endDate = '';
+        // keep both keys in sync for compatibility
+        state.formData.isCurrent = true;
+      
+      }
+    },
+    
     resetFormData: (state) => {
       state.formData = initialState.formData;
       state.editingId = null;

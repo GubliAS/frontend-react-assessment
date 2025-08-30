@@ -153,7 +153,7 @@ const ResumeUploadPage = ({ onBackToSelection, onExtractComplete }) => {
           issuingOrganization: 'Google',
           issueDate: '2023-01',
           expiryDate: '2024-01',
-          credentialId: 'GA-2023-001234'
+          credentialID: 'GA-2023-001234'
         }
       ]
     };

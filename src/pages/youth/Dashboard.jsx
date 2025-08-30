@@ -1,10 +1,11 @@
 import React, { use } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,  useNavigate } from 'react-router-dom';
 import Button from '../../components/shared/Button';
 import SkillDevelopmentTracker from '../../components/progress/SkillDevelopmentTracker';
 import { usePersonalInfo } from '../../redux/personaInfo/usePersonalInfo'
 import { selectUser } from '../../redux/auth/authSlice';
 import { useSelector } from 'react-redux';
+
 const YouthDashboard = () => {
   // Mock data
   const stats = [
@@ -41,6 +42,7 @@ const YouthDashboard = () => {
 
   const {personalInfo} = usePersonalInfo()
   const user = useSelector(selectUser)
+  const navigate = useNavigate();
   console.log(user)
 
    // Mock user data for development when not authenticated
@@ -54,16 +56,16 @@ const YouthDashboard = () => {
   };
 
    const handleCompleteProfile = () => {
-    navigate('/profile');
+    navigate('/youth/profile');
   };
   const handleBrowseJobs = () => {
-    navigate('/jobs');
+    navigate('/youth/jobs');
   };
   const handleSkillsAssessment = () => {
-    navigate('/assessments');
+    navigate('/youth/assessments');
   };
   const handleMessages = () => {
-    navigate('/messages');
+    navigate('/youth/messages');
   };
 
   return (
@@ -114,21 +116,30 @@ const YouthDashboard = () => {
                   <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
                     <div className="space-y-3">
-                      <Button className="w-full justify-start text-sm" variant="outline" onClick={handleCompleteProfile}>
-                        Complete Profile
-                      </Button>
-                      <Button className="w-full justify-start text-sm" variant="outline" onClick={handleBrowseJobs}>
-                        Browse Jobs
-                      </Button>
-                      <Button className="w-full justify-start text-sm" variant="outline" onClick={handleSkillsAssessment}>
-                        Skills Assessment
-                      </Button>
-                      <Button className="w-full justify-start text-sm" variant="outline" onClick={handleMessages}>
-                        Messages
-                      </Button>
-                      <Button className="w-full justify-start text-sm" variant="outline">
-                        Training Programs
-                      </Button>
+                      {/*
+                        Use a data structure and map to keep actions maintainable.
+                        Add/modify actions in the `quickActions` array below.
+                      */}
+                      {/*
+                        Use a data structure and map to keep actions maintainable.
+                        Add/modify actions in the `quickActions` array below.
+                      */}
+                      {[
+                        { key: 'complete-profile', label: 'Complete Profile', onClick: handleCompleteProfile,  },
+                        { key: 'browse-jobs', label: 'Browse Jobs', onClick: handleBrowseJobs },
+                        { key: 'skills-assessment', label: 'Skills Assessment', onClick: handleSkillsAssessment },
+                        { key: 'messages', label: 'Messages', onClick: handleMessages },
+                        { key: 'training-programs', label: 'Training Programs', onClick: () => navigate('/youth/training') },
+                      ].map(action => (
+                        <Button
+                          key={action.key}
+                          className={`w-full justify-start text-sm hover:bg-gray-200`}
+                          variant="outline"
+                          onClick={action.onClick}
+                        >
+                          {action.label}
+                        </Button>
+                      ))}
                     </div>
                   </div>
                   </div>

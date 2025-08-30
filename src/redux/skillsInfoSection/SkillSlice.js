@@ -12,9 +12,9 @@ const initialState = {
   formData: {
     name: '',
     category: 'technical', // technical | soft | language
-    level: 'intermediate', // beginner | intermediate | advanced
+    level: 'Intermediate', // beginner | intermediate | advanced
   }
-};
+};  
 
 const skillsSlice = createSlice({
   name: 'skills',

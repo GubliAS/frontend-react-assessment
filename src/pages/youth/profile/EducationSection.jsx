@@ -10,42 +10,7 @@ import { updateProfile } from '../../../services/profile';
 import { useToast } from '../../../hooks/use-toast';
 import { useDispatch } from 'react-redux';
 import { loadProfile } from '../../../redux/profile/profileActions';
-
-const GHANA_INSTITUTIONS = [
-  'University of Ghana',
-  'Kwame Nkrumah University of Science and Technology (KNUST)',
-  'University of Cape Coast (UCC)',
-  'University for Development Studies (UDS)',
-  'University of Education, Winneba (UEW)',
-  'Ghana Institute of Management and Public Administration (GIMPA)',
-  'Ashesi University',
-  'Presbyterian University College',
-  'Valley View University',
-  'Central University',
-  'Methodist University College',
-  'Wisconsin International University College',
-  'Regent University College',
-  'Accra Technical University',
-  'Ho Technical University',
-  'Tamale Technical University',
-  'Sunyani Technical University',
-  'Koforidua Technical University',
-  'Takoradi Technical University',
-  'Bolgatanga Technical University',
-  'Cape Coast Technical University',
-  'Wa Technical University',
-];
-
-const DEGREE_LEVELS = [
-  'High School / Secondary',
-  'Diploma',
-  'Higher National Diploma (HND)',
-  "Bachelor's Degree",
-  "Master's Degree",
-  'PhD / Doctorate',
-  'Professional Certificate',
-  'Vocational Training'
-];
+import { GHANA_INSTITUTIONS, DEGREE_LEVELS } from '../../../utils/constants';
 
 const currentYear = new Date().getFullYear();
 const YEARS = [

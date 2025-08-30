@@ -39,7 +39,7 @@ const CertificatesForm = () => {
     expirationDate: '',
     expirationMonth: '',
     expirationYear: '',
-    credentialId: '',
+    credentialID: '',
     file: null,
     fileUrl: ''
   });
@@ -210,7 +210,7 @@ const CertificatesForm = () => {
         issuingOrganization: formData.issuingOrganization.trim(),
         issueDate: issueIso,
         expirationDate: expirationIso,
-        credentialId: formData.credentialId.trim() || null,
+        credentialID: formData.credentialID.trim() || null,
         file: formData.file,
         fileUrl: formData.fileUrl
       };
@@ -258,7 +258,7 @@ const CertificatesForm = () => {
       expirationDate: '',
       expirationMonth: '',
       expirationYear: '',
-      credentialId: '',
+      credentialID: '',
       file: null,
       fileUrl: ''
     });
@@ -364,9 +364,9 @@ const CertificatesForm = () => {
                         Expires: {formatDate(certificate.expirationDate)}
                       </p>
                     )}
-                    {certificate.credentialId && (
+                    {certificate.credentialID && (
                       <p className="text-sm text-gray-500">
-                        ID: {certificate.credentialId}
+                        ID: {certificate.credentialID}
                       </p>
                     )}
                   </div>
@@ -525,8 +525,8 @@ const CertificatesForm = () => {
 
                 <InputField
                   label="Credential ID (Optional)"
-                  name="credentialId"
-                  value={formData.credentialId}
+                  name="credentialID"
+                  value={formData.credentialID}
                   onChange={handleInputChange}
                   placeholder="e.g., ABC123XYZ789"
                   className="md:col-span-2"

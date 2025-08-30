@@ -12,6 +12,7 @@ import PersonalInfoSection from './PersonalInfoSection';
 import { usePersonalInfo } from '../../../redux/personaInfo/usePersonalInfo';
 import { useDispatch } from 'react-redux';
 import { loadProfile } from '../../../redux/profile/profileActions';
+import { MONTHS } from '../../../utils/constants';
 
 // helper: normalize various date values to yyyy-MM-dd for <input type="date">
 function formatDateForInput(v) {
@@ -24,23 +25,6 @@ function formatDateForInput(v) {
     return '';
   }
 }
-
-// Month and Year options for dropdowns
-const MONTHS = [
-  { value: '', label: 'Month' },
-  { value: '01', label: 'January' },
-  { value: '02', label: 'February' },
-  { value: '03', label: 'March' },
-  { value: '04', label: 'April' },
-  { value: '05', label: 'May' },
-  { value: '06', label: 'June' },
-  { value: '07', label: 'July' },
-  { value: '08', label: 'August' },
-  { value: '09', label: 'September' },
-  { value: '10', label: 'October' },
-  { value: '11', label: 'November' },
-  { value: '12', label: 'December' },
-];
 
 const currentYear = new Date().getFullYear();
 const YEARS = [
@@ -276,6 +260,7 @@ const WorkExperienceSection = () => {
     });
   };
 console.log("start date", formData.startDate)
+console.log("end date", formData.endDate)
   return (
     <div className="space-y-6">
       <div>
