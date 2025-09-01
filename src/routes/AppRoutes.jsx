@@ -59,6 +59,8 @@ import AssessmentResults from '../pages/youth/assessment/AssessmentResults';
 import Gamification from '../pages/youth/gamification';
 import ProtectedRoute from "../routes/ProtectedRoute";
 
+//notification page
+import Notification from '../pages/youth/Notification';
 const AppRoutes = () => {
   return (
     <Provider store={store}>
@@ -125,6 +127,7 @@ const AppRoutes = () => {
           <Route path="assessments" element={<Assessments />} />
          <Route path="assessment/results" element={<AssessmentResults />} />
          <Route path="rewards" element={<Gamification/>} />
+          <Route path="notifications" element={<Notification/>} />
         </Route>
 
         {/* 404 Route */}

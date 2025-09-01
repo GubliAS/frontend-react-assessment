@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useState, useEffect, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import Button from "./shared/Button";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { Bell } from "lucide-react";
+import NotificationCenter from "./notification/NotificationCenter";
+import { mockNotifications } from "../utils/messagingState";
 const languageOptions = ["English", "Twi", "Ga", "Ewe"];
 
 // Single unified navigation structure
@@ -90,7 +92,7 @@ export default function Header() {
                     <div key={nav.label} className="relative group">
                       <button
                         onClick={() => toggleMenu(nav.label)}
-                        className="flex items-center gap-1 text-[var(--river-bed)] hover:text-[var(--gold-400)] transition-all duration-300 whitespace-nowrap"
+                        className="flex items-center gap-1 text-[var(--river-bed)] hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600 hover:text-transparent hover:bg-clip-text transition-all duration-300 whitespace-nowrap"
                         style={{
                           fontSize: "clamp(12px, 0.9vw, 16px)",
                         }}
@@ -110,7 +112,7 @@ export default function Header() {
                             <Link
                               key={item.to}
                               to={item.to}
-                              className="block px-4 py-2 text-white hover:bg-[var(--gold-400)]/20 hover:text-[var(--gold-400)] transition-all duration-200"
+                              className="block px-4 py-2 text-white hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600/20 hover:text-white transition-all duration-200"
                             >
                               {item.label}
                             </Link>
@@ -122,11 +124,11 @@ export default function Header() {
                     <Link
                       key={nav.to}
                       to={nav.to}
-                      className="text-[var(--river-bed)] hover:text-[var(--gold-400)] transition-all duration-300 whitespace-nowrap relative group"
+                      className="text-[var(--river-bed)] hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600 hover:text-transparent hover:bg-clip-text transition-all duration-300 whitespace-nowrap relative group"
                       style={{ fontSize: "clamp(12px, 0.9vw, 16px)" }}
                     >
                       {nav.label}
-                      <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[var(--gold-400)] transition-all duration-300 group-hover:w-full"></span>
+                      <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-green-600 to-emerald-600 transition-all duration-300 group-hover:w-full"></span>
                     </Link>
                   )
                 )}
@@ -173,8 +175,20 @@ export default function Header() {
                 )}
               </div>
 
-              {/* Sign In Button - only show when NOT authenticated */}
-              {!isAuth && (
+              {/* Notifications Popover */}
+              <div className="relative ml-2">
+                <NotificationCenter
+                  notifications={mockNotifications}
+                  // wire real props when available
+                />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
+              </div>
+
+              {/* Profile / Avatar + Dropdown (show when authenticated) */}
+              {isAuth ? (
+                <ProfileMenu />
+              ) : (
+                /* Sign In Button - only show when NOT authenticated */
                 <Link to="/login">
                   <Button
                     variant="emeraldGradient"
@@ -259,3 +273,58 @@ export default function Header() {
     </>
   );
 }
+
+// Add the ProfileMenu component near bottom of this file (or extract to its own file if preferred)
+const ProfileMenu = () => {
+  const user = useSelector((state) => state?.auth?.user);
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const onDoc = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((s) => !s)}
+        className="flex items-center gap-2 rounded-full p-1 hover:bg-gray-100 focus:outline-none"
+        aria-haspopup="true"
+        aria-expanded={open}
+      >
+        <div className="h-8 w-8 rounded-full bg-gradient-to-r from-green-600 to-emerald-600 text-white flex items-center justify-center text-sm font-medium">
+          {user?.firstName?.charAt(0) || "U"}
+        </div>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-50 border border-gray-100">
+          <div className="p-3 border-b border-gray-100">
+            <p className="text-sm font-semibold text-gray-800 truncate">{user?.firstName} {user?.lastName}</p>
+            <p className="text-xs text-gray-500">{user?.email}</p>
+          </div>
+          <div className="py-1">
+            <Link to="/youth/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Account Information</Link>
+            {/* <Link to="/youth/notifications" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Notifications & Reminders</Link> */}
+            <Link to="/youth/subscription" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Subscription & Billing</Link>
+            <Link to="/youth/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Settings</Link>
+            <Link to="/support" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Support</Link>
+          </div>
+          <div className="p-2 border-t border-gray-100">
+            <button
+              onClick={() => navigate('/logout')}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

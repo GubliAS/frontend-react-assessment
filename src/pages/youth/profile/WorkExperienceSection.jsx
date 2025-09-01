@@ -6,7 +6,7 @@ import { useWorkExperience } from '../../../redux/workExperienceSection/useWorkE
 import { addWorkExperience, updateWorkExperience, removeWorkExperience } from '../../../redux/workExperienceSection/WorkExperienceSlice';
 import Button from '../../../components/shared/Button';
 import { Card } from '../../../components/ui/card';
-import { updateProfile } from '../../../services/profile';
+import { updateProfile, deleteProfileItem } from '../../../services/profile';
 import { useToast } from '../../../hooks/use-toast';
 import PersonalInfoSection from './PersonalInfoSection';
 import { usePersonalInfo } from '../../../redux/personaInfo/usePersonalInfo';
@@ -300,6 +300,13 @@ console.log("end date", formData.endDate)
                   onClick={async () => {
                     // compute new list and persist after removing locally
                     const updatedList = workExperiences.filter((w) => w.id !== exp.id);
+                    // if server id exists try delete first (best-effort)
+                    const serverId = exp._id || exp.serverId;
+                    if (serverId) {
+                      deleteProfileItem('workExperience', serverId).catch(() => {
+                        console.warn('Failed to delete work experience on server', serverId);
+                      });
+                    }
                     dispatch(removeWorkExperience(exp.id));
                     await persistWorkExperiences(updatedList);
                   }}

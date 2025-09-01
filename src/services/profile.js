@@ -71,8 +71,22 @@ export const updateProfile = (rawBody) => {
   return api.patch('/api/youth/profiles', sanitized).then(handleResponse).catch(handleError);
 };
 
+export const deleteProfileItem = async (section, objectId) => {
+  if (!section || !objectId) {
+    throw new Error('section and objectId are required');
+  }
+  try {
+    // endpoint: DELETE /api/youth/profile/{profileSection}/{objectid}
+    const res = await api.delete(`/api/youth/profiles/${encodeURIComponent(section)}/${encodeURIComponent(objectId)}`);
+    return handleResponse(res);
+  } catch (err) {
+    return handleError(err);
+  }
+};
+
 export default {
   createProfile,
   getProfile,
   updateProfile,
+  deleteProfileItem,
 };

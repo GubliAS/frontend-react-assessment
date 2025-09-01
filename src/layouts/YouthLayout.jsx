@@ -122,11 +122,11 @@ const YouthLayout = () => {
             </Link>
           </div>
           <div className="flex items-center space-x-4">
-            <button className="relative p-1 text-gray-500 hover:text-gray-700 focus:outline-none">
+            {/* <button className="relative p-1 text-gray-500 hover:text-gray-700 focus:outline-none">
               <span className="sr-only">View notifications</span>
               <BellIcon className="h-6 w-6" />
               <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
-            </button>
+            </button> */}
             <div className="relative">
               <button className="flex items-center space-x-2 focus:outline-none">
                 <div className="h-8 w-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white flex items-center justify-center">
