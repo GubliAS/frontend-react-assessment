@@ -10,7 +10,7 @@ import InputField from '../../../components/shared/InputField'; // <- Use your c
 import { X, Plus, GripVertical } from 'lucide-react';
 import { addSkill, removeSkill, updateSkill, reorderSkills } from '../../../redux/skillsInfoSection/SkillSlice';
 // Added imports for persisting skills
-import { updateProfile, createProfile } from '../../../services/profile';
+import { updateProfile, createProfile, deleteProfileItem } from '../../../services/profile';
 import { useToast } from '../../../hooks/use-toast';
 import { useDispatch } from 'react-redux';
 import { loadProfile } from '../../../redux/profile/profileActions';
@@ -31,8 +31,12 @@ const SkillForm= () => {
   const MAX_PER_CATEGORY = 10;
   const currentCount = skills.filter(s => s.category === currentCategory).length;
 
-  // Use shared PREDEFINED_SKILLS from utils/constants
- 
+  const predefinedSkills = {
+    technical: ['JavaScript','TypeScript','React','Node.js','Python','Java','C++','SQL','MongoDB','PostgreSQL','AWS','Docker','Kubernetes','Git','HTML','CSS','Angular','Vue.js','Express.js','Django','Spring Boot','Machine Learning','Data Analysis','Cybersecurity','DevOps','Mobile Development','UI/UX Design'],
+    soft: ['Communication','Leadership','Teamwork','Problem Solving','Critical Thinking','Time Management','Adaptability','Creativity','Public Speaking','Negotiation','Project Management','Emotional Intelligence','Conflict Resolution','Mentoring','Strategic Planning','Decision Making','Customer Service','Analytical Thinking'],
+    language: ['English','Spanish','French','German','Chinese','Japanese','Korean','Arabic','Portuguese','Italian','Russian','Dutch','Swedish','Norwegian','Hindi','Bengali','Turkish','Polish','Hebrew','Thai','Vietnamese']
+  };
+
   const levelColors = {
     beginner: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     intermediate: 'bg-blue-100 text-blue-800 border-blue-200',
@@ -45,7 +49,7 @@ const SkillForm= () => {
     language: 'Languages'
   };
 
-  const filteredSuggestions = (PREDEFINED_SKILLS[currentCategory] || []).filter(
+  const filteredSuggestions = predefinedSkills[currentCategory].filter(
     skill => skill.toLowerCase().includes(currentInput.toLowerCase()) &&
              !skills.some(s => s.name.toLowerCase() === skill.toLowerCase())
   );
@@ -127,10 +131,25 @@ const SkillForm= () => {
   };
 
   const handleRemoveSkill = (id) => {
-    // compute optimistic list then dispatch + persist
-    const updatedList = skills.filter(s => s.id !== id && s._id !== id);
+    // find the removed item (server id might be in _id or serverId)
+    const removedItem = skills.find(s => s.id === id || s._id === id || s.serverId === id);
+
+    // optimistic update locally
+    const updatedList = skills.filter(s => s.id !== id && s._id !== id && s.serverId !== id);
     dispatch(removeSkill(id));
     persistSkills(updatedList).catch(() => {});
+
+    // if this item exists on server, call delete endpoint (best-effort)
+    const serverId = removedItem?._id || removedItem?.serverId;
+    if (serverId) {
+      const sectionMap = { technical: 'technicalSkills', soft: 'softSkills', language: 'languages' };
+      const cat = (removedItem.category || removedItem.type || 'technical').toString().toLowerCase();
+      const section = sectionMap[cat] || 'technicalSkills';
+      deleteProfileItem(section, serverId).catch((err) => {
+        // non-blocking: UI already updated optimistically
+        console.warn('Failed to delete skill on server', section, serverId, err);
+      });
+    }
   };
 
   const handleUpdateLevel = (id, level) => {

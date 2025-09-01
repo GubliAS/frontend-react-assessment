@@ -1,4 +1,4 @@
-  import { getProfile } from '../../services/profile';
+import { getProfile } from '../../services/profile';
   import { setPersonalInfo } from '../personaInfo/PersonalInfoSlice';
   import { setWorkExperiences } from '../workExperienceSection/WorkExperienceSlice';
   import { setEducationList } from '../educationSection/EducationSlice';
@@ -53,10 +53,23 @@
           dispatch(setEducationList(profile.education));
         }
 
-        if (profile.skills) {
+        // backend may return categorized skill arrays instead of a single `skills` array
+        if (profile.technicalSkills || profile.softSkills || profile.languages) {
+          console.log('Setting categorized skills:', {
+            technicalSkills: profile.technicalSkills,
+            softSkills: profile.softSkills,
+            languages: profile.languages
+          });
+          dispatch(setSkills({
+            technicalSkills: profile.technicalSkills || [],
+            softSkills: profile.softSkills || [],
+            languages: profile.languages || []
+          }));
+        } else if (profile.skills) {
+          console.log('Setting skills (legacy shape):', profile.skills);
           dispatch(setSkills(profile.skills));
         }
-
+        
         if (profile.certifications) {
           dispatch(setCertificates(profile.certifications));
         }
@@ -69,7 +82,7 @@
           // profile photo is handled in photo slice
           dispatch(setPhotoFile(profile.profilePhoto));
         }
-
+        console.log('Loaded profile into Redux:', profile);
         return profile;
       } catch (err) {
         // Only log non-404 errors

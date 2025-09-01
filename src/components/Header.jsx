@@ -175,7 +175,12 @@ export default function Header() {
                 )}
               </div>
 
-              {/* Notifications Popover */}
+            
+
+              {/* Profile / Avatar + Dropdown (show when authenticated) */}
+              {isAuth ? (
+                <>
+                  {/* Notifications Popover */}
               <div className="relative ml-2">
                 <NotificationCenter
                   notifications={mockNotifications}
@@ -183,10 +188,8 @@ export default function Header() {
                 />
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
               </div>
-
-              {/* Profile / Avatar + Dropdown (show when authenticated) */}
-              {isAuth ? (
-                <ProfileMenu />
+              <ProfileMenu />
+                </>
               ) : (
                 /* Sign In Button - only show when NOT authenticated */
                 <Link to="/login">
