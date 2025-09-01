@@ -6,7 +6,7 @@ import InputField from '../../../components/shared/InputField';
 import SelectField from '../../../components/shared/SelectInputField';
 import Button from '../../../components/shared/Button';
 // Added imports to persist education to backend and show toast
-import { updateProfile } from '../../../services/profile';
+import { updateProfile, deleteProfileItem } from '../../../services/profile';
 import { useToast } from '../../../hooks/use-toast';
 import { useDispatch } from 'react-redux';
 import { loadProfile } from '../../../redux/profile/profileActions';
@@ -248,6 +248,16 @@ const [formData, setFormData] = useState({
                   onClick={async () => {
                     // compute new list and persist after removing locally
                     const updatedList = (educationList || []).filter((w) => w.id !== edu.id);
+
+                    // if server id exists try delete first (best-effort)
+                    const serverId = edu._id || edu.serverId;
+                    if (serverId) {
+                      deleteProfileItem('education', serverId).catch(() => {
+                        console.warn('Failed to delete education on server', serverId);
+                      });
+                    }
+
+                    // update local store and persist canonical list
                     dispatch(removeEducation(edu.id));
                     await persistEducation(updatedList).catch(() => {});
                   }}
