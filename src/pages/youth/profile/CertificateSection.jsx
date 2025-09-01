@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui
 import { Plus, Trash2, FileText, Upload, Eye, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
 import { useToast } from '../../../hooks/use-toast';
-import { updateProfile, createProfile } from '../../../services/profile';
+import { updateProfile, createProfile, deleteProfileItem } from '../../../services/profile';
 import { useDispatch } from 'react-redux';
 import { loadProfile } from '../../../redux/profile/profileActions';
 
@@ -269,7 +269,19 @@ const CertificatesForm = () => {
  
   const handleRemove = async (id) => {
     try {
-      const certificate = certifications.find(cert => cert.id === id);
+      const certificate = certifications.find(cert => cert.id === id || cert._id === id);
+      
+      // attempt server-side delete if we have a server id (best-effort)
+      const serverId = certificate?._id || certificate?.serverId;
+      if (serverId) {
+        try {
+          // backend expects the same key used when persisting (certifications)
+          await deleteProfileItem('certifications', serverId);
+        } catch (delErr) {
+          console.warn('Failed to delete certificate on server', serverId, delErr);
+          // continue — we still remove locally and attempt to persist canonical list
+        }
+      }
       
       if (certificate?.fileUrl && certificate.file) {
         URL.revokeObjectURL(certificate.fileUrl);
