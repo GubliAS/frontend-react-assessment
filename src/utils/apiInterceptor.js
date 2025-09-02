@@ -5,9 +5,9 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 // Fix: Use import.meta.env.VITE_API_BASE for Vite environment variables
-// const BASE = import.meta.env.VITE_API_BASE
+const BASE = import.meta.env.VITE_API_BASE
 
-const BASE = 'http://localhost:9000';
+// const BASE = 'http://localhost:9000';
 
 const api = axios.create({
   baseURL: BASE,
