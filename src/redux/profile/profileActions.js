@@ -71,6 +71,7 @@ import { getProfile } from '../../services/profile';
         }
         
         if (profile.certifications) {
+          console.log('Setting certifications:', profile.certifications);
           dispatch(setCertificates(profile.certifications));
         }
 

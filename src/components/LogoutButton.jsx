@@ -9,7 +9,7 @@ import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 
 const cookies = new Cookies();
 
-export default function LogoutButton({ className }) {
+export default function LogoutButton({ className, children }) {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ export default function LogoutButton({ className }) {
       startIcon={<ArrowRightOnRectangleIcon className="h-5 w-5" />}
       disabled={loading}
     >
-    
+    {children || (loading ? "Logging out..." : "Logout")  }
     </Button>
   );
 }

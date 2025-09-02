@@ -53,18 +53,25 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
   const { toast } = useToast();
 
   const reduxDispatch = useDispatch();
-
+  
   // selectors from redux
   const { personalInfo } = usePersonalInfo();
   const { workExperiences } = useWorkExperience();
   const { educationList } = useEducation();
   const { skills } = useSkills();
-  const { certificates } = useCertificates();
+  const { certifications } = useCertificates();
   const { profilePhoto } = usePhoto();
   const { careerAspiration } = useCareerAspiration();
   const { assessmentScores } = useAssessment();
 
-
+  // Helper to format dates as "Mon YYYY" (e.g. "Sep 2013")
+  const formatMonthYear = (value) => {
+    if (!value) return 'N/A';
+    const d = new Date(value);
+    if (isNaN(d)) return value;
+    return d.toLocaleString(undefined, { month: 'short', year: 'numeric' });
+  };
+  
   const handleNext = () => {
     if (currentStep < steps.length) {
       if (stepValidation[currentStep] !== false) {
@@ -200,7 +207,7 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
         return (
          <CertificatesForm
            mode="create"
-           data={certificates}
+           data={certifications}
            onUpdate={handleCertificatesUpdate}
            onValidate={(isValid) => handleStepValidation(5, isValid)}
            showActions={false}
@@ -288,7 +295,7 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
                       workExperiences.map((we) => (
                         <div key={we.id || `${we.company}-${we.position}`} className="space-y-1">
                           <p className="font-semibold">{we.position} — {we.company}</p>
-                          <p className="text-muted-foreground text-xs">{we.startDate || 'N/A'} — {we.isCurrentlyWorking ? 'Present' : (we.endDate || 'N/A')}</p>
+                          <p className="text-muted-foreground text-xs">{formatMonthYear(we.startDate)} — {we.isCurrent ? 'Present' : formatMonthYear(we.endDate)}</p>
                           {we.description && <p className="text-sm">{we.description}</p>}
                         </div>
                       ))
@@ -305,7 +312,7 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
                       educationList.map((edu) => (
                         <div key={edu.id || `${edu.institution}-${edu.degree}`} className="space-y-1">
                           <p className="font-semibold">{edu.degree} — {edu.institution}</p>
-                          <p className="text-muted-foreground text-xs">{edu.startDate || 'N/A'} — {edu.isCurrentlyStudying ? 'Present' : (edu.endDate || 'N/A')}</p>
+                          <p className="text-muted-foreground text-xs">{edu.startYear || 'N/A'} — {edu.isCurrent ? 'Present' : (edu.endYear || 'N/A')}</p>
                           {edu.grade && <p className="text-sm">Grade: {edu.grade}</p>}
                         </div>
                       ))
@@ -331,12 +338,12 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
                 <div className="space-y-3">
                   <h4 className="font-medium text-[var(--ebony-50)]">Certificates</h4>
                   <div className="text-sm">
-                    {certificates && certificates.length > 0 ? (
+                    {certifications && certifications.length > 0 ? (
                       <ul className="space-y-1">
-                        {certificates.map(c => (
+                        {certifications.map(c => (
                           <li key={c.id || c.name}>
                             <p className="font-semibold">{c.name} — {c.issuingOrganization}</p>
-                            <p className="text-muted-foreground text-xs">{c.issueDate || 'N/A'}{c.expiryDate ? ` — ${c.expiryDate}` : ''}</p>
+                            <p className="text-muted-foreground text-xs">{formatMonthYear(c.issueDate) || 'N/A'}{c.expirationDate ? ` — ${formatMonthYear(c.expirationDate)}` : ''}</p>
                           </li>
                         ))}
                       </ul>
@@ -349,12 +356,12 @@ export const ManualFormFlow = ({ onComplete, onPreview }) => {
                 <div className="space-y-3 md:col-span-2">
                   <h4 className="font-medium text-[var(--ebony-50)]">Career Aspirations</h4>
                   <div className="text-sm space-y-1">
-                    <p><span className="font-medium">Desired Role:</span> {careerAspiration?.desiredRole || '—'}</p>
-                    <p><span className="font-medium">Industry:</span> {careerAspiration?.targetIndustry || '—'}</p>
-                    <p><span className="font-medium">Career Level:</span> {careerAspiration?.careerLevel || '—'}</p>
-                    <p><span className="font-medium">Target Salary:</span> {careerAspiration?.targetSalary || '—'}</p>
-                    <p><span className="font-medium">Timeframe:</span> {careerAspiration?.timeframe || '—'}</p>
-                    <p><span className="font-medium">Work Type:</span> {careerAspiration?.workType || '—'}</p>
+                    <p><span className="font-medium">Desired Role:</span> {careerAspiration?.desiredJobTitles || '—'}</p>
+                    <p><span className="font-medium">Industry:</span> {careerAspiration?.targetIndustries || '—'}</p>
+                    {/* <p><span className="font-medium">Career Level:</span> {careerAspiration?.careerLevels || '—'}</p> */}
+                    <p><span className="font-medium">Target Salary:</span> {careerAspiration?.expectedSalary?.min || '—'} - {careerAspiration?.expectedSalary?.max || '—'}</p>
+                    {/* <p><span className="font-medium">Timeframe:</span> {careerAspiration?.timeframe || '—'}</p> */}
+                    <p><span className="font-medium">Work Type:</span> {careerAspiration?.preferredJobTypes || '—'}</p>
                     {careerAspiration?.keySkillsToGain?.length > 0 && (
                       <p><span className="font-medium">Skills to gain:</span> {careerAspiration.keySkillsToGain.join(', ')}</p>
                     )}

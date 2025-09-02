@@ -40,8 +40,9 @@ const CertificatesForm = () => {
     expirationMonth: '',
     expirationYear: '',
     credentialID: '',
-    file: null,
-    fileUrl: ''
+    file: null, // The actual File object
+    certificateFile: null, // The blob URL for preview
+    certificateUrl: ''
   });
 
   const handleInputChange = (e) => {
@@ -138,8 +139,13 @@ const CertificatesForm = () => {
     setUploading(true);
 
     try {
-      const fileUrl = URL.createObjectURL(file);
-      setFormData(prev => ({ ...prev, file, fileUrl }));
+      const certificateFile = URL.createObjectURL(file);
+      // Store both the File object and the blob URL
+      setFormData(prev => ({ 
+        ...prev, 
+        file, // The actual File object for upload
+        certificateFile // The blob URL for preview
+      }));
       toast({
         title: "File uploaded successfully",
         description: `${file.name} has been uploaded.`
@@ -160,15 +166,56 @@ const CertificatesForm = () => {
   const persistCertificates = async (list) => {
     try {
       console.log('Persisting certificates to profile:', list);
-      // backend expects payload.certificates
-      await updateProfile({ certifications: list });
+
+      // Transform local list into backend-friendly payload.
+      const payloadList = list.map((c) => {
+        // Keep server id (_id) if present
+        const out = {
+          name: c.name,
+          issuingOrganization: c.issuingOrganization,
+          issueDate: c.issueDate,
+          expirationDate: c.expirationDate,
+          credentialID: c.credentialID,
+          _id: c._id || undefined,
+        };
+
+        // If there is a File/Blob in `file`, send it as certificateFile
+        if (c.file && (c.file instanceof File || c.file instanceof Blob)) {
+          out.certificateFile = c.file;
+        } else if (c.certificateUrl) {
+          out.credentialURL = c.certificateUrl;
+        } else if (c.credentialURL) {
+          out.credentialURL = c.credentialURL;
+        }
+
+        return out;
+      });
+
+      await updateProfile({ certifications: payloadList });
       await storeDispatch(loadProfile());
       toast?.({ title: 'Profile updated', description: 'Certificates saved.' });
     } catch (err) {
       const status = err?.status || err?.response?.status;
       if (status === 404) {
         try {
-          await createProfile({ certifications: list });
+          // same payload mapping for create
+          const payloadList = list.map((c) => {
+            const out = {
+              name: c.name,
+              issuingOrganization: c.issuingOrganization,
+              issueDate: c.issueDate,
+              expirationDate: c.expirationDate,
+              credentialID: c.credentialID,
+            };
+            if (c.file && (c.file instanceof File || c.file instanceof Blob)) {
+              out.certificateFile = c.file;
+            } else if (c.certificateUrl) {
+              out.credentialURL = c.certificateUrl;
+            }
+            return out;
+          });
+
+          await createProfile({ certifications: payloadList });
           await storeDispatch(loadProfile());
           toast?.({ title: 'Profile created', description: 'Certificates saved.' });
           return;
@@ -187,7 +234,6 @@ const CertificatesForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // make a client id for optimistic list + persistence
     const clientId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
     if (!validateForm()) {
@@ -211,17 +257,20 @@ const CertificatesForm = () => {
         issueDate: issueIso,
         expirationDate: expirationIso,
         credentialID: formData.credentialID.trim() || null,
-        file: formData.file,
-        fileUrl: formData.fileUrl
+        // include the real File object under `file`
+        file: formData.file || null,
+        // keep the blob/url for UI/preview
+        certificateFile: formData.certificateFile || '',
+        certificateUrl: formData.certificateUrl || ''
       };
+
       if (editingId) {
         // TODO: support editing existing certificate via hook if implemented
-        // updateCertificate(editingId, certificateData);
       } else {
         await addCertificate(certificateData);
       }
 
-      // optimistic list for persistence (use current certificates + new item if adding)
+      // optimistic list for persistence
       const optimisticList = editingId
         ? certifications.map(c => (c.id === editingId || c._id === editingId ? { ...c, ...certificateData } : c))
         : [...(certifications || []), certificateData];
@@ -245,8 +294,8 @@ const CertificatesForm = () => {
   };
 
   const handleCancel = () => {
-    if (formData.fileUrl && formData.file) {
-      URL.revokeObjectURL(formData.fileUrl);
+    if (formData.certificateFile) {
+      URL.revokeObjectURL(formData.certificateFile);
     }
     
     setFormData({
@@ -260,7 +309,8 @@ const CertificatesForm = () => {
       expirationYear: '',
       credentialID: '',
       file: null,
-      fileUrl: ''
+      certificateFile: null,
+      certificateUrl: ''
     });
     setFormErrors({});
     setEditingId(null);
@@ -271,20 +321,18 @@ const CertificatesForm = () => {
     try {
       const certificate = certifications.find(cert => cert.id === id || cert._id === id);
       
-      // attempt server-side delete if we have a server id (best-effort)
+      // attempt server-side delete if we have a server id
       const serverId = certificate?._id || certificate?.serverId;
       if (serverId) {
         try {
-          // backend expects the same key used when persisting (certifications)
           await deleteProfileItem('certifications', serverId);
         } catch (delErr) {
           console.warn('Failed to delete certificate on server', serverId, delErr);
-          // continue — we still remove locally and attempt to persist canonical list
         }
       }
       
-      if (certificate?.fileUrl && certificate.file) {
-        URL.revokeObjectURL(certificate.fileUrl);
+      if (certificate?.certificateFile) {
+        try { URL.revokeObjectURL(certificate.certificateFile); } catch (e) {}
       }
       
       await removeCertificate(id);
@@ -306,7 +354,7 @@ const CertificatesForm = () => {
     }
   };
 
-  const openPreview = (fileUrl) => setPreviewUrl(fileUrl);
+  const openPreview = (certificateUrl) => setPreviewUrl(certificateUrl);
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -319,10 +367,15 @@ const CertificatesForm = () => {
   };
 
   const removeFile = () => {
-    if (formData.fileUrl) {
-      URL.revokeObjectURL(formData.fileUrl);
+    if (formData.certificateFile) {
+      try { URL.revokeObjectURL(formData.certificateFile); } catch(e) {}
     }
-    setFormData(prev => ({ ...prev, file: null, fileUrl: '' }));
+    setFormData(prev => ({ 
+      ...prev, 
+      file: null,
+      certificateFile: null, 
+      certificateUrl: '' 
+    }));
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -365,7 +418,7 @@ const CertificatesForm = () => {
                     {certificate.name}
                   </CardTitle>
                   <p className="text-gray-600 font-medium">
-                    {certificate.issuer}
+                    {certificate.issuingOrganization || certificate.issuer}
                   </p>
                   <div className="mt-1 space-y-1">
                     <p className="text-sm text-gray-500">
@@ -384,11 +437,11 @@ const CertificatesForm = () => {
                   </div>
                 </div>
                 <div className="flex gap-2 ml-4">
-                  {certificate.fileUrl && (
+                  {certificate.certificateFile && (
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => openPreview(certificate.fileUrl)}
+                      onClick={() => openPreview(certificate.certificateFile)}
                       className="p-2"
                     >
                       <Eye className="w-4 h-4" />
@@ -405,7 +458,7 @@ const CertificatesForm = () => {
                 </div>
               </div>
             </CardHeader>
-            {certificate.fileUrl && (
+            {certificate.certificateFile && (
               <CardContent className="pt-0">
                 <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 p-2 rounded">
                   <FileText className="w-4 h-4" />
@@ -461,10 +514,10 @@ const CertificatesForm = () => {
                 <InputField
                   label="Issuing Organization"
                   name="issuingOrganization"
-                  value={formData.issuer}
+                  value={formData.issuingOrganization}
                   onChange={handleInputChange}
                   placeholder="e.g., Amazon Web Services"
-                  error={formErrors.issuer}
+                  error={formErrors.issuingOrganization}
                   required
                   variant="light"
                 />
@@ -552,26 +605,26 @@ const CertificatesForm = () => {
                   Certificate File (Optional)
                 </label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-                  {formData.file ? (
+                  {formData.file || formData.certificateFile ? (
                     <div className="flex items-center justify-between p-4 bg-gray-50 rounded">
                       <div className="flex items-center gap-3">
                         <FileText className="w-8 h-8 text-blue-500" />
                         <div className="text-left">
                           <p className="font-medium text-gray-900">
-                            {formData.file.name}
+                            {formData.file?.name || 'Uploaded file'}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {(formData.file.size / 1024 / 1024).toFixed(2)} MB
+                            {formData.file ? `${(formData.file.size / 1024 / 1024).toFixed(2)} MB` : ''}
                           </p>
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        {formData.fileUrl && (
+                        {formData.certificateFile && (
                           <Button 
                             type="button" 
                             variant="outline" 
                             size="sm" 
-                            onClick={() => openPreview(formData.fileUrl)}
+                            onClick={() => openPreview(formData.certificateFile)}
                             className="p-2"
                           >
                             <Eye className="w-4 h-4" />
@@ -663,7 +716,6 @@ const CertificatesForm = () => {
 };
 
 export default CertificatesForm;
-
 // helper: parse month/year from an ISO or Date-like value
 const parseMonthYear = (d) => {
   if (!d) return { m: '', y: '' };

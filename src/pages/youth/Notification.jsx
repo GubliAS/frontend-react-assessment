@@ -267,7 +267,7 @@ const Notifications = () => {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white border-none shadow-sm hover:shadow-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Notification?</AlertDialogTitle>
             <AlertDialogDescription>

@@ -6,7 +6,9 @@ import Button from "./shared/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import NotificationCenter from "./notification/NotificationCenter";
+import LogoutButton from "./LogoutButton"; // Import the LogoutButton component
 import { mockNotifications } from "../utils/messagingState";
+
 const languageOptions = ["English", "Twi", "Ga", "Ewe"];
 
 // Single unified navigation structure
@@ -277,12 +279,11 @@ export default function Header() {
   );
 }
 
-// Add the ProfileMenu component near bottom of this file (or extract to its own file if preferred)
+// Updated ProfileMenu component with proper LogoutButton implementation
 const ProfileMenu = () => {
   const user = useSelector((state) => state?.auth?.user);
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const onDoc = (e) => {
@@ -319,12 +320,9 @@ const ProfileMenu = () => {
             <Link to="/support" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Support</Link>
           </div>
           <div className="p-2 border-t border-gray-100">
-            <button
-              onClick={() => navigate('/logout')}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-            >
+            <LogoutButton className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 border-0 bg-transparent">
               Sign Out
-            </button>
+            </LogoutButton>
           </div>
         </div>
       )}
