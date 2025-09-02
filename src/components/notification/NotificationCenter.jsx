@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Button  from '../shared/Button';
 import { Badge } from '../ui/badge';
 import { Bell, Settings, Check, ExternalLink } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
@@ -18,7 +17,7 @@ const NotificationCenter = ({
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Link  className="text-emerald-900">
+        <Link className="relative inline-flex items-center justify-center p-2 rounded-lg hover:from-emerald-600 hover:to-emerald-700 text-emerald-600 transition-all duration-200 ">
           <Bell size={20} />
           {unreadCount > 0 && (
             <Badge
@@ -39,13 +38,19 @@ const NotificationCenter = ({
               <h3 className="font-semibold text-gray-900">Notifications</h3>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
-                  <Button variant="ghost" size="sm" onClick={onMarkAllRead}>
+                  <Link 
+                    onClick={onMarkAllRead}
+                    className="inline-flex items-center justify-center p-2 rounded-md bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white transition-all duration-200"
+                  >
                     <Check size={16} />
-                  </Button>
+                  </Link>
                 )}
-                <Button variant="ghost" size="sm" onClick={onOpenSettings}>
+                <Link 
+                  onClick={onOpenSettings}
+                  className="inline-flex items-center justify-center p-2 rounded-md bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white transition-all duration-200"
+                >
                   <Settings size={16} />
-                </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -54,7 +59,7 @@ const NotificationCenter = ({
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="p-8 text-center">
-                <Bell size={48} className="mx-auto text-gray-400 mb-4" />
+                <Bell size={48} className="mx-auto text-emerald-400 mb-4" />
                 <h4 className="text-gray-900 font-medium mb-2">No notifications</h4>
                 <p className="text-gray-600 text-sm">You're all caught up!</p>
               </div>
@@ -75,14 +80,12 @@ const NotificationCenter = ({
           {/* Footer */}
           {notifications.length > 0 && (
             <div className="p-3 border-t border-gray-200">
-              <Link to="youth/notifications">
-                <Button
-                  variant="ghost"
-                  className="w-full text-sm flex items-center gap-2"
-                >
-                  View all notifications
-                  <ExternalLink size={14} />
-                </Button>
+              <Link 
+                to="youth/notifications"
+                className="w-full text-sm flex items-center justify-center gap-2 p-3 rounded-md text-[var(--ebony-50)] hover:underline hover:text-gradient-to-r hover:from-green-400 hover:to-emerald-500 transition-all duration-200 font-medium"
+              >
+                View all notifications
+                <ExternalLink size={14} />
               </Link>
             </div>
           )}

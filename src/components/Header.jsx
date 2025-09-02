@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Button from "./shared/Button";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,7 +8,9 @@ import { Bell } from "lucide-react";
 import NotificationCenter from "./notification/NotificationCenter";
 import LogoutButton from "./LogoutButton"; // Import the LogoutButton component
 import { mockNotifications } from "../utils/messagingState";
-
+import { selectUser } from "../redux/auth/authSlice";
+import { usePersonalInfo } from "../redux/personaInfo/usePersonalInfo";
+import { loadProfile } from "../redux/profile/profileActions";
 const languageOptions = ["English", "Twi", "Ga", "Ewe"];
 
 // Single unified navigation structure
@@ -33,7 +35,15 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const isAuth = useSelector((state) => state?.auth?.isAuthenticated);
-
+  const user = useSelector(selectUser)
+  const dispatch = useDispatch();
+  const { personalInfo } = usePersonalInfo();
+  console.log("personalInfo in header:", personalInfo);
+ React.useEffect(() => {
+    if (user) {
+      dispatch(loadProfile());
+    }
+  }, [dispatch, user]);
   // include Dashboard in the nav for authenticated users
   const navToRender = isAuth
     ? [{ to: "/youth/dashboard", label: "Dashboard" }, ...navigation]
@@ -144,13 +154,15 @@ export default function Header() {
             >
               {/* Language Dropdown */}
               <div className="relative">
-                <Button
-                  onClick={() => toggleMenu("language")}
-                  variant="ghost"
-                  className="flex items-center gap-1 whitespace-nowrap group"
+                <Link
+                  to="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toggleMenu("language");
+                  }}
+                  className="flex items-center gap-1 whitespace-nowrap group px-3 py-2 text-[var(--river-bed)] hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600 hover:text-transparent hover:bg-clip-text transition-all duration-300"
                   style={{
                     fontSize: "clamp(12px, 0.9vw, 16px)",
-                    padding: "0 clamp(10px, 1vw, 14px)",
                   }}
                 >
                   English
@@ -161,13 +173,13 @@ export default function Header() {
                   >
                     ▼
                   </span>
-                </Button>
+                </Link>
                 {openMenu === "language" && (
                   <div className="absolute bg-slate-800/95 backdrop-blur-md border-white/20 shadow-xl mt-2">
                     {languageOptions.map((lang) => (
                       <div
                         key={lang}
-                        className="text-white hover:bg-[var(--gold-400)]/20 hover:text-[var(--gold-400)] transition-all duration-200 cursor-pointer px-4 py-2"
+                        className="text-white hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600/20 hover:text-white transition-all duration-200 cursor-pointer px-4 py-2"
                         onClick={() => setOpenMenu(null)}
                       >
                         {lang}
@@ -176,8 +188,6 @@ export default function Header() {
                   </div>
                 )}
               </div>
-
-            
 
               {/* Profile / Avatar + Dropdown (show when authenticated) */}
               {isAuth ? (
@@ -190,7 +200,7 @@ export default function Header() {
                 />
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
               </div>
-              <ProfileMenu />
+              <ProfileMenu personalInfo={personalInfo} />
                 </>
               ) : (
                 /* Sign In Button - only show when NOT authenticated */
@@ -209,8 +219,20 @@ export default function Header() {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <div className="md:hidden flex-shrink-0">
+            {/* Mobile Menu Button and Notifications */}
+            <div className="md:hidden flex items-center gap-3 flex-shrink-0">
+              {/* Mobile Notifications - show only when authenticated */}
+              {isAuth && (
+                <div className="relative">
+                  <NotificationCenter
+                    notifications={mockNotifications}
+                    // wire real props when available
+                  />
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
+                </div>
+              )}
+              
+              {/* Mobile Menu Button */}
               <Button
                 variant="secondary"
                 size="small"
@@ -226,21 +248,33 @@ export default function Header() {
           {isMobileMenuOpen && (
             <div className="md:hidden bg-slate-800/95 backdrop-blur-md border-t border-white/10">
               <div className="px-2 pt-2 pb-3 space-y-1">
+                {/* Auth summary at top for signed-in users */}
+                {isAuth && (
+                  <div className="px-3 py-2 border-b border-white/10 mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-r from-green-600 to-emerald-600 text-white flex items-center justify-center text-sm font-medium">
+                        {user?.firstName?.charAt(0) || personalInfo?.firstName?.charAt(0) || "U"}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-white truncate">
+                          {user?.firstName || personalInfo?.firstName || "User"} {user?.lastName || personalInfo?.lastName || ""}
+                        </p>
+                        <p className="text-xs text-gray-300">{user?.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Main navigation */}
                 {navToRender.map((nav) =>
                   nav.type === "dropdown" ? (
                     <div key={nav.label}>
                       <div
                         onClick={() => toggleMenu(nav.label)}
-                        className="px-3 py-2 text-white hover:bg-[var(--gold-400)]/30 hover:text-[var(--gold-400)] rounded transition-all duration-200 cursor-pointer flex justify-between items-center"
+                        className="px-3 py-2 text-white hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600/20 hover:text-white rounded transition-all duration-200 cursor-pointer flex justify-between items-center"
                       >
                         {nav.label}
-                        <span
-                          className={`transition-transform duration-300 ${
-                            openMenu === nav.label ? "rotate-180" : ""
-                          }`}
-                        >
-                          ▼
-                        </span>
+                        <span className={`transition-transform duration-300 ${openMenu === nav.label ? "rotate-180" : ""}`}>▼</span>
                       </div>
                       {openMenu === nav.label && (
                         <div className="pl-4">
@@ -248,7 +282,8 @@ export default function Header() {
                             <Link
                               key={item.to}
                               to={item.to}
-                              className="block px-3 py-2 text-white hover:bg-[var(--gold-400)]/20 hover:text-[var(--gold-400)] rounded transition-all duration-200"
+                              className="block px-3 py-2 text-white hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600/20 hover:text-white rounded transition-all duration-200"
+                              onClick={() => setIsMobileMenuOpen(false)}
                             >
                               {item.label}
                             </Link>
@@ -260,13 +295,91 @@ export default function Header() {
                     <Link
                       key={nav.to}
                       to={nav.to}
-                      className="block px-3 py-2 text-white hover:bg-[var(--gold-400)]/30 hover:text-[var(--gold-400)] rounded transition-all duration-200 relative group"
+                      className="block px-3 py-2 text-white hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600/20 hover:text-white rounded transition-all duration-200 relative group"
                       style={{ fontSize: "clamp(14px, 1.2vw, 16px)" }}
+                      onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {nav.label}
-                      <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[var(--gold-400)] transition-all duration-300 group-hover:w-full"></span>
+                      <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-green-600 to-emerald-600 transition-all duration-300 group-hover:w-full"></span>
                     </Link>
                   )
+                )}
+
+                {/* Language selector (after main nav) */}
+                <div>
+                  <div
+                    onClick={() => toggleMenu("mobile-language")}
+                    className="px-3 py-2 text-white hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600/20 hover:text-white rounded transition-all duration-200 cursor-pointer flex justify-between items-center"
+                  >
+                    English
+                    <span className={`transition-transform duration-300 ${openMenu === "mobile-language" ? "rotate-180" : ""}`}>▼</span>
+                  </div>
+                  {openMenu === "mobile-language" && (
+                    <div className="pl-4">
+                      {languageOptions.map((lang) => (
+                        <div
+                          key={lang}
+                          className="block px-3 py-2 text-white hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600/20 hover:text-white rounded transition-all duration-200 cursor-pointer"
+                          onClick={() => {
+                            setOpenMenu(null);
+                            setIsMobileMenuOpen(false);
+                          }}
+                        >
+                          {lang}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Account links + logout at bottom (keeps them separate from nav) */}
+                {isAuth ? (
+                  <div className="border-t border-white/10 mt-2 pt-2">
+                    <Link
+                      to="/youth/profile"
+                      className="block px-3 py-2 text-white hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600/20 hover:text-white rounded transition-all duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Account Information
+                    </Link>
+                    <Link
+                      to="/youth/subscription"
+                      className="block px-3 py-2 text-white hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600/20 hover:text-white rounded transition-all duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Subscription & Billing
+                    </Link>
+                    <Link
+                      to="/youth/settings"
+                      className="block px-3 py-2 text-white hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600/20 hover:text-white rounded transition-all duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Settings
+                    </Link>
+                    <Link
+                      to="/support"
+                      className="block px-3 py-2 text-white hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600/20 hover:text-white rounded transition-all duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Support
+                    </Link>
+
+                    <div className="px-3 py-2">
+                      <LogoutButton className="w-full text-left text-white hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600/20 hover:text-white border-0 bg-transparent rounded transition-all duration-200">
+                        Sign Out
+                      </LogoutButton>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border-t border-white/10 mt-2 pt-2 px-3">
+                    <Link
+                      to="/login"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block w-full text-center bg-gradient-to-r from-green-600 to-emerald-600 text-white py-2 px-4 rounded-full hover:shadow-lg hover:shadow-[rgb(151,177,150)]/25 transition-all duration-300"
+                    >
+                      Sign In
+                    </Link>
+                  </div>
                 )}
               </div>
             </div>
@@ -280,7 +393,7 @@ export default function Header() {
 }
 
 // Updated ProfileMenu component with proper LogoutButton implementation
-const ProfileMenu = () => {
+const ProfileMenu = ({ personalInfo }) => {
   const user = useSelector((state) => state?.auth?.user);
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -302,7 +415,7 @@ const ProfileMenu = () => {
         aria-expanded={open}
       >
         <div className="h-8 w-8 rounded-full bg-gradient-to-r from-green-600 to-emerald-600 text-white flex items-center justify-center text-sm font-medium">
-          {user?.firstName?.charAt(0) || "U"}
+          {user?.firstName?.charAt(0) || personalInfo?.firstName?.charAt(0) || "U"}
         </div>
       </button>
 
