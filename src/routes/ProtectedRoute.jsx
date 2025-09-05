@@ -13,13 +13,16 @@ const roleMap = {
 };
 
 export default function ProtectedRoute({ children, role }) {
-  const isAuth = useSelector((state) => state?.auth?.isAuthenticated);
-  const user = useSelector((state) => state?.auth?.user);
+  const isAuthFromState = useSelector((state) => state?.auth?.isAuthenticated);
+  const userFromState = useSelector((state) => state?.auth?.user);
   const location = useLocation();
 
   const token = cookies.get("auth_token");
 
   // redirect if completely unauthenticated
+  const isAuth = Boolean(isAuthFromState || token);
+  const user = userFromState;
+
   if (!isAuth && !token) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }

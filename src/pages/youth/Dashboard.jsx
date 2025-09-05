@@ -3,7 +3,6 @@ import { Link,  useNavigate } from 'react-router-dom';
 import Button from '../../components/shared/Button';
 import SkillDevelopmentTracker from '../../components/progress/SkillDevelopmentTracker';
 import { usePersonalInfo } from '../../redux/personaInfo/usePersonalInfo'
-import { selectUser } from '../../redux/auth/authSlice';
 import { useSelector } from 'react-redux';
 
 const YouthDashboard = () => {
@@ -41,7 +40,8 @@ const YouthDashboard = () => {
   ];
 
   const {personalInfo} = usePersonalInfo()
-  const user = useSelector(selectUser)
+  // auth slice selectors were removed for the assessment; read user safely from state
+  const user = useSelector((state) => state?.auth?.user);
   const navigate = useNavigate();
   console.log(user)
 

@@ -3,8 +3,8 @@ import { MessageSquare, PenLine } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { verifyOtpSeeker, verifyOtpEmployer } from "../services/auth";
 import { useDispatch } from "react-redux";
-import { setUser, setToken } from "../redux/auth/authSlice";
 import Cookies from "universal-cookie";
+import { setUser, setToken } from '../redux/auth/authSlice';
 import Button from "../components/shared/Button";
 import { createProfile } from "../services/profile";
 
@@ -67,45 +67,31 @@ const OTPVerificationPage = () => {
     }
     setIsSubmitting(true);
     try {
-      const body = { email, otp: code };
-      let res;
-      if (accountType === "seeker") {
-        res = await verifyOtpSeeker(body);
-      } else {
-        res = await verifyOtpEmployer(body);
-      }
-
-      // Persist token + user in redux (reducers also write cookies)
-      // backend returns accessToken (not token)
+      const service = accountType === 'seeker' ? verifyOtpSeeker : verifyOtpEmployer;
+      const payload = { email, otp: code };
+      const res = await service(payload);
       const token = res?.accessToken || res?.token;
-      const user = res?.user || null;
+      const user = res?.user || res;
+      if (!token || !user) throw new Error('Invalid response from auth service');
 
-      if (token) {
-        // store via redux (authSlice will also set cookies) and ensure cookie fallback
-        dispatch(setToken(token));
-        cookies.set("auth_token", token, { path: "/", sameSite: "lax" });
-      }
-      if (user) {
-        dispatch(setUser(user));
-        cookies.set("user", JSON.stringify(user), { path: "/", sameSite: "lax" });
-      }
+      // Persist to redux and cookies
+      dispatch(setToken(token));
+      dispatch(setUser(user));
+      try {
+        cookies.set('auth_token', token, { path: '/' });
+        cookies.set('user', JSON.stringify(user), { path: '/' });
+      } catch (e) {}
 
-      // Ensure a first, empty profile instance is created for newly registered seekers.
-      // Do this non-blocking: log errors but don't prevent navigation.
-      if (accountType === "seeker") {
+      // If seeker, optionally create profile and navigate
+      if (accountType === 'seeker') {
         try {
-          // backend links profile to current authenticated user (token used by api interceptor)
-          // backend requires a region enum — provide default to satisfy validation
-          await createProfile({ address: { region: "Greater Accra" } });
-        } catch (err) {
-          console.error("Failed to create initial profile:", err);
+          await createProfile({ userId: user.id });
+        } catch (e) {
+          // ignore profile create errors in mock path
         }
-      }
-      // redirect based on accountType
-      if (accountType === "seeker") {
-        navigate("/youth/dashboard", { replace: true });
+        navigate('/youth/dashboard');
       } else {
-        navigate("/employer/dashboard", { replace: true });
+        navigate('/employer/dashboard');
       }
     } catch (err) {
       setError(err?.message || "Verification failed");

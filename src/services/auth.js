@@ -1,4 +1,11 @@
 import api from '../utils/apiInterceptor';
+// For the assessment we expose a simple feature flag to use a mock service.
+// Set to `true` to run the app with the mock implementations provided in
+// `src/services/auth.mock.js`. Interns should implement the real calls and
+// set this to false when done.
+const USE_MOCK_AUTH = true;
+// Use ES module import so the browser bundler (Vite) can handle it.
+import mockService from './auth.mock';
 
 function handleResponse(res) {
   return res?.data;
@@ -27,17 +34,29 @@ export const registerEmployer = (body) =>
 export const verifyAccount = (token, role, id) =>
   api.get(`/verify-account/${token}/${role}/${id}`).then(handleResponse).catch(handleError);
 
-export const loginSeeker = (body) =>
-  api.post('/seeker/login', body).then(handleResponse).catch(handleError);
+export const loginSeeker = (body) => {
+  if (USE_MOCK_AUTH && mockService) return mockService.mockLogin(body);
+  // Removed for assessment: implement login flow for seekers
+  return Promise.reject(new Error('loginSeeker removed for assessment - implement this API call'));
+};
 
-export const loginEmployer = (body) =>
-  api.post('/employer/login', body).then(handleResponse).catch(handleError);
+export const loginEmployer = (body) => {
+  if (USE_MOCK_AUTH && mockService) return mockService.mockLogin(body);
+  // Removed for assessment: implement login flow for employers
+  return Promise.reject(new Error('loginEmployer removed for assessment - implement this API call'));
+};
 
-export const verifyOtpSeeker = (body) =>
-  api.post('/verifyOtp/seeker', body).then(handleResponse).catch(handleError);
+export const verifyOtpSeeker = (body) => {
+  if (USE_MOCK_AUTH && mockService) return mockService.mockVerifyOtp(body);
+  // Removed for assessment: implement OTP verification for seekers
+  return Promise.reject(new Error('verifyOtpSeeker removed for assessment - implement this API call'));
+};
 
-export const verifyOtpEmployer = (body) =>
-  api.post('/verifyOtp/employer', body).then(handleResponse).catch(handleError);
+export const verifyOtpEmployer = (body) => {
+  if (USE_MOCK_AUTH && mockService) return mockService.mockVerifyOtp(body);
+  // Removed for assessment: implement OTP verification for employers
+  return Promise.reject(new Error('verifyOtpEmployer removed for assessment - implement this API call'));
+};
 
 export const logoutSeeker = (body) =>
   api.post('/seeker/logout', body).then(handleResponse).catch(handleError);

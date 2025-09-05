@@ -9,7 +9,12 @@ import { FaFacebookF, FaLinkedinIn } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { loginSeeker, loginEmployer } from '../services/auth';
 import { ErrorMessage } from '../components/error-componenets';
+import { useDispatch } from 'react-redux';
+import Cookies from 'universal-cookie';
+import { setUser, setToken } from '../redux/auth/authSlice';
 const Login = () => {
+  const dispatch = useDispatch();
+  const cookies = new Cookies();
   const [accountType, setAccountType] = useState('seeker'); // seeker | employer
   const [formData, setFormData] = useState({ email: '', password: '', remember: false });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,16 +38,27 @@ const Login = () => {
     setError('');
     setIsSubmitting(true);
     try {
-      const body = { email: formData.email, password: formData.password };
-      let res;
-      if (accountType === 'seeker') {
-        res = await loginSeeker(body);
-      } else {
-        res = await loginEmployer(body);
+      const service = accountType === 'seeker' ? loginSeeker : loginEmployer;
+      const payload = { email: formData.email, password: formData.password };
+      const res = await service(payload);
+      // Expect { accessToken, user }
+      const token = res?.accessToken || res?.token;
+      const user = res?.user || res;
+      if (!token || !user) throw new Error('Invalid response from auth service');
+
+      // Persist to redux and cookies (minimal implementation for assessment)
+      dispatch(setToken(token));
+      dispatch(setUser(user));
+      try {
+        cookies.set('auth_token', token, { path: '/' });
+        cookies.set('user', JSON.stringify(user), { path: '/' });
+      } catch (e) {
+        // ignore cookie errors in some environments
       }
-      // on success: navigate to appropriate dashboard (adjust routes as needed)
-      // you can also dispatch Redux actions here to store token/user
-      navigate('/otp-verification', {state: { accountType: accountType, email: formData.email } });
+
+      // Navigate to appropriate dashboard
+      const redirect = (user?.role || accountType) === 'seeker' || accountType === 'seeker' ? '/youth/dashboard' : '/employer/dashboard';
+      navigate(redirect);
     } catch (err) {
       setError(err?.message || 'Login failed');
     } finally {

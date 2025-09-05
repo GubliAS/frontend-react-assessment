@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import Cookies from 'universal-cookie';
 import Button from "./shared/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import NotificationCenter from "./notification/NotificationCenter";
 import LogoutButton from "./LogoutButton"; // Import the LogoutButton component
 import { mockNotifications } from "../utils/messagingState";
-import { selectUser } from "../redux/auth/authSlice";
+// auth selectors removed for assessment; read user directly from state where needed
 import { usePersonalInfo } from "../redux/personaInfo/usePersonalInfo";
 import { loadProfile } from "../redux/profile/profileActions";
 const languageOptions = ["English", "Twi", "Ga", "Ewe"];
@@ -34,8 +35,11 @@ const navigation = [
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
-  const isAuth = useSelector((state) => state?.auth?.isAuthenticated);
-  const user = useSelector(selectUser)
+  const cookies = new Cookies();
+  const isAuthFromState = useSelector((state) => state?.auth?.isAuthenticated);
+  const user = useSelector((state) => state?.auth?.user);
+  const token = cookies.get('auth_token');
+  const isAuth = Boolean(isAuthFromState || token);
   const dispatch = useDispatch();
   const { personalInfo } = usePersonalInfo();
   console.log("personalInfo in header:", personalInfo);

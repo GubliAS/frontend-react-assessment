@@ -13,6 +13,7 @@ export default function LogoutButton({ className, children }) {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  // auth slice shape removed for the assessment; read user safely
   const user = useSelector((state) => state?.auth?.user);
   const role = user?.role || "";
 
