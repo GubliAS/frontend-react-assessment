@@ -37,25 +37,30 @@ export const verifyAccount = (token, role, id) =>
 export const loginSeeker = (body) => {
   if (USE_MOCK_AUTH && mockService) return mockService.mockLogin(body);
   // Removed for assessment: implement login flow for seekers
-  return Promise.reject(new Error('loginSeeker removed for assessment - implement this API call'));
+  return api.post('/seeker/login', body).then(handleResponse).catch(handleError);
+  // return Promise.reject(new Error('loginSeeker removed for assessment - implement this API call'));
 };
 
 export const loginEmployer = (body) => {
   if (USE_MOCK_AUTH && mockService) return mockService.mockLogin(body);
   // Removed for assessment: implement login flow for employers
-  return Promise.reject(new Error('loginEmployer removed for assessment - implement this API call'));
+  return api.post('/employer/login', body).then(handleResponse).catch(handleError);
+  // return Promise.reject(new Error('loginEmployer removed for assessment - implement this API call'));
 };
 
 export const verifyOtpSeeker = (body) => {
   if (USE_MOCK_AUTH && mockService) return mockService.mockVerifyOtp(body);
   // Removed for assessment: implement OTP verification for seekers
-  return Promise.reject(new Error('verifyOtpSeeker removed for assessment - implement this API call'));
+  return api.post('/verifyOtp/seeker', body).then(handleResponse).catch(handleError);
+  // return Promise.reject(new Error('verifyOtpSeeker removed for assessment - implement this API call'));
 };
 
 export const verifyOtpEmployer = (body) => {
   if (USE_MOCK_AUTH && mockService) return mockService.mockVerifyOtp(body);
   // Removed for assessment: implement OTP verification for employers
-  return Promise.reject(new Error('verifyOtpEmployer removed for assessment - implement this API call'));
+  return api.post('/verifyOtp/employer', body).then(handleResponse).catch(handleError);
+
+  // return Promise.reject(new Error('verifyOtpEmployer removed for assessment - implement this API call'));
 };
 
 export const logoutSeeker = (body) =>

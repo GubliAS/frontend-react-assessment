@@ -41,7 +41,12 @@ const Login = () => {
       const service = accountType === 'seeker' ? loginSeeker : loginEmployer;
       const payload = { email: formData.email, password: formData.password };
       const res = await service(payload);
+      // console.log(res)
       // Expect { accessToken, user }
+      if(res.message === 'OTP sent to your email. Please verify to complete login.' || res?.message?.toLowerCase()?.includes('otp') || res.accessToken === 'mock-token-abc123')  {
+        navigate('/otp-verification', { state: { email: formData.email, accountType } });
+        return;
+      }
       const token = res?.accessToken || res?.token;
       const user = res?.user || res;
       if (!token || !user) throw new Error('Invalid response from auth service');
